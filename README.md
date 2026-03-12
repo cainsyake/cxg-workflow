@@ -8,8 +8,11 @@ English | [简体中文](./README.zh-CN.md)
 
 CXG is a Codex-first workflow package for Codex CLI. It installs a structured set of slash commands, skills, role prompts, and a `codeagent-wrapper` binary so Codex can handle research, planning, execution, optimization, and review in a consistent single-model workflow.
 
+> Note: CXG is a Codex-only simplified derivative of [`ccg-workflow`](https://github.com/fengshao1227/ccg-workflow). It keeps the structured workflow and wrapper-based orchestration ideas from the original project, while narrowing the scope to a leaner single-model experience built around Codex.
+
 ## Why CXG?
 
+- **Derived from `ccg-workflow`**: preserves the original workflow philosophy while simplifying it into a Codex-only package.
 - **Single-model by design**: no routing between different models, only Codex orchestration plus Codex subprocess roles.
 - **Structured delivery**: the main workflow follows `research -> plan -> execute -> optimize -> review`.
 - **Reusable expert roles**: built-in `analyzer`, `architect`, and `reviewer` role prompts drive subprocess work.

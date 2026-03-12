@@ -8,8 +8,11 @@
 
 CXG 是一个面向 Codex CLI 的单模型工作流包。它会安装一组结构化 Slash Commands、Skills、角色提示词和 `codeagent-wrapper` 二进制，使 Codex 能以统一方式完成研究、规划、执行、优化和评审。
 
+> 说明：CXG 基于 [`ccg-workflow`](https://github.com/fengshao1227/ccg-workflow) 项目衍生而来，可视为面向 Codex 的单模型简化版。它保留了原项目的结构化工作流与 wrapper 编排思路，但将范围收敛为更精简的 Codex-only 使用体验。
+
 ## 为什么选择 CXG？
 
+- **基于 `ccg-workflow` 衍生**：延续原项目的工作流设计思路，同时简化为仅面向 Codex 的轻量版本。
 - **单模型协作**：不做多模型路由，只使用 Codex 主会话加 Codex 子进程角色分工。
 - **结构化交付**：主工作流固定为 `研究 -> 计划 -> 执行 -> 优化 -> 评审`。
 - **内置专家角色**：提供 `analyzer`、`architect`、`reviewer` 三类角色提示词。
