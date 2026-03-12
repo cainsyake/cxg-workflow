@@ -215,6 +215,31 @@ CXG stores its own state in `~/.codex/.cxg/config.toml`, including:
 - Linux `arm64` / `amd64`
 - Windows `arm64` / `amd64`
 
+## GitHub CI/CD
+
+CXG can use GitHub Actions for both CI and npm release automation:
+
+- `CI`: runs on every push and pull request to `main`, executing `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` on Node.js 20 and 22.
+- `Publish to npm`: runs when a Git tag matching `v*.*.*` is pushed. The workflow verifies that the tag matches `package.json`, reruns validation, and publishes to npm with provenance enabled.
+
+Required repository secret:
+
+- `NPM_TOKEN`: npm automation token with publish access to the `cxg-workflow` package
+
+Recommended release flow:
+
+```bash
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+git commit -am "chore: release v0.1.1"
+git tag v0.1.1
+git push origin main --tags
+```
+
+`codeagent-wrapper` is still downloaded from the shared GitHub Release maintained by `fengshao1227/ccg-workflow` under the `preset` tag. CXG's GitHub workflow added here covers the npm package itself, not binary compilation.
+
 ## FAQ
 
 ### The slash commands do not appear in Codex CLI

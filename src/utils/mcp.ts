@@ -40,8 +40,12 @@ export async function installAceTool(config: AceToolConfig): Promise<{ success: 
     }
 
     const args = ['-y', 'ace-tool@latest']
-    if (config.baseUrl) args.push('--base-url', config.baseUrl)
-    if (config.token) args.push('--token', config.token)
+    if (config.baseUrl) {
+      args.push('--base-url', config.baseUrl)
+    }
+    if (config.token) {
+      args.push('--token', config.token)
+    }
 
     codexConfig.mcp_servers['ace-tool'] = {
       type: 'stdio',

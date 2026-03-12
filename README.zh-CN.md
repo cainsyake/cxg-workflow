@@ -215,6 +215,31 @@ CXG 自身状态保存在 `~/.codex/.cxg/config.toml`，包含：
 - Linux `arm64` / `amd64`
 - Windows `arm64` / `amd64`
 
+## GitHub CI/CD
+
+CXG 可以通过 GitHub Actions 完成 CI 和 npm 自动发布：
+
+- `CI`：在每次向 `main` 分支 push 或发起 PR 时运行，执行 `pnpm lint`、`pnpm typecheck`、`pnpm test`、`pnpm build`，并覆盖 Node.js 20、22。
+- `Publish to npm`：在推送匹配 `v*.*.*` 的 Git tag 时触发。工作流会先校验 tag 与 `package.json` 版本一致，再重新执行校验并发布到 npm，同时开启 provenance。
+
+需要配置的仓库 Secret：
+
+- `NPM_TOKEN`：具备 `cxg-workflow` 发布权限的 npm automation token
+
+推荐发版流程：
+
+```bash
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+git commit -am "chore: release v0.1.1"
+git tag v0.1.1
+git push origin main --tags
+```
+
+当前 `codeagent-wrapper` 仍然从 `fengshao1227/ccg-workflow` 仓库的 GitHub Release `preset` tag 下载。这里新增的 GitHub 工作流只负责 `cxg-workflow` npm 包本身，不负责编译二进制。
+
 ## 常见问题
 
 ### Codex CLI 里看不到 Slash Commands

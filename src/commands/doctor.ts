@@ -119,7 +119,9 @@ export async function doctor(): Promise<void> {
     const icon = r.ok ? '✓' : '✗'
     const detail = r.detail ? ` — ${r.detail}` : ''
     console.log(`  ${icon} ${r.label}${detail}`)
-    if (!r.ok) allOk = false
+    if (!r.ok) {
+      allOk = false
+    }
   }
 
   console.log()

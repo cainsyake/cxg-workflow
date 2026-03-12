@@ -27,9 +27,13 @@ export async function uninstall(): Promise<void> {
   // 2. Remove MCP servers
   const mcpErrors: string[] = []
   const aceResult = await uninstallMcpServer('ace-tool')
-  if (!aceResult.success) mcpErrors.push(aceResult.message)
+  if (!aceResult.success) {
+    mcpErrors.push(aceResult.message)
+  }
   const cwResult = await uninstallMcpServer('contextweaver')
-  if (!cwResult.success) mcpErrors.push(cwResult.message)
+  if (!cwResult.success) {
+    mcpErrors.push(cwResult.message)
+  }
 
   if (mcpErrors.length > 0) {
     console.log('  ⚠ MCP 清理部分失败:')
