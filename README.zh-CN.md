@@ -223,7 +223,7 @@ CXG 自身状态保存在 `~/.codex/.cxg/config.toml`，包含：
 CXG 可以通过 GitHub Actions 完成 CI 和 npm 自动发布：
 
 - `CI`：在每次向 `main` 分支 push 或发起 PR 时运行，执行 `pnpm lint`、`pnpm typecheck`、`pnpm test`、`pnpm build`，并覆盖 Node.js 20、22。
-- `Publish to npm`：在推送匹配 `v*.*.*` 的 Git tag 时触发。工作流会先校验 tag 与 `package.json` 版本一致，再重新执行校验并发布到 npm，同时开启 provenance。
+- `Publish to npm`：在推送匹配 `v*.*.*` 的 Git tag 时触发。工作流会先校验 tag 与 `package.json` 版本一致，再重新执行校验，并以 `public` 访问级别发布到 npm，同时开启 provenance。
 
 需要配置的仓库 Secret：
 

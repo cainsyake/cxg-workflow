@@ -223,7 +223,7 @@ CXG stores its own state in `~/.codex/.cxg/config.toml`, including:
 CXG can use GitHub Actions for both CI and npm release automation:
 
 - `CI`: runs on every push and pull request to `main`, executing `pnpm lint`, `pnpm typecheck`, `pnpm test`, and `pnpm build` on Node.js 20 and 22.
-- `Publish to npm`: runs when a Git tag matching `v*.*.*` is pushed. The workflow verifies that the tag matches `package.json`, reruns validation, and publishes to npm with provenance enabled.
+- `Publish to npm`: runs when a Git tag matching `v*.*.*` is pushed. The workflow verifies that the tag matches `package.json`, reruns validation, and publishes the package to npm as `public` with provenance enabled.
 
 Required repository secret:
 

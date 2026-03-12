@@ -1,6 +1,6 @@
 {
   "name": "cxg-workflow",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Codex CLI single-model workflow system - structured development workflow powered by Codex",
   "type": "module",
   "packageManager": "pnpm@10.17.1",
@@ -21,6 +21,9 @@
   "main": "dist/index.mjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.mts",
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "bin/cxg.mjs",
     "dist",
