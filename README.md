@@ -56,13 +56,15 @@ npx cxg-workflow init
 Useful variants:
 
 ```bash
+npx cxg-workflow init
+
 # overwrite existing CXG files
 npx cxg-workflow init --force
 
 # install without WebUI-related wrapper behavior
 npx cxg-workflow init --lite
 
-# configure ace-tool in ~/.codex/config.toml
+# explicitly select ace-tool (default behavior)
 npx cxg-workflow init --mcp ace-tool
 
 # skip MCP and use filesystem search fallback
@@ -195,7 +197,8 @@ CXG stores its own state in `~/.codex/.cxg/config.toml`, including:
 
 **`ace-tool`**
 
-- Install with `npx cxg-workflow init --mcp ace-tool`
+- Default with `npx cxg-workflow init`
+- Also available via `npx cxg-workflow init --mcp ace-tool`
 - CXG writes the MCP server entry into `~/.codex/config.toml`
 - Prompt templates use `mcp__ace-tool__search_context`
 
@@ -207,7 +210,7 @@ CXG stores its own state in `~/.codex/.cxg/config.toml`, including:
 
 **`skip`**
 
-- Default behavior
+- Use `npx cxg-workflow init --skip-mcp`
 - Prompt templates fall back to filesystem search via `Glob + Grep`
 
 ## Supported Platforms

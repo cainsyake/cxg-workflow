@@ -5,6 +5,7 @@ import { version } from '../package.json'
 import { init } from './commands/init'
 import { uninstall } from './commands/uninstall'
 import { doctor } from './commands/doctor'
+import { DEFAULT_MCP_PROVIDER } from './utils/constants'
 
 const VALID_MCP_PROVIDERS: McpProvider[] = ['skip', 'ace-tool', 'contextweaver']
 
@@ -22,10 +23,10 @@ export function setupCommands(cli: CAC): void {
     .alias('i')
     .option('--force, -f', '强制覆盖已有文件')
     .option('--lite', '精简模式（禁用 WebUI）')
-    .option('--mcp <provider>', 'MCP 代码检索提供者 (ace-tool|contextweaver|skip)', { default: 'skip' })
+    .option('--mcp <provider>', 'MCP 代码检索提供者 (ace-tool|contextweaver|skip)', { default: DEFAULT_MCP_PROVIDER })
     .option('--skip-mcp', '跳过 MCP 配置')
     .action(async (options: CliOptions) => {
-      const provider = options.skipMcp ? 'skip' : (options.mcp || 'skip')
+      const provider = options.skipMcp ? 'skip' : (options.mcp || DEFAULT_MCP_PROVIDER)
       if (!VALID_MCP_PROVIDERS.includes(provider as McpProvider)) {
         console.error(`  ✗ 无效的 MCP provider: ${provider}`)
         console.error(`    有效值: ${VALID_MCP_PROVIDERS.join(', ')}`)

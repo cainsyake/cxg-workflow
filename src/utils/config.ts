@@ -5,6 +5,7 @@ import { join } from 'pathe'
 import { parse, stringify } from 'smol-toml'
 import { version as packageVersion } from '../../package.json'
 import { isWindows } from './platform'
+import { DEFAULT_MCP_PROVIDER } from './constants'
 
 const CODEX_HOME = join(homedir(), '.codex')
 const CXG_DIR = join(CODEX_HOME, '.cxg')
@@ -69,7 +70,7 @@ export function createDefaultConfig(options?: {
       installed: [],
     },
     mcp: {
-      provider: options?.mcpProvider || 'skip',
+      provider: options?.mcpProvider || DEFAULT_MCP_PROVIDER,
     },
   }
 }

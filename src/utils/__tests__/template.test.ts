@@ -56,10 +56,10 @@ describe('injectTemplateVariables — mcpProvider=ace-tool', () => {
     expect(result).toBe('query')
   })
 
-  it('defaults to skip (Glob + Grep) when mcpProvider is not specified', () => {
+  it('defaults to ace-tool when mcpProvider is not specified', () => {
     const input = '{{MCP_SEARCH_TOOL}}'
     const result = injectTemplateVariables(input, {})
-    expect(result).toBe('Glob + Grep')
+    expect(result).toBe('mcp__ace-tool__search_context')
   })
 })
 

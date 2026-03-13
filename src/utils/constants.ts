@@ -1,4 +1,6 @@
-import type { WorkflowConfig } from '../types'
+import type { McpProvider, WorkflowConfig } from '../types'
+
+export const DEFAULT_MCP_PROVIDER: McpProvider = 'ace-tool'
 
 export const ALL_COMMANDS = [
   'cxg-workflow',

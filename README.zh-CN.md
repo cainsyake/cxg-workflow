@@ -56,13 +56,15 @@ npx cxg-workflow init
 常用变体：
 
 ```bash
+npx cxg-workflow init
+
 # 强制覆盖已有 CXG 文件
 npx cxg-workflow init --force
 
 # 精简模式安装
 npx cxg-workflow init --lite
 
-# 在 ~/.codex/config.toml 中配置 ace-tool
+# 显式指定 ace-tool（默认行为）
 npx cxg-workflow init --mcp ace-tool
 
 # 跳过 MCP，使用文件系统检索兜底
@@ -195,7 +197,8 @@ CXG 自身状态保存在 `~/.codex/.cxg/config.toml`，包含：
 
 **`ace-tool`**
 
-- 使用 `npx cxg-workflow init --mcp ace-tool`
+- 默认使用 `npx cxg-workflow init`
+- 也可显式指定 `npx cxg-workflow init --mcp ace-tool`
 - CXG 会把 MCP 服务写入 `~/.codex/config.toml`
 - 命令模板内部调用 `mcp__ace-tool__search_context`
 
@@ -207,7 +210,7 @@ CXG 自身状态保存在 `~/.codex/.cxg/config.toml`，包含：
 
 **`skip`**
 
-- 默认模式
+- 使用 `npx cxg-workflow init --skip-mcp`
 - 命令模板自动退回 `Glob + Grep` 文件系统检索
 
 ## 支持平台

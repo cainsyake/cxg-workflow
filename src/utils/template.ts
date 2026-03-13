@@ -1,6 +1,7 @@
 import type { McpProvider } from '../types'
 import { homedir } from 'node:os'
 import { join } from 'pathe'
+import { DEFAULT_MCP_PROVIDER } from './constants'
 import { isWindows, normalizePath } from './platform'
 
 /**
@@ -25,7 +26,7 @@ export function injectTemplateVariables(content: string, config: {
   processed = processed.replace(/\{\{LITE_MODE_FLAG\}\}/g, liteModeFlag)
 
   // MCP tool injection
-  const mcpProvider = config.mcpProvider || 'skip'
+  const mcpProvider = config.mcpProvider || DEFAULT_MCP_PROVIDER
   if (mcpProvider === 'skip') {
     processed = processed.replace(/\{\{MCP_SEARCH_TOOL\}\}/g, 'Glob + Grep')
     processed = processed.replace(/\{\{MCP_SEARCH_PARAM\}\}/g, '')

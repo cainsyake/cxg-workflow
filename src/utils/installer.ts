@@ -3,7 +3,7 @@ import fs from 'fs-extra'
 import { homedir } from 'node:os'
 import { dirname, join } from 'pathe'
 import { fileURLToPath } from 'node:url'
-import { ALL_COMMANDS, WORKFLOW_CONFIGS } from './constants'
+import { ALL_COMMANDS, DEFAULT_MCP_PROVIDER, WORKFLOW_CONFIGS } from './constants'
 import { downloadBinary, resolveBinaryName, verifyBinary } from './binary'
 import { isWindows } from './platform'
 import { injectTemplateVariables, replaceHomePathsInTemplate } from './template'
@@ -47,7 +47,7 @@ export async function installCxg(options: {
   liteMode?: boolean
   mcpProvider?: McpProvider
 } = {}): Promise<InstallResult> {
-  const { force = false, liteMode = false, mcpProvider = 'skip' } = options
+  const { force = false, liteMode = false, mcpProvider = DEFAULT_MCP_PROVIDER } = options
   const codexHome = join(homedir(), '.codex')
   const promptsDir = join(codexHome, 'prompts')
   const skillsDir = join(codexHome, 'skills', 'cxg')

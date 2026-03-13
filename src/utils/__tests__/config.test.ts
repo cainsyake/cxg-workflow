@@ -36,9 +36,9 @@ describe('createDefaultConfig', () => {
     expect(config.paths.wrapper).toContain('codeagent-wrapper')
   })
 
-  it('defaults mcp provider to skip when not specified', () => {
+  it('defaults mcp provider to ace-tool when not specified', () => {
     const config = createDefaultConfig()
-    expect(config.mcp?.provider).toBe('skip')
+    expect(config.mcp?.provider).toBe('ace-tool')
   })
 
   it('respects custom mcpProvider', () => {
