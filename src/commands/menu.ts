@@ -12,7 +12,7 @@ import { readCxgConfig } from '../utils/config'
 // ═══════════════════════════════════════════════════════
 
 function visWidth(s: string): number {
-  const stripped = s.replace(/\x1B\[[0-9;]*m/g, '')
+  const stripped = ansis.strip(s)
   let w = 0
   for (const ch of stripped) {
     const code = ch.codePointAt(0) || 0

@@ -149,8 +149,12 @@ graph TD
         codexConfig.mcp_servers = {}
       }
       const args = ['ace-tool-rs']
-      if (config.baseUrl) args.push('--base-url', config.baseUrl)
-      if (config.token) args.push('--token', config.token)
+      if (config.baseUrl) {
+        args.push('--base-url', config.baseUrl)
+      }
+      if (config.token) {
+        args.push('--token', config.token)
+      }
       codexConfig.mcp_servers['ace-tool'] = {
         type: 'stdio',
         command: 'npx',

@@ -28,8 +28,9 @@ export async function configMcp(): Promise<void> {
     ],
   }])
 
-  if (action === 'cancel')
+  if (action === 'cancel') {
     return
+  }
 
   if (action === 'code-retrieval') {
     await handleCodeRetrieval()
@@ -65,8 +66,9 @@ async function handleCodeRetrieval(): Promise<void> {
     ],
   }])
 
-  if (tool === 'cancel')
+  if (tool === 'cancel') {
     return
+  }
 
   if (tool === 'contextweaver') {
     await handleInstallContextWeaver()
@@ -178,10 +180,18 @@ async function handleGrokSearch(): Promise<void> {
   ])
 
   const env: Record<string, string> = {}
-  if (answers.grokApiUrl?.trim()) env.GROK_API_URL = answers.grokApiUrl.trim()
-  if (answers.grokApiKey?.trim()) env.GROK_API_KEY = answers.grokApiKey.trim()
-  if (answers.tavilyKey?.trim()) env.TAVILY_API_KEY = answers.tavilyKey.trim()
-  if (answers.firecrawlKey?.trim()) env.FIRECRAWL_API_KEY = answers.firecrawlKey.trim()
+  if (answers.grokApiUrl?.trim()) {
+    env.GROK_API_URL = answers.grokApiUrl.trim()
+  }
+  if (answers.grokApiKey?.trim()) {
+    env.GROK_API_KEY = answers.grokApiKey.trim()
+  }
+  if (answers.tavilyKey?.trim()) {
+    env.TAVILY_API_KEY = answers.tavilyKey.trim()
+  }
+  if (answers.firecrawlKey?.trim()) {
+    env.FIRECRAWL_API_KEY = answers.firecrawlKey.trim()
+  }
 
   if (Object.keys(env).length === 0) {
     console.log(ansis.yellow('  未填写任何 Key，已跳过'))
@@ -243,7 +253,7 @@ async function handleAuxiliary(): Promise<void> {
 
   for (const id of selected) {
     const mcp = AUXILIARY_MCPS.find(m => m.id === id)!
-    let env: Record<string, string> = {}
+    const env: Record<string, string> = {}
 
     if (mcp.requiresApiKey) {
       console.log(ansis.cyan(`📖 获取 ${mcp.name} API Key：`))
