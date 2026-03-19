@@ -50,8 +50,10 @@
     "lint:fix": "eslint --fix"
   },
   "dependencies": {
+    "ansis": "^4.1.0",
     "cac": "^6.7.14",
     "fs-extra": "^11.3.2",
+    "inquirer": "^12.9.6",
     "pathe": "^2.0.3",
     "smol-toml": "^1.4.2"
   },

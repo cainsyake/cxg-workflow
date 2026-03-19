@@ -105,6 +105,67 @@ RERANK_TOP_N=20
 }
 
 /**
+ * Install ace-tool-rs MCP server to Codex config.toml
+ */
+export async function installAceToolRs(config: AceToolConfig): Promise<{ success: boolean, message: string }> {
+  try {
+    const codexConfig = await readCodexConfig()
+    if (!codexConfig.mcp_servers) {
+      codexConfig.mcp_servers = {}
+    }
+
+    const args = ['-y', 'ace-tool-rs@latest']
+    if (config.baseUrl) {
+      args.push('--base-url', config.baseUrl)
+    }
+    if (config.token) {
+      args.push('--token', config.token)
+    }
+
+    codexConfig.mcp_servers['ace-tool'] = {
+      type: 'stdio',
+      command: 'npx',
+      args,
+    }
+
+    await writeCodexConfig(codexConfig)
+    return { success: true, message: 'ace-tool-rs MCP configured in ~/.codex/config.toml' }
+  }
+  catch (error) {
+    return { success: false, message: `Failed to configure ace-tool-rs: ${error}` }
+  }
+}
+
+/**
+ * Install a generic MCP server to Codex config.toml
+ */
+export async function installMcpServer(
+  id: string,
+  command: string,
+  args: string[],
+  env: Record<string, string> = {},
+): Promise<{ success: boolean, message: string }> {
+  try {
+    const codexConfig = await readCodexConfig()
+    if (!codexConfig.mcp_servers) {
+      codexConfig.mcp_servers = {}
+    }
+
+    const entry: Record<string, any> = { type: 'stdio', command, args }
+    if (Object.keys(env).length > 0) {
+      entry.env = env
+    }
+
+    codexConfig.mcp_servers[id] = entry
+    await writeCodexConfig(codexConfig)
+    return { success: true, message: `${id} MCP configured in ~/.codex/config.toml` }
+  }
+  catch (error) {
+    return { success: false, message: `Failed to install ${id}: ${error}` }
+  }
+}
+
+/**
  * Uninstall an MCP server from Codex config.toml
  */
 export async function uninstallMcpServer(id: string): Promise<{ success: boolean, message: string }> {

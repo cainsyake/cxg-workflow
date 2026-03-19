@@ -5,16 +5,26 @@ import { version } from '../package.json'
 import { init } from './commands/init'
 import { uninstall } from './commands/uninstall'
 import { doctor } from './commands/doctor'
+import { showMainMenu } from './commands/menu'
+import { configMcp } from './commands/config-mcp'
 import { DEFAULT_MCP_PROVIDER } from './utils/constants'
 
 const VALID_MCP_PROVIDERS: McpProvider[] = ['skip', 'ace-tool', 'contextweaver']
 
 export function setupCommands(cli: CAC): void {
-  // Default command - show help
+  // Default command - show menu
   cli
     .command('', 'CXG Workflow - Codex 单模型协作工作流')
-    .action(() => {
-      cli.outputHelp()
+    .action(async () => {
+      await showMainMenu()
+    })
+
+  // Menu command (explicit)
+  cli
+    .command('menu', 'CXG 交互式菜单')
+    .alias('m')
+    .action(async () => {
+      await showMainMenu()
     })
 
   // Init command
@@ -38,6 +48,13 @@ export function setupCommands(cli: CAC): void {
         liteMode: options.lite,
         mcpProvider: provider as McpProvider,
       })
+    })
+
+  // Config MCP command
+  cli
+    .command('config-mcp', '配置 MCP 工具')
+    .action(async () => {
+      await configMcp()
     })
 
   // Uninstall command

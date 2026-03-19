@@ -61,3 +61,13 @@ export interface AceToolConfig {
 export interface ContextWeaverConfig {
   siliconflowApiKey: string
 }
+
+export interface AuxiliaryMcpDef {
+  id: string
+  name: string
+  desc: string
+  command: string
+  args: string[]
+  requiresApiKey?: boolean
+  apiKeyEnv?: string
+}
