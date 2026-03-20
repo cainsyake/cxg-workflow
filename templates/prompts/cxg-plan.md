@@ -73,7 +73,7 @@ EOF",
 
 `[模式：规划]`
 
-**调用子进程**（architect 角色，`resume $SESSION`）：
+**调用子进程**（architect 角色，`resume <<SESSION_ID>>`）：
 
 - 基于用户选定方案，生成详细实施计划
 - 包含：文件变更清单、架构设计、步骤分解、风险缓解

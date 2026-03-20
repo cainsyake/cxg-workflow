@@ -116,7 +116,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 `[模式：计划]` - 协作规划：
 
 **调用子进程**（复用会话 `resume <SESSION_ID>`）：
-- 使用规划提示词 + `resume $SESSION`，输出技术架构和实施计划
+- 使用规划提示词 + `resume <<SESSION_ID>>`，输出技术架构和实施计划
 
 综合规划结果，用户批准后存入 `.codex/plan/任务名.md`
 
