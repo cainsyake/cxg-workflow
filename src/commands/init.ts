@@ -11,7 +11,7 @@ export async function init(options: InitOptions = {}): Promise<void> {
   console.log(`  Codex 单模型协作工作流`)
   console.log()
 
-  const { force = false, liteMode = false, mcpProvider = DEFAULT_MCP_PROVIDER } = options
+  const { force = false, liteMode = true, mcpProvider = DEFAULT_MCP_PROVIDER } = options
 
   // 1. Install prompts + skills + roles + binary
   console.log('  [1/3] 安装工作流组件...')

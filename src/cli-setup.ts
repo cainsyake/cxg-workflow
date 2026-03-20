@@ -32,7 +32,7 @@ export function setupCommands(cli: CAC): void {
     .command('init', '安装 CXG 工作流到 ~/.codex/')
     .alias('i')
     .option('--force, -f', '强制覆盖已有文件')
-    .option('--lite', '精简模式（禁用 WebUI）')
+    .option('--lite', '精简模式（默认开启，禁用 WebUI；可用 --no-lite 关闭）', { default: true })
     .option('--mcp <provider>', 'MCP 代码检索提供者 (ace-tool|contextweaver|skip)', { default: DEFAULT_MCP_PROVIDER })
     .option('--skip-mcp', '跳过 MCP 配置')
     .action(async (options: CliOptions) => {

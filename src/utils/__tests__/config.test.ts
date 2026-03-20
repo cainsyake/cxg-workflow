@@ -18,14 +18,14 @@ describe('createDefaultConfig', () => {
     expect(config.runtime.backend).toBe('codex')
   })
 
-  it('defaults lite_mode to false', () => {
+  it('defaults lite_mode to true', () => {
     const config = createDefaultConfig()
-    expect(config.runtime.lite_mode).toBe(false)
+    expect(config.runtime.lite_mode).toBe(true)
   })
 
-  it('respects liteMode = true', () => {
-    const config = createDefaultConfig({ liteMode: true })
-    expect(config.runtime.lite_mode).toBe(true)
+  it('respects liteMode = false', () => {
+    const config = createDefaultConfig({ liteMode: false })
+    expect(config.runtime.lite_mode).toBe(false)
   })
 
   it('sets paths with .codex directory', () => {

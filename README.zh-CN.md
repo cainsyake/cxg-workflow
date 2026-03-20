@@ -56,13 +56,17 @@ npx cxg-workflow init
 常用变体：
 
 ```bash
-npx cxg-workflow init
-
 # 强制覆盖已有 CXG 文件
 npx cxg-workflow init --force
 
-# 精简模式安装
-npx cxg-workflow init --lite
+# 默认精简模式安装（禁用 WebUI）
+npx cxg-workflow init
+
+# 关闭精简模式（启用 WebUI 相关行为）
+npx cxg-workflow init --no-lite
+
+# 在菜单中交互切换 Lite 模式（选项 5）
+npx cxg-workflow menu
 
 # 显式指定 ace-tool（默认行为）
 npx cxg-workflow init --mcp ace-tool
@@ -191,7 +195,7 @@ CXG 自身状态保存在 `~/.codex/.cxg/config.toml`，包含：
 - wrapper 路径
 - 角色提示词路径
 - 当前 MCP provider
-- 是否启用 `--lite`
+- 是否启用 lite 模式（默认 `true`）
 
 ### MCP 配置
 

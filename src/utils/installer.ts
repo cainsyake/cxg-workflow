@@ -46,8 +46,9 @@ export async function installCxg(options: {
   force?: boolean
   liteMode?: boolean
   mcpProvider?: McpProvider
+  skipBinary?: boolean
 } = {}): Promise<InstallResult> {
-  const { force = false, liteMode = false, mcpProvider = DEFAULT_MCP_PROVIDER } = options
+  const { force = false, liteMode = true, mcpProvider = DEFAULT_MCP_PROVIDER, skipBinary = false } = options
   const codexHome = join(homedir(), '.codex')
   const promptsDir = join(codexHome, 'prompts')
   const skillsDir = join(codexHome, 'skills', 'cxg')
@@ -172,30 +173,32 @@ export async function installCxg(options: {
   }
 
   // 4. Install codeagent-wrapper binary
-  try {
-    const binaryName = resolveBinaryName()
-    const destBinary = join(binDir, isWindows() ? 'codeagent-wrapper.exe' : 'codeagent-wrapper')
+  if (!skipBinary) {
+    try {
+      const binaryName = resolveBinaryName()
+      const destBinary = join(binDir, isWindows() ? 'codeagent-wrapper.exe' : 'codeagent-wrapper')
 
-    const installed = await downloadBinary(binaryName, destBinary)
-    if (installed) {
-      const verified = await verifyBinary(destBinary)
-      if (verified) {
-        result.binInstalled = true
-        result.binPath = binDir
+      const installed = await downloadBinary(binaryName, destBinary)
+      if (installed) {
+        const verified = await verifyBinary(destBinary)
+        if (verified) {
+          result.binInstalled = true
+          result.binPath = binDir
+        }
+        else {
+          result.errors.push('Binary verification failed')
+          result.success = false
+        }
       }
       else {
-        result.errors.push('Binary verification failed')
+        result.errors.push(`Failed to download binary: ${binaryName}`)
         result.success = false
       }
     }
-    else {
-      result.errors.push(`Failed to download binary: ${binaryName}`)
+    catch (error) {
+      result.errors.push(`Failed to install codeagent-wrapper: ${error}`)
       result.success = false
     }
-  }
-  catch (error) {
-    result.errors.push(`Failed to install codeagent-wrapper: ${error}`)
-    result.success = false
   }
 
   return result

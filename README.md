@@ -56,13 +56,17 @@ npx cxg-workflow init
 Useful variants:
 
 ```bash
-npx cxg-workflow init
-
 # overwrite existing CXG files
 npx cxg-workflow init --force
 
-# install without WebUI-related wrapper behavior
-npx cxg-workflow init --lite
+# lite mode is now the default (WebUI disabled)
+npx cxg-workflow init
+
+# disable lite mode (allow WebUI-related behavior)
+npx cxg-workflow init --no-lite
+
+# switch Lite mode interactively in menu (Option 5)
+npx cxg-workflow menu
 
 # explicitly select ace-tool (default behavior)
 npx cxg-workflow init --mcp ace-tool
@@ -191,7 +195,7 @@ CXG stores its own state in `~/.codex/.cxg/config.toml`, including:
 - wrapper path
 - role prompt paths
 - selected MCP provider
-- whether `--lite` mode was used
+- whether lite mode is enabled (defaults to `true`)
 
 ### MCP Options
 

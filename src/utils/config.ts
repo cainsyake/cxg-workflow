@@ -58,7 +58,7 @@ export function createDefaultConfig(options?: {
     },
     runtime: {
       backend: 'codex',
-      lite_mode: options?.liteMode || false,
+      lite_mode: options?.liteMode ?? true,
     },
     paths: {
       prompts: join(CODEX_HOME, 'prompts'),
