@@ -81,7 +81,7 @@ export async function showMainMenu(): Promise<void> {
         item('2', '配置 MCP', 'MCP 工具配置'),
         item('3', '诊断安装', '检查安装完整性'),
         item('4', '卸载', '移除 CXG 配置'),
-        item('5', '切换 Lite 模式', '切换子进程 --lite 开关并重渲染模板'),
+        item('5', '设置 Lite 模式', '选择子进程 --lite 开关并重渲染模板'),
         new inquirer.Separator(ansis.gray('─'.repeat(42))),
         { name: `  ${ansis.red('Q.')} 退出`, value: 'Q' },
       ],
@@ -128,24 +128,45 @@ async function toggleLiteMode(config: CxgConfig | null): Promise<void> {
   }
 
   const current = config.runtime?.lite_mode ?? true
-  const next = !current
   const provider = config.mcp?.provider || DEFAULT_MCP_PROVIDER
 
   console.log()
-  console.log(ansis.cyan.bold('  Lite 模式切换'))
+  console.log(ansis.cyan.bold('  Lite 模式设置'))
   console.log(ansis.gray(`  当前: ${current ? '开启' : '关闭'}`))
-  console.log(ansis.gray(`  目标: ${next ? '开启' : '关闭'}`))
   console.log()
+
+  const { target } = await inquirer.prompt([{
+    type: 'list',
+    name: 'target',
+    message: '请选择 Lite 模式目标状态',
+    choices: [
+      { name: `开启${current ? '（当前）' : ''}`, value: 'on' },
+      { name: `关闭${!current ? '（当前）' : ''}`, value: 'off' },
+      { name: '取消', value: 'cancel' },
+    ],
+    default: current ? 0 : 1,
+  }])
+
+  if (target === 'cancel') {
+    console.log(ansis.gray('  已取消设置'))
+    return
+  }
+
+  const next = target === 'on'
+  if (next === current) {
+    console.log(ansis.gray(`  Lite 模式已是${current ? '开启' : '关闭'}状态，无需变更`))
+    return
+  }
 
   const { confirmed } = await inquirer.prompt([{
     type: 'confirm',
     name: 'confirmed',
-    message: `确认切换为 ${next ? '开启' : '关闭'} Lite 模式并立即生效？`,
+    message: `确认设置为 ${next ? '开启' : '关闭'} Lite 模式并立即生效？`,
     default: true,
   }])
 
   if (!confirmed) {
-    console.log(ansis.gray('  已取消切换'))
+    console.log(ansis.gray('  已取消设置'))
     return
   }
 
