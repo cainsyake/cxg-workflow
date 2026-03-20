@@ -1,0 +1,4 @@
+interface:
+  display_name: "Release Version"
+  short_description: "Bump version, commit, tag, and push release."
+  default_prompt: "Release a new version by bumping package.json, creating a release commit and tag, then pushing both."
