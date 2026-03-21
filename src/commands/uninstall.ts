@@ -8,14 +8,14 @@ export async function uninstall(): Promise<void> {
   console.log('  卸载 CXG Workflow...')
   console.log()
 
-  // 1. Remove prompts, skills, roles, binary
+  // 1. Remove skills, roles, binary, and legacy prompts
   const result = await uninstallCxg()
 
-  if (result.removedPrompts.length > 0) {
-    console.log(`  ✓ 已移除 ${result.removedPrompts.length} 个 Custom Prompts`)
-  }
   if (result.removedSkills.length > 0) {
     console.log(`  ✓ 已移除 ${result.removedSkills.length} 个 Skills`)
+  }
+  if (result.removedLegacyPrompts.length > 0) {
+    console.log(`  ✓ 已清理 ${result.removedLegacyPrompts.length} 个历史 Custom Prompts`)
   }
   if (result.removedRoles.length > 0) {
     console.log(`  ✓ 已移除角色提示词: ${result.removedRoles.join(', ')}`)

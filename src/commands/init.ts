@@ -16,15 +16,15 @@ export async function init(options: InitOptions = {}): Promise<void> {
 
   const { force = false, liteMode = true, mcpProvider = DEFAULT_MCP_PROVIDER } = options
 
-  // 1. Install prompts + skills + roles + binary
+  // 1. Install skills + roles + binary
   console.log('  [1/3] 安装工作流组件...')
   const result = await installCxg({ force, liteMode, mcpProvider })
 
-  if (result.installedPrompts.length > 0) {
-    console.log(`    ✓ Custom Prompts: ${result.installedPrompts.length} 个`)
-  }
   if (result.installedSkills.length > 0) {
     console.log(`    ✓ Skills: ${result.installedSkills.length} 个`)
+  }
+  if (result.cleanedLegacyPrompts.length > 0) {
+    console.log(`    ✓ 已清理历史 Custom Prompts: ${result.cleanedLegacyPrompts.length} 个`)
   }
   if (result.installedRoles.length > 0) {
     console.log(`    ✓ 角色提示词: ${result.installedRoles.join(', ')}`)
@@ -63,7 +63,7 @@ export async function init(options: InitOptions = {}): Promise<void> {
   console.log('  [3/3] 保存配置...')
   const installedCommands = result.success
     ? [...ALL_COMMANDS]
-    : result.installedPrompts
+    : result.installedSkills.map(skill => `cxg-${skill}`)
 
   const hasInstalledArtifacts = installedCommands.length > 0
     || result.installedSkills.length > 0
@@ -106,17 +106,17 @@ export async function init(options: InitOptions = {}): Promise<void> {
   }
 
   console.log()
-  console.log('  已安装命令:')
+  console.log('  已安装技能:')
   if (installedCommands.length === 0) {
     console.log('    (无)')
   }
   else {
     for (const cmd of installedCommands) {
-      console.log(`    /${cmd}`)
+      console.log(`    $${cmd}`)
     }
   }
 
   console.log()
-  console.log('  使用方法: 在 Codex CLI 中输入 /<命令名> 调用')
+  console.log('  使用方法: 在 Codex CLI 中通过技能名称触发（示例：$cxg-workflow <任务描述>）')
   console.log()
 }

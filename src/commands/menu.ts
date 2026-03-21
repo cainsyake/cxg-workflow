@@ -48,7 +48,7 @@ function pad(s: string, w: number): string {
 export async function showMainMenu(): Promise<void> {
   while (true) {
     const config = await readCxgConfig()
-    const cmdCount = config?.commands?.installed?.length || 0
+    const skillCount = config?.commands?.installed?.length || 0
     const mcpProvider = config?.mcp?.provider || '—'
     const liteMode = config?.runtime?.lite_mode ?? true
 
@@ -59,7 +59,7 @@ export async function showMainMenu(): Promise<void> {
 
     // Status line
     const statusParts = [
-      `${cmdCount} commands`,
+      `${skillCount} skills`,
     ]
     if (mcpProvider && mcpProvider !== '—' && mcpProvider !== 'skip') {
       statusParts.push(ansis.magenta(mcpProvider))
@@ -181,7 +181,7 @@ async function toggleLiteMode(config: CxgConfig | null): Promise<void> {
   }
 
   console.log()
-  console.log(ansis.yellow('  ⏳ 正在重渲染 prompts/skills...'))
+  console.log(ansis.yellow('  ⏳ 正在重渲染 skills...'))
 
   const result = await installCxg({
     force: true,
@@ -194,8 +194,8 @@ async function toggleLiteMode(config: CxgConfig | null): Promise<void> {
     mcpProvider: provider,
     liteMode: next,
   })
-  nextConfig.commands.installed = result.installedPrompts.length > 0
-    ? result.installedPrompts
+  nextConfig.commands.installed = result.installedSkills.length > 0
+    ? result.installedSkills.map(skill => `cxg-${skill}`)
     : (config.commands?.installed || [])
 
   await writeCxgConfig(nextConfig)

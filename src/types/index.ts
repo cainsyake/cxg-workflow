@@ -11,7 +11,6 @@ export interface CxgConfig {
     lite_mode: boolean
   }
   paths: {
-    prompts: string
     skills: string
     roles: string
     wrapper: string
@@ -32,9 +31,9 @@ export interface CxgConfig {
 
 export interface InstallResult {
   success: boolean
-  installedPrompts: string[]
   installedSkills: string[]
   installedRoles: string[]
+  cleanedLegacyPrompts: string[]
   errors: string[]
   binInstalled?: boolean
   binPath?: string
@@ -45,9 +44,9 @@ export interface InstallResult {
 
 export interface UninstallResult {
   success: boolean
-  removedPrompts: string[]
   removedSkills: string[]
   removedRoles: string[]
+  removedLegacyPrompts: string[]
   removedBin: boolean
   errors: string[]
 }

@@ -21,7 +21,6 @@ function findPackageRoot(): string {
 }
 
 const PACKAGE_ROOT = findPackageRoot()
-const PROMPTS_DIR = join(PACKAGE_ROOT, 'templates', 'prompts')
 const SKILLS_DIR = join(PACKAGE_ROOT, 'templates', 'skills', 'cxg')
 
 // ─────────────────────────────────────────────────────────────
@@ -72,16 +71,6 @@ describe('command registry', () => {
 // B. Template file completeness
 // ─────────────────────────────────────────────────────────────
 describe('template file completeness', () => {
-  it('every command has a matching Custom Prompt template', () => {
-    for (const cmd of ALL_COMMANDS) {
-      const templatePath = join(PROMPTS_DIR, `${cmd}.md`)
-      expect(
-        require('fs').existsSync(templatePath),
-        `prompt template missing: templates/prompts/${cmd}.md`,
-      ).toBe(true)
-    }
-  })
-
   it('every command has a matching Skill template', () => {
     for (const cmd of ALL_COMMANDS) {
       const shortName = cmd.replace('cxg-', '')
@@ -123,9 +112,8 @@ describe('template variable completeness', () => {
     return files
   }
 
-  const allPrompts = collectTemplateFiles(PROMPTS_DIR)
   const allSkills = collectTemplateFiles(SKILLS_DIR)
-  const allTemplates = [...allPrompts, ...allSkills]
+  const allTemplates = [...allSkills]
 
   it('finds template files', () => {
     expect(allTemplates.length).toBeGreaterThan(0)

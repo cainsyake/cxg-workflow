@@ -15,7 +15,7 @@ import {
   readCxgConfig,
   writeCxgConfig,
 } from '../utils/config'
-import { ALL_COMMANDS, DEFAULT_MCP_PROVIDER } from '../utils/constants'
+import { DEFAULT_MCP_PROVIDER } from '../utils/constants'
 import { showBinaryDownloadWarning, verifyBinary } from '../utils/binary'
 import { installCxg } from '../utils/installer'
 import { isWindows } from '../utils/platform'
@@ -72,6 +72,25 @@ async function restoreBackup(records: MoveRecord[]): Promise<RestoreResult> {
   }
 }
 
+async function backupLegacyPrompts(codexHome: string, backupRoot: string, records: MoveRecord[]): Promise<void> {
+  const promptsDir = join(codexHome, 'prompts')
+  if (!(await fs.pathExists(promptsDir))) {
+    return
+  }
+
+  const files = await fs.readdir(promptsDir)
+  for (const file of files) {
+    if (!file.startsWith('cxg-') || !file.endsWith('.md')) {
+      continue
+    }
+    await moveIfExists(
+      join(promptsDir, file),
+      join(backupRoot, 'prompts', file),
+      records,
+    )
+  }
+}
+
 function getWrapperPath(codexHome: string): string {
   return join(codexHome, 'bin', isWindows() ? 'codeagent-wrapper.exe' : 'codeagent-wrapper')
 }
@@ -109,15 +128,7 @@ async function performAtomicUpdate(
     await fs.remove(backupRoot).catch(() => {})
     await fs.ensureDir(backupRoot)
 
-    const promptsDir = join(codexHome, 'prompts')
-    for (const cmd of ALL_COMMANDS) {
-      await moveIfExists(
-        join(promptsDir, `${cmd}.md`),
-        join(backupRoot, 'prompts', `${cmd}.md`),
-        records,
-      )
-    }
-
+    await backupLegacyPrompts(codexHome, backupRoot, records)
     await moveIfExists(join(codexHome, 'skills', 'cxg'), join(backupRoot, 'skills', 'cxg'), records)
     await moveIfExists(join(codexHome, '.cxg'), join(backupRoot, '.cxg'), records)
     await moveIfExists(getWrapperPath(codexHome), join(backupRoot, 'bin', isWindows() ? 'codeagent-wrapper.exe' : 'codeagent-wrapper'), records)
@@ -154,7 +165,7 @@ async function performAtomicUpdate(
           version: installResult.binVersion,
         },
       })
-      nextConfig.commands.installed = [...ALL_COMMANDS]
+      nextConfig.commands.installed = [...installResult.installedSkills].map(skill => `cxg-${skill}`)
       await writeCxgConfig(nextConfig)
     }
 
