@@ -1,6 +1,6 @@
 {
   "name": "cxg-workflow",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Codex CLI single-model workflow system - structured development workflow powered by Codex",
   "type": "module",
   "packageManager": "pnpm@10.17.1",
