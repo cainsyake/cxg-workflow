@@ -15,7 +15,7 @@ export async function uninstall(): Promise<void> {
     console.log(`  ✓ 已移除 ${result.removedPrompts.length} 个 Custom Prompts`)
   }
   if (result.removedSkills.length > 0) {
-    console.log(`  ✓ 已移除 ${result.removedSkills.length} 个 Skills`)
+    console.log(`  ✓ 已移除 skills: ${result.removedSkills.length} 个目录`)
   }
   if (result.removedRoles.length > 0) {
     console.log(`  ✓ 已移除角色提示词: ${result.removedRoles.join(', ')}`)

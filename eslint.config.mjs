@@ -3,6 +3,7 @@ import antfu from '@antfu/eslint-config'
 export default antfu(
   {
     ignores: [
+      'templates/skills/**',
       'dist',
       'node_modules',
       '.codex/**',

@@ -1,7 +1,7 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-`src/` contains the TypeScript source for CLI entrypoints, commands, shared utilities, and exported types. Use `src/commands/` for user-facing actions, `src/utils/` for reusable logic, and `src/types/` for shared interfaces. Prompt, role, and skill templates live in `templates/prompts/`, `templates/roles/codex/`, and `templates/skills/cxg/`. Treat `dist/` as generated output.
+`src/` contains the TypeScript source for CLI entrypoints, commands, shared utilities, and exported types. Use `src/commands/` for user-facing actions, `src/utils/` for reusable logic, and `src/types/` for shared interfaces. Runtime templates live in `templates/prompts/`, `templates/skills/`, and `templates/roles/codex/`. Treat `dist/` as generated output.
 
 Tests are colocated under `src/**/__tests__/*.test.ts`. An empty top-level `test/` directory exists, but current coverage is maintained beside the modules it validates.
 
@@ -28,4 +28,4 @@ Vitest is the test framework. Add unit tests next to the implementation you chan
 The current history uses Conventional Commit formatting, for example `feat: initialize cxg workflow project`. Continue with prefixes like `feat:`, `fix:`, `refactor:`, and `test:`. PRs should include a short description, linked issue when applicable, and the exact verification commands you ran. Include terminal output or screenshots only when CLI UX or install flow changes.
 
 ## Template & Configuration Safety
-This package installs files into `~/.codex/` at runtime. Do not hardcode user-specific home paths in templates or source; use the existing config and template helpers instead. When adding a new slash command, update the prompt template, matching skill directory, and command registry constants together so installer and completeness tests stay aligned.
+This package installs files into `~/.codex/` at runtime. Do not hardcode user-specific home paths in templates or source; use the existing config and template helpers instead. When adding a new slash command, update the prompt template and command registry constants together so installer and completeness tests stay aligned.

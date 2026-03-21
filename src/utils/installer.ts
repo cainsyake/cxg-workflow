@@ -38,19 +38,51 @@ async function readBinaryVersion(binaryPath: string): Promise<string | undefined
   }
 }
 
-async function countInstalledSkills(dir: string): Promise<string[]> {
-  const skills: string[] = []
+async function replacePathsInMarkdownFiles(
+  dir: string,
+  codexHome: string,
+  installConfig: { liteMode: boolean, mcpProvider: McpProvider },
+): Promise<void> {
   const entries = await fs.readdir(dir, { withFileTypes: true })
   for (const entry of entries) {
-    if (!entry.isDirectory()) {
+    const fullPath = join(dir, entry.name)
+    if (entry.isDirectory()) {
+      await replacePathsInMarkdownFiles(fullPath, codexHome, installConfig)
       continue
     }
-    const skillFile = join(dir, entry.name, 'SKILL.md')
-    if (await fs.pathExists(skillFile)) {
-      skills.push(entry.name)
+    if (!entry.name.endsWith('.md')) {
+      continue
+    }
+    const original = await fs.readFile(fullPath, 'utf-8')
+    let processed = injectTemplateVariables(original, installConfig)
+    processed = replaceHomePathsInTemplate(processed, codexHome)
+    if (processed !== original) {
+      await fs.writeFile(fullPath, processed, 'utf-8')
     }
   }
-  return skills
+}
+
+async function collectInstalledSkills(skillsDir: string): Promise<string[]> {
+  const skillIds: string[] = []
+  if (!(await fs.pathExists(skillsDir))) {
+    return skillIds
+  }
+
+  const walk = async (dir: string): Promise<void> => {
+    if (dir !== skillsDir && await fs.pathExists(join(dir, 'SKILL.md'))) {
+      const relative = dir.slice(skillsDir.length + 1).replace(/\\/g, '/')
+      skillIds.push(relative)
+    }
+    const entries = await fs.readdir(dir, { withFileTypes: true })
+    for (const entry of entries) {
+      if (entry.isDirectory()) {
+        await walk(join(dir, entry.name))
+      }
+    }
+  }
+
+  await walk(skillsDir)
+  return skillIds.sort()
 }
 
 async function preflightCheck(templateDir: string, skipBinary: boolean): Promise<string[]> {
@@ -169,36 +201,20 @@ export async function installCxg(options: {
     }
   }
 
-  // 2. Install Skills
-  const skillsTemplateDir = join(templateDir, 'skills', 'cxg')
+  // 2. Install skills
+  const skillsTemplateDir = join(templateDir, 'skills')
   if (await fs.pathExists(skillsTemplateDir)) {
     try {
+      if (force && await fs.pathExists(skillsDir)) {
+        await fs.remove(skillsDir)
+        await fs.ensureDir(skillsDir)
+      }
       await fs.copy(skillsTemplateDir, skillsDir, {
         overwrite: force,
         errorOnExist: false,
       })
-
-      const replacePathsInDir = async (dir: string): Promise<void> => {
-        const entries = await fs.readdir(dir, { withFileTypes: true })
-        for (const entry of entries) {
-          const fullPath = join(dir, entry.name)
-          if (entry.isDirectory()) {
-            await replacePathsInDir(fullPath)
-            continue
-          }
-          if (entry.name.endsWith('.md')) {
-            const original = await fs.readFile(fullPath, 'utf-8')
-            let processed = injectTemplateVariables(original, installConfig)
-            processed = replaceHomePathsInTemplate(processed, codexHome)
-            if (processed !== original) {
-              await fs.writeFile(fullPath, processed, 'utf-8')
-            }
-          }
-        }
-      }
-
-      await replacePathsInDir(skillsDir)
-      result.installedSkills = await countInstalledSkills(skillsDir)
+      await replacePathsInMarkdownFiles(skillsDir, codexHome, installConfig)
+      result.installedSkills = await collectInstalledSkills(skillsDir)
     }
     catch (error) {
       result.errors.push(`Failed to install skills: ${error}`)
@@ -210,7 +226,7 @@ export async function installCxg(options: {
     result.success = false
   }
 
-  // 3. Install Role Prompts
+  // 3. Install role prompts
   const rolesTemplateDir = join(templateDir, 'roles', 'codex')
   if (await fs.pathExists(rolesTemplateDir)) {
     try {
@@ -330,7 +346,7 @@ export async function uninstallCxg(options?: { preserveBinary?: boolean }): Prom
     }
   }
 
-  // 2. Remove Skills (entire cxg/ directory)
+  // 2. Remove skills directory (if exists)
   if (await fs.pathExists(skillsDir)) {
     try {
       const entries = await fs.readdir(skillsDir, { withFileTypes: true })

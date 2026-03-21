@@ -14,6 +14,7 @@ CXG is a Codex-first workflow package for Codex CLI. It installs a structured se
 
 - **Derived from `ccg-workflow`**: preserves the original workflow philosophy while simplifying it into a Codex-only package.
 - **Single-model by design**: no routing between different models, only Codex orchestration plus Codex subprocess roles.
+- **Prompt + skills runtime**: `init` installs prompts, migrated skills, roles, and wrapper.
 - **Structured delivery**: the main workflow follows `research -> plan -> execute -> optimize -> review`.
 - **Reusable expert roles**: built-in `analyzer`, `architect`, and `reviewer` role prompts drive subprocess work.
 - **Optional code retrieval**: supports `ace-tool`, can be prepared for `contextweaver`, and falls back to `Glob + Grep` when MCP is skipped.
@@ -25,8 +26,6 @@ CXG is a Codex-first workflow package for Codex CLI. It installs a structured se
 Codex CLI
    |
    +-- /cxg-* custom prompts
-   |
-   +-- skills/cxg/*
    |
    +-- codeagent-wrapper
           |
@@ -185,8 +184,8 @@ This command generates root-level and module-level `AGENTS.md` files using a "co
 │   └── ...
 ├── skills/
 │   └── cxg/
-│       ├── workflow/SKILL.md
-│       ├── plan/SKILL.md
+│       ├── SKILL.md
+│       ├── run_skill.js
 │       └── ...
 ├── bin/
 │   └── codeagent-wrapper
@@ -199,6 +198,11 @@ This command generates root-level and module-level `AGENTS.md` files using a "co
             ├── architect.md
             └── reviewer.md
 ```
+
+### Repository Assets
+
+- `templates/skills/` contains migrated skill assets from `ccg-workflow/templates/skills`.
+- `cxg-workflow init` installs these assets into `~/.codex/skills/cxg/`.
 
 ### CXG Config
 

@@ -24,7 +24,7 @@ export async function init(options: InitOptions = {}): Promise<void> {
     console.log(`    ✓ Custom Prompts: ${result.installedPrompts.length} 个`)
   }
   if (result.installedSkills.length > 0) {
-    console.log(`    ✓ Skills: ${result.installedSkills.length} 个`)
+    console.log(`    ✓ Skills: ${result.installedSkills.length} 个定义`)
   }
   if (result.installedRoles.length > 0) {
     console.log(`    ✓ 角色提示词: ${result.installedRoles.join(', ')}`)

@@ -47,24 +47,56 @@ export async function doctor(): Promise<void> {
     detail: missingPrompts.length > 0 ? `缺失: ${missingPrompts.join(', ')}` : undefined,
   })
 
-  // 3. Check Skills
+  // 3. Check skills
   const skillsDir = join(codexHome, 'skills', 'cxg')
-  let skillCount = 0
-  const missingSkills: string[] = []
-  for (const cmd of ALL_COMMANDS) {
-    const shortName = cmd.replace('cxg-', '')
-    const skillPath = join(skillsDir, shortName, 'SKILL.md')
-    if (await fs.pathExists(skillPath)) {
-      skillCount++
-    }
-    else {
-      missingSkills.push(shortName)
+  const requiredSkillFiles = [
+    join(skillsDir, 'SKILL.md'),
+    join(skillsDir, 'run_skill.js'),
+    join(skillsDir, 'orchestration', 'multi-agent', 'SKILL.md'),
+    join(skillsDir, 'tools', 'gen-docs', 'SKILL.md'),
+    join(skillsDir, 'tools', 'gen-docs', 'scripts', 'doc_generator.js'),
+    join(skillsDir, 'tools', 'verify-change', 'SKILL.md'),
+    join(skillsDir, 'tools', 'verify-change', 'scripts', 'change_analyzer.js'),
+    join(skillsDir, 'tools', 'verify-module', 'SKILL.md'),
+    join(skillsDir, 'tools', 'verify-module', 'scripts', 'module_scanner.js'),
+    join(skillsDir, 'tools', 'verify-quality', 'SKILL.md'),
+    join(skillsDir, 'tools', 'verify-quality', 'scripts', 'quality_checker.js'),
+    join(skillsDir, 'tools', 'verify-security', 'SKILL.md'),
+    join(skillsDir, 'tools', 'verify-security', 'scripts', 'security_scanner.js'),
+  ]
+  const missingSkillFiles: string[] = []
+  for (const file of requiredSkillFiles) {
+    if (!(await fs.pathExists(file))) {
+      missingSkillFiles.push(file.replace(`${codexHome}/`, ''))
     }
   }
+
+  const countSkillDefinitions = async (dir: string): Promise<number> => {
+    if (!(await fs.pathExists(dir))) {
+      return 0
+    }
+    let count = 0
+    const walk = async (current: string): Promise<void> => {
+      if (current !== dir && await fs.pathExists(join(current, 'SKILL.md'))) {
+        count++
+      }
+      const entries = await fs.readdir(current, { withFileTypes: true })
+      for (const entry of entries) {
+        if (entry.isDirectory()) {
+          await walk(join(current, entry.name))
+        }
+      }
+    }
+    await walk(dir)
+    return count
+  }
+
+  const skillDefinitions = await countSkillDefinitions(skillsDir)
+  const skillsOk = missingSkillFiles.length === 0 && skillDefinitions > 0
   results.push({
-    label: `Skills (${skillCount}/${ALL_COMMANDS.length})`,
-    ok: skillCount === ALL_COMMANDS.length,
-    detail: missingSkills.length > 0 ? `缺失: ${missingSkills.join(', ')}` : undefined,
+    label: `Skills (${skillDefinitions} 个定义)`,
+    ok: skillsOk,
+    detail: missingSkillFiles.length > 0 ? `缺失: ${missingSkillFiles.join(', ')}` : undefined,
   })
 
   // 4. Check role prompts

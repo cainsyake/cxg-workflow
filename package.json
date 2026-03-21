@@ -36,8 +36,8 @@
     "bin/cxg.mjs",
     "dist",
     "templates/prompts/",
-    "templates/skills/",
-    "templates/roles/"
+    "templates/roles/",
+    "templates/skills/"
   ],
   "scripts": {
     "dev": "tsx src/cli.ts",

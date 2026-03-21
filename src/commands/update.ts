@@ -118,6 +118,7 @@ async function performAtomicUpdate(
       )
     }
 
+    // Keep skills backup for rollback compatibility.
     await moveIfExists(join(codexHome, 'skills', 'cxg'), join(backupRoot, 'skills', 'cxg'), records)
     await moveIfExists(join(codexHome, '.cxg'), join(backupRoot, '.cxg'), records)
     await moveIfExists(getWrapperPath(codexHome), join(backupRoot, 'bin', isWindows() ? 'codeagent-wrapper.exe' : 'codeagent-wrapper'), records)

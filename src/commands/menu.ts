@@ -181,7 +181,7 @@ async function toggleLiteMode(config: CxgConfig | null): Promise<void> {
   }
 
   console.log()
-  console.log(ansis.yellow('  ⏳ 正在重渲染 prompts/skills...'))
+  console.log(ansis.yellow('  ⏳ 正在重渲染 prompts/skills/roles...'))
 
   const result = await installCxg({
     force: true,

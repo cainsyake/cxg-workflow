@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { ALL_COMMANDS, WORKFLOW_CONFIGS } from '../constants'
@@ -20,9 +20,39 @@ function findPackageRoot(): string {
   throw new Error('Could not find package root')
 }
 
+function collectMarkdownFiles(dir: string): string[] {
+  const files: string[] = []
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = join(dir, entry.name)
+    if (entry.isDirectory()) {
+      files.push(...collectMarkdownFiles(fullPath))
+    }
+    else if (entry.name.endsWith('.md')) {
+      files.push(fullPath)
+    }
+  }
+  return files
+}
+
 const PACKAGE_ROOT = findPackageRoot()
 const PROMPTS_DIR = join(PACKAGE_ROOT, 'templates', 'prompts')
-const SKILLS_DIR = join(PACKAGE_ROOT, 'templates', 'skills', 'cxg')
+const SKILLS_DIR = join(PACKAGE_ROOT, 'templates', 'skills')
+const ROLES_DIR = join(PACKAGE_ROOT, 'templates', 'roles', 'codex')
+const REQUIRED_SKILL_FILES = [
+  join(SKILLS_DIR, 'SKILL.md'),
+  join(SKILLS_DIR, 'run_skill.js'),
+  join(SKILLS_DIR, 'orchestration', 'multi-agent', 'SKILL.md'),
+  join(SKILLS_DIR, 'tools', 'gen-docs', 'SKILL.md'),
+  join(SKILLS_DIR, 'tools', 'gen-docs', 'scripts', 'doc_generator.js'),
+  join(SKILLS_DIR, 'tools', 'verify-change', 'SKILL.md'),
+  join(SKILLS_DIR, 'tools', 'verify-change', 'scripts', 'change_analyzer.js'),
+  join(SKILLS_DIR, 'tools', 'verify-module', 'SKILL.md'),
+  join(SKILLS_DIR, 'tools', 'verify-module', 'scripts', 'module_scanner.js'),
+  join(SKILLS_DIR, 'tools', 'verify-quality', 'SKILL.md'),
+  join(SKILLS_DIR, 'tools', 'verify-quality', 'scripts', 'quality_checker.js'),
+  join(SKILLS_DIR, 'tools', 'verify-security', 'SKILL.md'),
+  join(SKILLS_DIR, 'tools', 'verify-security', 'scripts', 'security_scanner.js'),
+]
 
 // ─────────────────────────────────────────────────────────────
 // A. Command registry consistency
@@ -76,32 +106,38 @@ describe('template file completeness', () => {
     for (const cmd of ALL_COMMANDS) {
       const templatePath = join(PROMPTS_DIR, `${cmd}.md`)
       expect(
-        require('fs').existsSync(templatePath),
+        existsSync(templatePath),
         `prompt template missing: templates/prompts/${cmd}.md`,
       ).toBe(true)
     }
   })
 
-  it('every command has a matching Skill template', () => {
-    for (const cmd of ALL_COMMANDS) {
-      const shortName = cmd.replace('cxg-', '')
-      const skillPath = join(SKILLS_DIR, shortName, 'SKILL.md')
+  it('role prompts exist', () => {
+    for (const role of ['analyzer', 'architect', 'reviewer']) {
+      const rolePath = join(ROLES_DIR, `${role}.md`)
       expect(
-        require('fs').existsSync(skillPath),
-        `skill template missing: templates/skills/cxg/${shortName}/SKILL.md`,
+        existsSync(rolePath),
+        `role template missing: ${role}.md`,
       ).toBe(true)
     }
   })
 
-  it('role prompts exist', () => {
-    const rolesDir = join(PACKAGE_ROOT, 'templates', 'roles', 'codex')
-    for (const role of ['analyzer', 'architect', 'reviewer']) {
-      const rolePath = join(rolesDir, `${role}.md`)
+  it('skills assets exist', () => {
+    for (const requiredFile of REQUIRED_SKILL_FILES) {
       expect(
-        require('fs').existsSync(rolePath),
-        `role template missing: ${role}.md`,
+        existsSync(requiredFile),
+        `required skill asset missing: ${requiredFile.replace(`${PACKAGE_ROOT}/`, '')}`,
       ).toBe(true)
     }
+
+    const skillDefinitionFiles = collectMarkdownFiles(SKILLS_DIR)
+      .filter(path => /[\\/]SKILL\.md$/.test(path))
+      .filter(path => path !== join(SKILLS_DIR, 'SKILL.md'))
+
+    expect(
+      skillDefinitionFiles.length,
+      'at least one nested skill definition should exist in templates/skills/',
+    ).toBeGreaterThan(0)
   })
 })
 
@@ -109,23 +145,10 @@ describe('template file completeness', () => {
 // C. Template variable completeness
 // ─────────────────────────────────────────────────────────────
 describe('template variable completeness', () => {
-  function collectTemplateFiles(dir: string): string[] {
-    const files: string[] = []
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      const fullPath = join(dir, entry.name)
-      if (entry.isDirectory()) {
-        files.push(...collectTemplateFiles(fullPath))
-      }
-      else if (entry.name.endsWith('.md')) {
-        files.push(fullPath)
-      }
-    }
-    return files
-  }
-
-  const allPrompts = collectTemplateFiles(PROMPTS_DIR)
-  const allSkills = collectTemplateFiles(SKILLS_DIR)
-  const allTemplates = [...allPrompts, ...allSkills]
+  const allPrompts = collectMarkdownFiles(PROMPTS_DIR)
+  const allSkills = collectMarkdownFiles(SKILLS_DIR)
+  const allRoles = collectMarkdownFiles(ROLES_DIR)
+  const allTemplates = [...allPrompts, ...allSkills, ...allRoles]
 
   it('finds template files', () => {
     expect(allTemplates.length).toBeGreaterThan(0)
@@ -156,24 +179,21 @@ describe('template variable completeness', () => {
   }
 })
 
-// ─────────────────────────────────────────────────────────────
-// D. Skill frontmatter validation
-// ─────────────────────────────────────────────────────────────
-describe('skill SKILL.md frontmatter', () => {
-  for (const cmd of ALL_COMMANDS) {
-    const shortName = cmd.replace('cxg-', '')
-    it(`${shortName}/SKILL.md has valid frontmatter`, () => {
-      const skillPath = join(SKILLS_DIR, shortName, 'SKILL.md')
-      const content = readFileSync(skillPath, 'utf-8')
+describe('skills template migration guards', () => {
+  const legacyMarkers = [
+    '~/.claude/skills/ccg',
+    'npx ccg-workflow',
+    'name: ccg-skills',
+  ]
+  const skillDocs = collectMarkdownFiles(SKILLS_DIR)
 
-      // Must start with ---
-      expect(content.startsWith('---'), 'must start with YAML frontmatter').toBe(true)
-
-      // Must have name field matching cxg-<shortName>
-      expect(content).toContain(`name: ${cmd}`)
-
-      // Must have description field
-      expect(content).toMatch(/description:\s*"/)
+  for (const file of skillDocs) {
+    const relativePath = file.replace(`${PACKAGE_ROOT}/`, '')
+    it(`${relativePath}: no legacy CCG markers`, () => {
+      const content = readFileSync(file, 'utf-8')
+      for (const marker of legacyMarkers) {
+        expect(content.includes(marker), `found legacy marker "${marker}" in ${relativePath}`).toBe(false)
+      }
     })
   }
 })
