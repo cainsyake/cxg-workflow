@@ -59,16 +59,6 @@ async function preflightCheck(templateDir: string, skipBinary: boolean): Promise
     errors.push(`Template directory not found: ${templateDir}`)
   }
 
-  const skillsTemplateDir = join(templateDir, 'skills', 'cxg')
-  if (!(await fs.pathExists(skillsTemplateDir))) {
-    errors.push(`Skills template directory not found: ${skillsTemplateDir}`)
-  }
-
-  const rolesTemplateDir = join(templateDir, 'roles', 'codex')
-  if (!(await fs.pathExists(rolesTemplateDir))) {
-    errors.push(`Roles template directory not found: ${rolesTemplateDir}`)
-  }
-
   if (!skipBinary) {
     try {
       resolveBinaryName()
@@ -87,18 +77,17 @@ async function postflightCheck(
   result: InstallResult,
 ): Promise<string[]> {
   const errors: string[] = []
-  const skillsDir = join(codexHome, 'skills', 'cxg')
-  const missingSkills: string[] = []
+  const promptsDir = join(codexHome, 'prompts')
+  const missingPrompts: string[] = []
 
   for (const cmd of ALL_COMMANDS) {
-    const skillName = cmd.replace('cxg-', '')
-    if (!(await fs.pathExists(join(skillsDir, skillName, 'SKILL.md')))) {
-      missingSkills.push(skillName)
+    if (!(await fs.pathExists(join(promptsDir, `${cmd}.md`)))) {
+      missingPrompts.push(cmd)
     }
   }
 
-  if (missingSkills.length > 0) {
-    errors.push(`Missing skill files after install: ${missingSkills.join(', ')}`)
+  if (missingPrompts.length > 0) {
+    errors.push(`Missing prompt files after install: ${missingPrompts.join(', ')}`)
   }
 
   if (!skipBinary && !result.binInstalled) {
@@ -114,24 +103,6 @@ export function getWorkflowConfigs() {
 
 export function getAllCommandIds(): string[] {
   return [...ALL_COMMANDS]
-}
-
-async function cleanupLegacyPrompts(promptsDir: string): Promise<string[]> {
-  const removed: string[] = []
-  if (!(await fs.pathExists(promptsDir))) {
-    return removed
-  }
-
-  const files = await fs.readdir(promptsDir)
-  for (const file of files) {
-    if (!file.startsWith('cxg-') || !file.endsWith('.md')) {
-      continue
-    }
-    await fs.remove(join(promptsDir, file))
-    removed.push(file.replace('.md', ''))
-  }
-
-  return removed
 }
 
 /**
@@ -154,9 +125,9 @@ export async function installCxg(options: {
 
   const result: InstallResult = {
     success: true,
+    installedPrompts: [],
     installedSkills: [],
     installedRoles: [],
-    cleanedLegacyPrompts: [],
     errors: [],
   }
 
@@ -167,74 +138,104 @@ export async function installCxg(options: {
     return result
   }
 
+  await fs.ensureDir(promptsDir)
   await fs.ensureDir(skillsDir)
   await fs.ensureDir(rolesDir)
   await fs.ensureDir(binDir)
 
-  // 1. Cleanup legacy prompts from old dual-track releases
-  try {
-    result.cleanedLegacyPrompts = await cleanupLegacyPrompts(promptsDir)
-  }
-  catch (error) {
-    result.errors.push(`Failed to cleanup legacy prompts: ${error}`)
-    result.success = false
+  // 1. Install Custom Prompts
+  const promptsTemplateDir = join(templateDir, 'prompts')
+  for (const cmd of ALL_COMMANDS) {
+    const srcFile = join(promptsTemplateDir, `${cmd}.md`)
+    const destFile = join(promptsDir, `${cmd}.md`)
+
+    try {
+      if (!(await fs.pathExists(srcFile))) {
+        result.errors.push(`Prompt template not found: ${cmd}`)
+        result.success = false
+        continue
+      }
+      if (force || !(await fs.pathExists(destFile))) {
+        let content = await fs.readFile(srcFile, 'utf-8')
+        content = injectTemplateVariables(content, installConfig)
+        content = replaceHomePathsInTemplate(content, codexHome)
+        await fs.writeFile(destFile, content, 'utf-8')
+        result.installedPrompts.push(cmd)
+      }
+    }
+    catch (error) {
+      result.errors.push(`Failed to install prompt ${cmd}: ${error}`)
+      result.success = false
+    }
   }
 
   // 2. Install Skills
   const skillsTemplateDir = join(templateDir, 'skills', 'cxg')
-  try {
-    await fs.copy(skillsTemplateDir, skillsDir, {
-      overwrite: force,
-      errorOnExist: false,
-    })
+  if (await fs.pathExists(skillsTemplateDir)) {
+    try {
+      await fs.copy(skillsTemplateDir, skillsDir, {
+        overwrite: force,
+        errorOnExist: false,
+      })
 
-    const replacePathsInDir = async (dir: string): Promise<void> => {
-      const entries = await fs.readdir(dir, { withFileTypes: true })
-      for (const entry of entries) {
-        const fullPath = join(dir, entry.name)
-        if (entry.isDirectory()) {
-          await replacePathsInDir(fullPath)
-          continue
-        }
-        if (entry.name.endsWith('.md')) {
-          const original = await fs.readFile(fullPath, 'utf-8')
-          let processed = injectTemplateVariables(original, installConfig)
-          processed = replaceHomePathsInTemplate(processed, codexHome)
-          if (processed !== original) {
-            await fs.writeFile(fullPath, processed, 'utf-8')
+      const replacePathsInDir = async (dir: string): Promise<void> => {
+        const entries = await fs.readdir(dir, { withFileTypes: true })
+        for (const entry of entries) {
+          const fullPath = join(dir, entry.name)
+          if (entry.isDirectory()) {
+            await replacePathsInDir(fullPath)
+            continue
+          }
+          if (entry.name.endsWith('.md')) {
+            const original = await fs.readFile(fullPath, 'utf-8')
+            let processed = injectTemplateVariables(original, installConfig)
+            processed = replaceHomePathsInTemplate(processed, codexHome)
+            if (processed !== original) {
+              await fs.writeFile(fullPath, processed, 'utf-8')
+            }
           }
         }
       }
-    }
 
-    await replacePathsInDir(skillsDir)
-    result.installedSkills = await countInstalledSkills(skillsDir)
+      await replacePathsInDir(skillsDir)
+      result.installedSkills = await countInstalledSkills(skillsDir)
+    }
+    catch (error) {
+      result.errors.push(`Failed to install skills: ${error}`)
+      result.success = false
+    }
   }
-  catch (error) {
-    result.errors.push(`Failed to install skills: ${error}`)
+  else {
+    result.errors.push(`Skills template directory not found: ${skillsTemplateDir}`)
     result.success = false
   }
 
   // 3. Install Role Prompts
   const rolesTemplateDir = join(templateDir, 'roles', 'codex')
-  try {
-    const files = await fs.readdir(rolesTemplateDir)
-    for (const file of files) {
-      if (!file.endsWith('.md')) {
-        continue
-      }
-      const srcFile = join(rolesTemplateDir, file)
-      const destFile = join(rolesDir, file)
-      if (force || !(await fs.pathExists(destFile))) {
-        const content = await fs.readFile(srcFile, 'utf-8')
-        const processed = replaceHomePathsInTemplate(content, codexHome)
-        await fs.writeFile(destFile, processed, 'utf-8')
-        result.installedRoles.push(file.replace('.md', ''))
+  if (await fs.pathExists(rolesTemplateDir)) {
+    try {
+      const files = await fs.readdir(rolesTemplateDir)
+      for (const file of files) {
+        if (!file.endsWith('.md')) {
+          continue
+        }
+        const srcFile = join(rolesTemplateDir, file)
+        const destFile = join(rolesDir, file)
+        if (force || !(await fs.pathExists(destFile))) {
+          const content = await fs.readFile(srcFile, 'utf-8')
+          const processed = replaceHomePathsInTemplate(content, codexHome)
+          await fs.writeFile(destFile, processed, 'utf-8')
+          result.installedRoles.push(file.replace('.md', ''))
+        }
       }
     }
+    catch (error) {
+      result.errors.push(`Failed to install roles: ${error}`)
+      result.success = false
+    }
   }
-  catch (error) {
-    result.errors.push(`Failed to install roles: ${error}`)
+  else {
+    result.errors.push(`Roles template directory not found: ${rolesTemplateDir}`)
     result.success = false
   }
 
@@ -305,14 +306,31 @@ export async function uninstallCxg(options?: { preserveBinary?: boolean }): Prom
 
   const result: UninstallResult = {
     success: true,
+    removedPrompts: [],
     removedSkills: [],
     removedRoles: [],
-    removedLegacyPrompts: [],
     removedBin: false,
     errors: [],
   }
 
-  // 1. Remove Skills (entire cxg/ directory)
+  // 1. Remove Custom Prompts (only cxg-* files)
+  if (await fs.pathExists(promptsDir)) {
+    try {
+      const files = await fs.readdir(promptsDir)
+      for (const file of files) {
+        if (file.startsWith('cxg-') && file.endsWith('.md')) {
+          await fs.remove(join(promptsDir, file))
+          result.removedPrompts.push(file.replace('.md', ''))
+        }
+      }
+    }
+    catch (error) {
+      result.errors.push(`Failed to remove prompts: ${error}`)
+      result.success = false
+    }
+  }
+
+  // 2. Remove Skills (entire cxg/ directory)
   if (await fs.pathExists(skillsDir)) {
     try {
       const entries = await fs.readdir(skillsDir, { withFileTypes: true })
@@ -329,7 +347,7 @@ export async function uninstallCxg(options?: { preserveBinary?: boolean }): Prom
     }
   }
 
-  // 2. Remove Roles and .cxg directory
+  // 3. Remove Roles and .cxg directory
   if (await fs.pathExists(cxgDir)) {
     try {
       if (await fs.pathExists(rolesDir)) {
@@ -348,7 +366,7 @@ export async function uninstallCxg(options?: { preserveBinary?: boolean }): Prom
     }
   }
 
-  // 3. Remove codeagent-wrapper binary
+  // 4. Remove codeagent-wrapper binary
   if (!options?.preserveBinary && await fs.pathExists(binDir)) {
     try {
       const wrapperPath = getWrapperPath(binDir)
@@ -361,15 +379,6 @@ export async function uninstallCxg(options?: { preserveBinary?: boolean }): Prom
       result.errors.push(`Failed to remove binary: ${error}`)
       result.success = false
     }
-  }
-
-  // 4. Remove legacy prompts from old dual-track releases
-  try {
-    result.removedLegacyPrompts = await cleanupLegacyPrompts(promptsDir)
-  }
-  catch (error) {
-    result.errors.push(`Failed to remove legacy prompts: ${error}`)
-    result.success = false
   }
 
   return result

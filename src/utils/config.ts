@@ -67,6 +67,7 @@ export function createDefaultConfig(options?: {
       lite_mode: options?.liteMode ?? true,
     },
     paths: {
+      prompts: join(CODEX_HOME, 'prompts'),
       skills: join(CODEX_HOME, 'skills', 'cxg'),
       roles: join(CXG_DIR, 'roles', 'codex'),
       wrapper: join(CODEX_HOME, 'bin', isWindows() ? 'codeagent-wrapper.exe' : 'codeagent-wrapper'),

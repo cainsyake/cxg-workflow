@@ -28,7 +28,26 @@ export async function doctor(): Promise<void> {
     detail: config ? `v${config.general.version}` : '未找到',
   })
 
-  // 2. Check Skills
+  // 2. Check Custom Prompts
+  const promptsDir = join(codexHome, 'prompts')
+  let promptCount = 0
+  const missingPrompts: string[] = []
+  for (const cmd of ALL_COMMANDS) {
+    const promptPath = join(promptsDir, `${cmd}.md`)
+    if (await fs.pathExists(promptPath)) {
+      promptCount++
+    }
+    else {
+      missingPrompts.push(cmd)
+    }
+  }
+  results.push({
+    label: `Custom Prompts (${promptCount}/${ALL_COMMANDS.length})`,
+    ok: promptCount === ALL_COMMANDS.length,
+    detail: missingPrompts.length > 0 ? `缺失: ${missingPrompts.join(', ')}` : undefined,
+  })
+
+  // 3. Check Skills
   const skillsDir = join(codexHome, 'skills', 'cxg')
   let skillCount = 0
   const missingSkills: string[] = []
@@ -46,23 +65,6 @@ export async function doctor(): Promise<void> {
     label: `Skills (${skillCount}/${ALL_COMMANDS.length})`,
     ok: skillCount === ALL_COMMANDS.length,
     detail: missingSkills.length > 0 ? `缺失: ${missingSkills.join(', ')}` : undefined,
-  })
-
-  // 3. Check legacy Custom Prompts cleanup status
-  const promptsDir = join(codexHome, 'prompts')
-  let legacyPromptCount = 0
-  const legacyPromptFiles: string[] = []
-  for (const cmd of ALL_COMMANDS) {
-    const promptPath = join(promptsDir, `${cmd}.md`)
-    if (await fs.pathExists(promptPath)) {
-      legacyPromptCount++
-      legacyPromptFiles.push(`${cmd}.md`)
-    }
-  }
-  results.push({
-    label: `Legacy Custom Prompts (${legacyPromptCount})`,
-    ok: legacyPromptCount === 0,
-    detail: legacyPromptCount > 0 ? `建议清理: ${legacyPromptFiles.join(', ')}` : undefined,
   })
 
   // 4. Check role prompts

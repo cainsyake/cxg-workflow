@@ -6,7 +6,7 @@ English | [简体中文](./README.zh-CN.md)
 
 </div>
 
-CXG is a Codex-first workflow package for Codex CLI. It installs a structured set of skills, role prompts, and a `codeagent-wrapper` binary so Codex can handle research, planning, execution, optimization, and review in a consistent single-model workflow.
+CXG is a Codex-first workflow package for Codex CLI. It installs a structured set of slash commands, skills, role prompts, and a `codeagent-wrapper` binary so Codex can handle research, planning, execution, optimization, and review in a consistent single-model workflow.
 
 > Note: CXG is a Codex-only simplified derivative of [`ccg-workflow`](https://github.com/fengshao1227/ccg-workflow). It keeps the structured workflow and wrapper-based orchestration ideas from the original project, while narrowing the scope to a leaner single-model experience built around Codex.
 
@@ -17,12 +17,14 @@ CXG is a Codex-first workflow package for Codex CLI. It installs a structured se
 - **Structured delivery**: the main workflow follows `research -> plan -> execute -> optimize -> review`.
 - **Reusable expert roles**: built-in `analyzer`, `architect`, and `reviewer` role prompts drive subprocess work.
 - **Optional code retrieval**: supports `ace-tool`, can be prepared for `contextweaver`, and falls back to `Glob + Grep` when MCP is skipped.
-- **Skills-first command system**: installs 12 workflow skills into `~/.codex/skills/cxg/`.
+- **Ready-to-use slash commands**: installs 12 commands directly into `~/.codex/prompts/`.
 
 ## Architecture
 
 ```text
 Codex CLI
+   |
+   +-- /cxg-* custom prompts
    |
    +-- skills/cxg/*
    |
@@ -73,12 +75,12 @@ npx cxg-workflow init --mcp ace-tool
 npx cxg-workflow init --skip-mcp
 ```
 
-After installation, open Codex CLI and invoke skills by name such as:
+After installation, open Codex CLI and invoke commands as slash commands such as:
 
 ```bash
-$cxg-workflow implement user authentication
-$cxg-plan refactor payment service
-$cxg-review
+/cxg-workflow implement user authentication
+/cxg-plan refactor payment service
+/cxg-review
 ```
 
 ### Verify Installation
@@ -112,33 +114,33 @@ npx cxg-workflow uninstall
 
 | Command | Description |
 |---------|-------------|
-| `$cxg-workflow` | Full 5-phase structured workflow |
-| `$cxg-plan` | Generate an implementation plan |
-| `$cxg-execute` | Execute an approved plan file |
+| `/cxg-workflow` | Full 5-phase structured workflow |
+| `/cxg-plan` | Generate an implementation plan |
+| `/cxg-execute` | Execute an approved plan file |
 
 ### Development
 
 | Command | Description |
 |---------|-------------|
-| `$cxg-feat` | Smart feature development |
-| `$cxg-analyze` | Technical analysis without code changes |
-| `$cxg-debug` | Diagnose and fix problems |
-| `$cxg-optimize` | Performance and resource optimization |
+| `/cxg-feat` | Smart feature development |
+| `/cxg-analyze` | Technical analysis without code changes |
+| `/cxg-debug` | Diagnose and fix problems |
+| `/cxg-optimize` | Performance and resource optimization |
 
 ### Quality
 
 | Command | Description |
 |---------|-------------|
-| `$cxg-test` | Test design and generation |
-| `$cxg-review` | Quality and security review |
-| `$cxg-enhance` | Turn vague requests into structured tasks |
+| `/cxg-test` | Test design and generation |
+| `/cxg-review` | Quality and security review |
+| `/cxg-enhance` | Turn vague requests into structured tasks |
 
 ### Delivery And Bootstrap
 
 | Command | Description |
 |---------|-------------|
-| `$cxg-commit` | Generate Conventional Commit messages |
-| `$cxg-init` | Generate project `AGENTS.md` context docs |
+| `/cxg-commit` | Generate Conventional Commit messages |
+| `/cxg-init` | Generate project `AGENTS.md` context docs |
 
 ## Workflow Guides
 
@@ -146,19 +148,19 @@ npx cxg-workflow uninstall
 
 ```bash
 # 1. Generate the plan
-$cxg-plan implement user authentication
+/cxg-plan implement user authentication
 
 # 2. Review and adjust the generated plan
 # plan file is saved under .codex/plan/
 
 # 3. Execute the approved plan
-$cxg-execute .codex/plan/user-auth.md
+/cxg-execute .codex/plan/user-auth.md
 ```
 
 ### Full Workflow For Larger Tasks
 
 ```bash
-$cxg-workflow implement invoice export with audit logging
+/cxg-workflow implement invoice export with audit logging
 ```
 
 Use the full workflow when the task spans multiple modules, needs tradeoff analysis, or should go through an explicit optimization and review phase.
@@ -166,7 +168,7 @@ Use the full workflow when the task spans multiple modules, needs tradeoff analy
 ### Initialize Project Context
 
 ```bash
-$cxg-init build a modular AGENTS.md for this repository
+/cxg-init build a modular AGENTS.md for this repository
 ```
 
 This command generates root-level and module-level `AGENTS.md` files using a "concise at root, detailed by module" strategy.
@@ -177,6 +179,10 @@ This command generates root-level and module-level `AGENTS.md` files using a "co
 
 ```text
 ~/.codex/
+├── prompts/
+│   ├── cxg-workflow.md
+│   ├── cxg-plan.md
+│   └── ...
 ├── skills/
 │   └── cxg/
 │       ├── workflow/SKILL.md
@@ -211,7 +217,7 @@ CXG stores its own state in `~/.codex/.cxg/config.toml`, including:
 - Default with `npx cxg-workflow init`
 - Also available via `npx cxg-workflow init --mcp ace-tool`
 - CXG writes the MCP server entry into `~/.codex/config.toml`
-- Skill templates use `mcp__ace-tool__search_context`
+- Prompt templates use `mcp__ace-tool__search_context`
 
 **`contextweaver`**
 
@@ -222,7 +228,7 @@ CXG stores its own state in `~/.codex/.cxg/config.toml`, including:
 **`skip`**
 
 - Use `npx cxg-workflow init --skip-mcp`
-- Skill templates fall back to filesystem search via `Glob + Grep`
+- Prompt templates fall back to filesystem search via `Glob + Grep`
 
 ## Supported Platforms
 
@@ -259,9 +265,9 @@ git push origin main --tags
 
 ## FAQ
 
-### The skills do not appear in Codex CLI
+### The slash commands do not appear in Codex CLI
 
-Run `npx cxg-workflow init`, then restart Codex CLI. CXG installs skill files into `~/.codex/skills/cxg/`, and `init` also cleans up legacy `~/.codex/prompts/cxg-*.md` files.
+Run `npx cxg-workflow init`, then restart Codex CLI. CXG installs prompt files into `~/.codex/prompts/`, which Codex loads as slash commands.
 
 ### Installation failed while downloading `codeagent-wrapper`
 
