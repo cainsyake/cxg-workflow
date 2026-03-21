@@ -4,14 +4,47 @@ import { homedir } from 'node:os'
 import { join } from 'pathe'
 import { parse as parseToml, stringify as stringifyToml } from 'smol-toml'
 
-const CODEX_CONFIG_PATH = join(homedir(), '.codex', 'config.toml')
+function getCodexConfigPath(): string {
+  return join(homedir(), '.codex', 'config.toml')
+}
+
+function readArgValue(args: unknown, key: string): string | undefined {
+  if (!Array.isArray(args)) {
+    return undefined
+  }
+  const index = args.findIndex(v => v === key)
+  if (index < 0 || index + 1 >= args.length) {
+    return undefined
+  }
+  const value = args[index + 1]
+  return typeof value === 'string' ? value : undefined
+}
+
+function buildAceToolArgs(
+  packageName: 'ace-tool' | 'ace-tool-rs',
+  config: AceToolConfig,
+  existingEntry?: Record<string, any>,
+): string[] {
+  const baseUrl = config.baseUrl || readArgValue(existingEntry?.args, '--base-url')
+  const token = config.token || readArgValue(existingEntry?.args, '--token')
+
+  const args = ['-y', `${packageName}@latest`]
+  if (baseUrl) {
+    args.push('--base-url', baseUrl)
+  }
+  if (token) {
+    args.push('--token', token)
+  }
+  return args
+}
 
 /**
  * Read Codex config.toml
  */
 async function readCodexConfig(): Promise<Record<string, any>> {
-  if (await fs.pathExists(CODEX_CONFIG_PATH)) {
-    const content = await fs.readFile(CODEX_CONFIG_PATH, 'utf-8')
+  const codexConfigPath = getCodexConfigPath()
+  if (await fs.pathExists(codexConfigPath)) {
+    const content = await fs.readFile(codexConfigPath, 'utf-8')
     return parseToml(content) as Record<string, any>
   }
   return {}
@@ -23,9 +56,10 @@ async function readCodexConfig(): Promise<Record<string, any>> {
 async function writeCodexConfig(config: Record<string, any>): Promise<void> {
   const dir = join(homedir(), '.codex')
   await fs.ensureDir(dir)
-  const tmpPath = `${CODEX_CONFIG_PATH}.tmp`
+  const codexConfigPath = getCodexConfigPath()
+  const tmpPath = `${codexConfigPath}.tmp`
   await fs.writeFile(tmpPath, stringifyToml(config), 'utf-8')
-  await fs.rename(tmpPath, CODEX_CONFIG_PATH)
+  await fs.rename(tmpPath, codexConfigPath)
 }
 
 /**
@@ -39,13 +73,7 @@ export async function installAceTool(config: AceToolConfig): Promise<{ success: 
       codexConfig.mcp_servers = {}
     }
 
-    const args = ['-y', 'ace-tool@latest']
-    if (config.baseUrl) {
-      args.push('--base-url', config.baseUrl)
-    }
-    if (config.token) {
-      args.push('--token', config.token)
-    }
+    const args = buildAceToolArgs('ace-tool', config, codexConfig.mcp_servers['ace-tool'])
 
     codexConfig.mcp_servers['ace-tool'] = {
       type: 'stdio',
@@ -114,13 +142,7 @@ export async function installAceToolRs(config: AceToolConfig): Promise<{ success
       codexConfig.mcp_servers = {}
     }
 
-    const args = ['-y', 'ace-tool-rs@latest']
-    if (config.baseUrl) {
-      args.push('--base-url', config.baseUrl)
-    }
-    if (config.token) {
-      args.push('--token', config.token)
-    }
+    const args = buildAceToolArgs('ace-tool-rs', config, codexConfig.mcp_servers['ace-tool'])
 
     codexConfig.mcp_servers['ace-tool'] = {
       type: 'stdio',
