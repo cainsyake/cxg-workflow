@@ -89,6 +89,19 @@ npx cxg-workflow init --skip-mcp
 npx cxg-workflow doctor
 ```
 
+### 查看版本与更新
+
+```bash
+# 查看 CLI / 本地工作流 / binary 状态
+npx cxg-workflow version --check
+
+# 原子更新（失败自动回滚）
+npx cxg-workflow update
+
+# 非交互更新
+npx cxg-workflow update --yes
+```
+
 ### 卸载
 
 ```bash

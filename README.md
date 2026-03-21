@@ -89,6 +89,19 @@ After installation, open Codex CLI and invoke commands as slash commands such as
 npx cxg-workflow doctor
 ```
 
+### Check Version And Update
+
+```bash
+# show CLI/local workflow/binary status
+npx cxg-workflow version --check
+
+# atomic update (auto rollback on failure)
+npx cxg-workflow update
+
+# non-interactive update
+npx cxg-workflow update --yes
+```
+
 ### Uninstall
 
 ```bash

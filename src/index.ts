@@ -13,6 +13,8 @@ export type {
 export { init } from './commands/init'
 export { uninstall } from './commands/uninstall'
 export { doctor } from './commands/doctor'
+export { update } from './commands/update'
+export { showVersion } from './commands/version'
 
 // Config
 export {
@@ -31,6 +33,14 @@ export {
   getWorkflowConfigs,
   getAllCommandIds,
 } from './utils/installer'
+
+// Version
+export {
+  getCurrentVersion,
+  getLatestVersion,
+  checkForUpdates,
+  compareVersions,
+} from './utils/version'
 
 // MCP
 export {

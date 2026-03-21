@@ -50,6 +50,12 @@ export async function writeCxgConfig(config: CxgConfig): Promise<void> {
 export function createDefaultConfig(options?: {
   mcpProvider?: McpProvider
   liteMode?: boolean
+  binary?: {
+    source?: string
+    checksum_status?: 'verified' | 'missing' | 'failed' | 'skipped'
+    verified_at?: string
+    version?: string
+  }
 }): CxgConfig {
   return {
     general: {
@@ -69,6 +75,7 @@ export function createDefaultConfig(options?: {
     commands: {
       installed: [],
     },
+    binary: options?.binary,
     mcp: {
       provider: options?.mcpProvider || DEFAULT_MCP_PROVIDER,
     },

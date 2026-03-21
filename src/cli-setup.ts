@@ -1,12 +1,14 @@
 import type { McpProvider } from './types'
 import type { CAC } from 'cac'
-import type { CliOptions } from './types/cli'
+import type { CliOptions, UpdateCliOptions, VersionCliOptions } from './types/cli'
 import { version } from '../package.json'
 import { init } from './commands/init'
 import { uninstall } from './commands/uninstall'
 import { doctor } from './commands/doctor'
 import { showMainMenu } from './commands/menu'
 import { configMcp } from './commands/config-mcp'
+import { update } from './commands/update'
+import { showVersion } from './commands/version'
 import { DEFAULT_MCP_PROVIDER } from './utils/constants'
 
 const VALID_MCP_PROVIDERS: McpProvider[] = ['skip', 'ace-tool', 'contextweaver']
@@ -70,6 +72,27 @@ export function setupCommands(cli: CAC): void {
     .command('doctor', '诊断 CXG 安装完整性')
     .action(async () => {
       await doctor()
+    })
+
+  // Update command
+  cli
+    .command('update', '更新 CXG 并在失败时自动回滚')
+    .alias('up')
+    .option('--yes, -y', '跳过确认，直接更新')
+    .action(async (options: UpdateCliOptions) => {
+      await update({
+        yes: options.yes,
+      })
+    })
+
+  // Version command
+  cli
+    .command('version', '显示 CXG 版本状态')
+    .option('--check', '检查 npm 最新版本')
+    .action(async (options: VersionCliOptions) => {
+      await showVersion({
+        check: options.check,
+      })
     })
 
   cli.help()

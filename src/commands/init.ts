@@ -1,9 +1,12 @@
 import type { InitOptions } from '../types/cli'
+import { homedir } from 'node:os'
+import { join } from 'pathe'
 import { version } from '../../package.json'
 import { createDefaultConfig, writeCxgConfig } from '../utils/config'
-import { DEFAULT_MCP_PROVIDER } from '../utils/constants'
+import { ALL_COMMANDS, DEFAULT_MCP_PROVIDER } from '../utils/constants'
+import { showBinaryDownloadWarning } from '../utils/binary'
 import { installCxg } from '../utils/installer'
-import { installAceTool, installContextWeaver } from '../utils/mcp'
+import { installAceTool } from '../utils/mcp'
 
 export async function init(options: InitOptions = {}): Promise<void> {
   console.log()
@@ -58,10 +61,33 @@ export async function init(options: InitOptions = {}): Promise<void> {
   // 3. Save config
   console.log()
   console.log('  [3/3] 保存配置...')
-  const config = createDefaultConfig({ mcpProvider, liteMode })
-  config.commands.installed = result.installedPrompts
-  await writeCxgConfig(config)
-  console.log('    ✓ ~/.codex/.cxg/config.toml')
+  const installedCommands = result.success
+    ? [...ALL_COMMANDS]
+    : result.installedPrompts
+
+  const hasInstalledArtifacts = installedCommands.length > 0
+    || result.installedSkills.length > 0
+    || result.installedRoles.length > 0
+    || Boolean(result.binInstalled)
+
+  if (hasInstalledArtifacts) {
+    const config = createDefaultConfig({
+      mcpProvider,
+      liteMode,
+      binary: {
+        source: result.binSource,
+        checksum_status: result.binChecksumStatus,
+        verified_at: result.binInstalled ? new Date().toISOString() : undefined,
+        version: result.binVersion,
+      },
+    })
+    config.commands.installed = installedCommands
+    await writeCxgConfig(config)
+    console.log('    ✓ ~/.codex/.cxg/config.toml')
+  }
+  else {
+    console.log('    ✗ 未写入配置（安装未产生有效产物）')
+  }
 
   // Summary
   console.log()
@@ -75,10 +101,19 @@ export async function init(options: InitOptions = {}): Promise<void> {
     console.log('  ✓ 安装完成!')
   }
 
+  if (!result.binInstalled) {
+    showBinaryDownloadWarning(join(homedir(), '.codex', 'bin'))
+  }
+
   console.log()
   console.log('  已安装命令:')
-  for (const cmd of result.installedPrompts) {
-    console.log(`    /${cmd}`)
+  if (installedCommands.length === 0) {
+    console.log('    (无)')
+  }
+  else {
+    for (const cmd of installedCommands) {
+      console.log(`    /${cmd}`)
+    }
   }
 
   console.log()

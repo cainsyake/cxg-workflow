@@ -24,6 +24,79 @@ function findPackageRoot(startDir: string): string {
 
 const PACKAGE_ROOT = findPackageRoot(__dirname)
 
+function getWrapperPath(binDir: string): string {
+  return join(binDir, isWindows() ? 'codeagent-wrapper.exe' : 'codeagent-wrapper')
+}
+
+async function readBinaryVersion(binaryPath: string): Promise<string | undefined> {
+  try {
+    const { execSync } = await import('node:child_process')
+    return execSync(`"${binaryPath}" --version`, { stdio: 'pipe', encoding: 'utf-8' }).trim()
+  }
+  catch {
+    return undefined
+  }
+}
+
+async function countInstalledSkills(dir: string): Promise<string[]> {
+  const skills: string[] = []
+  const entries = await fs.readdir(dir, { withFileTypes: true })
+  for (const entry of entries) {
+    if (!entry.isDirectory()) {
+      continue
+    }
+    const skillFile = join(dir, entry.name, 'SKILL.md')
+    if (await fs.pathExists(skillFile)) {
+      skills.push(entry.name)
+    }
+  }
+  return skills
+}
+
+async function preflightCheck(templateDir: string, skipBinary: boolean): Promise<string[]> {
+  const errors: string[] = []
+  if (!(await fs.pathExists(templateDir))) {
+    errors.push(`Template directory not found: ${templateDir}`)
+  }
+
+  if (!skipBinary) {
+    try {
+      resolveBinaryName()
+    }
+    catch (error) {
+      errors.push(`Unsupported platform for binary install: ${String(error)}`)
+    }
+  }
+
+  return errors
+}
+
+async function postflightCheck(
+  codexHome: string,
+  skipBinary: boolean,
+  result: InstallResult,
+): Promise<string[]> {
+  const errors: string[] = []
+  const promptsDir = join(codexHome, 'prompts')
+  const missingPrompts: string[] = []
+
+  for (const cmd of ALL_COMMANDS) {
+    if (!(await fs.pathExists(join(promptsDir, `${cmd}.md`)))) {
+      missingPrompts.push(cmd)
+    }
+  }
+
+  if (missingPrompts.length > 0) {
+    errors.push(`Missing prompt files after install: ${missingPrompts.join(', ')}`)
+  }
+
+  if (!skipBinary && !result.binInstalled) {
+    errors.push('Binary postflight check failed: codeagent-wrapper is unavailable')
+  }
+
+  return errors
+}
+
 export function getWorkflowConfigs() {
   return [...WORKFLOW_CONFIGS].sort((a, b) => a.order - b.order)
 }
@@ -34,13 +107,6 @@ export function getAllCommandIds(): string[] {
 
 /**
  * Install CXG workflow system to ~/.codex/
- *
- * Installs:
- * - Custom Prompts to ~/.codex/prompts/cxg-*.md
- * - Skills to ~/.codex/skills/cxg/* /SKILL.md
- * - Role prompts to ~/.codex/.cxg/roles/codex/*.md
- * - codeagent-wrapper binary to ~/.codex/bin/
- * - Config to ~/.codex/.cxg/config.toml
  */
 export async function installCxg(options: {
   force?: boolean
@@ -55,7 +121,6 @@ export async function installCxg(options: {
   const rolesDir = join(codexHome, '.cxg', 'roles', 'codex')
   const binDir = join(codexHome, 'bin')
   const templateDir = join(PACKAGE_ROOT, 'templates')
-
   const installConfig = { liteMode, mcpProvider }
 
   const result: InstallResult = {
@@ -66,7 +131,13 @@ export async function installCxg(options: {
     errors: [],
   }
 
-  // Ensure directories
+  const preflightErrors = await preflightCheck(templateDir, skipBinary)
+  if (preflightErrors.length > 0) {
+    result.success = false
+    result.errors.push(...preflightErrors)
+    return result
+  }
+
   await fs.ensureDir(promptsDir)
   await fs.ensureDir(skillsDir)
   await fs.ensureDir(rolesDir)
@@ -74,26 +145,27 @@ export async function installCxg(options: {
 
   // 1. Install Custom Prompts
   const promptsTemplateDir = join(templateDir, 'prompts')
-  if (await fs.pathExists(promptsTemplateDir)) {
-    for (const cmd of ALL_COMMANDS) {
-      const srcFile = join(promptsTemplateDir, `${cmd}.md`)
-      const destFile = join(promptsDir, `${cmd}.md`)
+  for (const cmd of ALL_COMMANDS) {
+    const srcFile = join(promptsTemplateDir, `${cmd}.md`)
+    const destFile = join(promptsDir, `${cmd}.md`)
 
-      try {
-        if (await fs.pathExists(srcFile)) {
-          if (force || !(await fs.pathExists(destFile))) {
-            let content = await fs.readFile(srcFile, 'utf-8')
-            content = injectTemplateVariables(content, installConfig)
-            content = replaceHomePathsInTemplate(content, codexHome)
-            await fs.writeFile(destFile, content, 'utf-8')
-            result.installedPrompts.push(cmd)
-          }
-        }
-      }
-      catch (error) {
-        result.errors.push(`Failed to install prompt ${cmd}: ${error}`)
+    try {
+      if (!(await fs.pathExists(srcFile))) {
+        result.errors.push(`Prompt template not found: ${cmd}`)
         result.success = false
+        continue
       }
+      if (force || !(await fs.pathExists(destFile))) {
+        let content = await fs.readFile(srcFile, 'utf-8')
+        content = injectTemplateVariables(content, installConfig)
+        content = replaceHomePathsInTemplate(content, codexHome)
+        await fs.writeFile(destFile, content, 'utf-8')
+        result.installedPrompts.push(cmd)
+      }
+    }
+    catch (error) {
+      result.errors.push(`Failed to install prompt ${cmd}: ${error}`)
+      result.success = false
     }
   }
 
@@ -106,15 +178,15 @@ export async function installCxg(options: {
         errorOnExist: false,
       })
 
-      // Post-copy: apply template variable replacement to .md files
       const replacePathsInDir = async (dir: string): Promise<void> => {
         const entries = await fs.readdir(dir, { withFileTypes: true })
         for (const entry of entries) {
           const fullPath = join(dir, entry.name)
           if (entry.isDirectory()) {
             await replacePathsInDir(fullPath)
+            continue
           }
-          else if (entry.name.endsWith('.md')) {
+          if (entry.name.endsWith('.md')) {
             const original = await fs.readFile(fullPath, 'utf-8')
             let processed = injectTemplateVariables(original, installConfig)
             processed = replaceHomePathsInTemplate(processed, codexHome)
@@ -124,28 +196,18 @@ export async function installCxg(options: {
           }
         }
       }
-      await replacePathsInDir(skillsDir)
 
-      // Count installed skills
-      const countSkills = async (dir: string): Promise<string[]> => {
-        const skills: string[] = []
-        const entries = await fs.readdir(dir, { withFileTypes: true })
-        for (const entry of entries) {
-          if (entry.isDirectory()) {
-            const skillFile = join(dir, entry.name, 'SKILL.md')
-            if (await fs.pathExists(skillFile)) {
-              skills.push(entry.name)
-            }
-          }
-        }
-        return skills
-      }
-      result.installedSkills = await countSkills(skillsDir)
+      await replacePathsInDir(skillsDir)
+      result.installedSkills = await countInstalledSkills(skillsDir)
     }
     catch (error) {
       result.errors.push(`Failed to install skills: ${error}`)
       result.success = false
     }
+  }
+  else {
+    result.errors.push(`Skills template directory not found: ${skillsTemplateDir}`)
+    result.success = false
   }
 
   // 3. Install Role Prompts
@@ -154,15 +216,16 @@ export async function installCxg(options: {
     try {
       const files = await fs.readdir(rolesTemplateDir)
       for (const file of files) {
-        if (file.endsWith('.md')) {
-          const srcFile = join(rolesTemplateDir, file)
-          const destFile = join(rolesDir, file)
-          if (force || !(await fs.pathExists(destFile))) {
-            const content = await fs.readFile(srcFile, 'utf-8')
-            const processed = replaceHomePathsInTemplate(content, codexHome)
-            await fs.writeFile(destFile, processed, 'utf-8')
-            result.installedRoles.push(file.replace('.md', ''))
-          }
+        if (!file.endsWith('.md')) {
+          continue
+        }
+        const srcFile = join(rolesTemplateDir, file)
+        const destFile = join(rolesDir, file)
+        if (force || !(await fs.pathExists(destFile))) {
+          const content = await fs.readFile(srcFile, 'utf-8')
+          const processed = replaceHomePathsInTemplate(content, codexHome)
+          await fs.writeFile(destFile, processed, 'utf-8')
+          result.installedRoles.push(file.replace('.md', ''))
         }
       }
     }
@@ -171,28 +234,48 @@ export async function installCxg(options: {
       result.success = false
     }
   }
+  else {
+    result.errors.push(`Roles template directory not found: ${rolesTemplateDir}`)
+    result.success = false
+  }
 
   // 4. Install codeagent-wrapper binary
   if (!skipBinary) {
-    try {
-      const binaryName = resolveBinaryName()
-      const destBinary = join(binDir, isWindows() ? 'codeagent-wrapper.exe' : 'codeagent-wrapper')
+    const binaryName = resolveBinaryName()
+    const destBinary = getWrapperPath(binDir)
 
-      const installed = await downloadBinary(binaryName, destBinary)
-      if (installed) {
-        const verified = await verifyBinary(destBinary)
-        if (verified) {
+    try {
+      if (await fs.pathExists(destBinary)) {
+        const isHealthy = await verifyBinary(destBinary)
+        if (isHealthy) {
           result.binInstalled = true
           result.binPath = binDir
-        }
-        else {
-          result.errors.push('Binary verification failed')
-          result.success = false
+          result.binSource = 'local-existing'
+          result.binChecksumStatus = 'skipped'
+          result.binVersion = await readBinaryVersion(destBinary)
         }
       }
-      else {
-        result.errors.push(`Failed to download binary: ${binaryName}`)
-        result.success = false
+
+      if (!result.binInstalled) {
+        const downloadResult = await downloadBinary(binaryName, destBinary)
+        if (!downloadResult.success) {
+          result.errors.push(`Failed to download binary: ${binaryName} (${downloadResult.error || 'unknown error'})`)
+          result.success = false
+        }
+        else {
+          const verified = await verifyBinary(destBinary)
+          if (!verified) {
+            result.errors.push('Binary verification failed after download')
+            result.success = false
+          }
+          else {
+            result.binInstalled = true
+            result.binPath = binDir
+            result.binSource = downloadResult.sourceName
+            result.binChecksumStatus = downloadResult.checksumStatus
+            result.binVersion = await readBinaryVersion(destBinary)
+          }
+        }
       }
     }
     catch (error) {
@@ -201,13 +284,19 @@ export async function installCxg(options: {
     }
   }
 
+  const postflightErrors = await postflightCheck(codexHome, skipBinary, result)
+  if (postflightErrors.length > 0) {
+    result.errors.push(...postflightErrors)
+    result.success = false
+  }
+
   return result
 }
 
 /**
  * Uninstall CXG workflow system from ~/.codex/
  */
-export async function uninstallCxg(): Promise<UninstallResult> {
+export async function uninstallCxg(options?: { preserveBinary?: boolean }): Promise<UninstallResult> {
   const codexHome = join(homedir(), '.codex')
   const promptsDir = join(codexHome, 'prompts')
   const skillsDir = join(codexHome, 'skills', 'cxg')
@@ -278,10 +367,9 @@ export async function uninstallCxg(): Promise<UninstallResult> {
   }
 
   // 4. Remove codeagent-wrapper binary
-  if (await fs.pathExists(binDir)) {
+  if (!options?.preserveBinary && await fs.pathExists(binDir)) {
     try {
-      const wrapperName = isWindows() ? 'codeagent-wrapper.exe' : 'codeagent-wrapper'
-      const wrapperPath = join(binDir, wrapperName)
+      const wrapperPath = getWrapperPath(binDir)
       if (await fs.pathExists(wrapperPath)) {
         await fs.remove(wrapperPath)
         result.removedBin = true

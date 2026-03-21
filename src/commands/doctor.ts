@@ -87,19 +87,24 @@ export async function doctor(): Promise<void> {
   const wrapperPath = join(codexHome, 'bin', wrapperName)
   const binExists = await fs.pathExists(wrapperPath)
   let binVersion = ''
+  let binHealthy = false
   if (binExists) {
     try {
       const { execSync } = await import('node:child_process')
       binVersion = execSync(`"${wrapperPath}" --version`, { stdio: 'pipe', encoding: 'utf-8' }).trim()
+      binHealthy = true
     }
     catch {
       binVersion = '(版本检测失败)'
     }
   }
+  const source = config?.binary?.source ? `source=${config.binary.source}` : ''
+  const checksum = config?.binary?.checksum_status ? `checksum=${config.binary.checksum_status}` : ''
+  const details = [binVersion, source, checksum].filter(Boolean).join(' | ')
   results.push({
     label: 'codeagent-wrapper',
-    ok: binExists,
-    detail: binExists ? binVersion : '未安装',
+    ok: binExists && binHealthy,
+    detail: binExists ? details : '未安装',
   })
 
   // 6. Check MCP config
@@ -129,7 +134,7 @@ export async function doctor(): Promise<void> {
     console.log('  所有检查通过!')
   }
   else {
-    console.log('  部分检查未通过，运行 npx cxg-workflow init --force 修复')
+    console.log('  部分检查未通过，运行 npx cxg-workflow init --force 或 npx cxg-workflow update 修复')
   }
   console.log()
 }

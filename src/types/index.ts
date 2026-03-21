@@ -19,6 +19,12 @@ export interface CxgConfig {
   commands: {
     installed: string[]
   }
+  binary?: {
+    source?: string
+    checksum_status?: 'verified' | 'missing' | 'failed' | 'skipped'
+    verified_at?: string
+    version?: string
+  }
   mcp?: {
     provider: McpProvider
   }
@@ -32,6 +38,9 @@ export interface InstallResult {
   errors: string[]
   binInstalled?: boolean
   binPath?: string
+  binSource?: string
+  binChecksumStatus?: 'verified' | 'missing' | 'failed' | 'skipped'
+  binVersion?: string
 }
 
 export interface UninstallResult {

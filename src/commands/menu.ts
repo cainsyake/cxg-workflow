@@ -7,6 +7,8 @@ import { configMcp } from './config-mcp'
 import { init } from './init'
 import { uninstall } from './uninstall'
 import { doctor } from './doctor'
+import { update } from './update'
+import { showVersion } from './version'
 import { createDefaultConfig, readCxgConfig, writeCxgConfig } from '../utils/config'
 import { installCxg } from '../utils/installer'
 
@@ -82,6 +84,8 @@ export async function showMainMenu(): Promise<void> {
         item('3', '诊断安装', '检查安装完整性'),
         item('4', '卸载', '移除 CXG 配置'),
         item('5', '设置 Lite 模式', '选择子进程 --lite 开关并重渲染模板'),
+        item('6', '更新', '执行原子更新，失败自动回滚'),
+        item('7', '版本状态', '查看 CLI/本地/binary 版本'),
         new inquirer.Separator(ansis.gray('─'.repeat(42))),
         { name: `  ${ansis.red('Q.')} 退出`, value: 'Q' },
       ],
@@ -102,6 +106,12 @@ export async function showMainMenu(): Promise<void> {
         break
       case '5':
         await toggleLiteMode(config)
+        break
+      case '6':
+        await update()
+        break
+      case '7':
+        await showVersion({ check: true })
         break
       case 'Q':
         console.log()

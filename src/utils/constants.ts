@@ -38,3 +38,25 @@ export const WORKFLOW_CONFIGS: WorkflowConfig[] = [
 export const GITHUB_REPO = 'fengshao1227/ccg-workflow'
 export const RELEASE_TAG = 'preset'
 export const BINARY_DOWNLOAD_URL = `https://github.com/${GITHUB_REPO}/releases/download/${RELEASE_TAG}`
+export const BINARY_RELEASE_URL = `https://github.com/${GITHUB_REPO}/releases/tag/${RELEASE_TAG}`
+
+export interface BinarySource {
+  name: string
+  url: string
+  timeoutMs: number
+}
+
+export const BINARY_DOWNLOAD_RETRY_ATTEMPTS = 2
+
+export const BINARY_SOURCES: BinarySource[] = [
+  {
+    name: 'GitHub Release',
+    url: BINARY_DOWNLOAD_URL,
+    timeoutMs: 8_000,
+  },
+  {
+    name: 'Cloudflare R2',
+    url: 'https://pub-29270440a0854a49bf1589cd3662c067.r2.dev/preset',
+    timeoutMs: 60_000,
+  },
+]
