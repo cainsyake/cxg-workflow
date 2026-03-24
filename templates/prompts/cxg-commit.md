@@ -14,7 +14,6 @@
 |------|------|
 | `--all` | 暂存所有改动 |
 | `--amend` | 修补上次提交 |
-| `--emoji` | 包含 emoji 前缀 |
 
 ---
 
@@ -47,7 +46,7 @@
 
 `[模式：生成]`
 
-**格式**：`[emoji] <type>(<scope>): <subject>`
+**格式**：`<type>(<scope>): <subject>`
 
 - 首行 ≤ 72 字符
 - 祈使语气
@@ -65,18 +64,18 @@ git commit -F .git/COMMIT_EDITMSG
 
 ---
 
-## Type 与 Emoji 映射
+## Type 映射
 
-| Emoji | Type | 说明 |
-|-------|------|------|
-| ✨ | `feat` | 新增功能 |
-| 🐛 | `fix` | 缺陷修复 |
-| 📝 | `docs` | 文档更新 |
-| 🎨 | `style` | 代码格式 |
-| ♻️ | `refactor` | 重构 |
-| ⚡️ | `perf` | 性能优化 |
-| ✅ | `test` | 测试相关 |
-| 🔧 | `chore` | 构建/工具 |
+| Type | 说明 |
+|------|------|
+| `feat` | 新增功能 |
+| `fix` | 缺陷修复 |
+| `docs` | 文档更新 |
+| `style` | 代码格式 |
+| `refactor` | 重构 |
+| `perf` | 性能优化 |
+| `test` | 测试相关 |
+| `chore` | 构建/工具 |
 
 ---
 
