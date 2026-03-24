@@ -2,7 +2,7 @@
 
 ## 文档说明
 
-本文件用于记录 `ccg-workflow` 到 `cxg-workflow` 的同步内容与关键差异。  
+本文件用于记录 `ccg-workflow` 到 `cxg-workflow` 的同步内容与关键差异。
 维护策略：仅维护中文版本。
 
 基线日期：2026-03-21
