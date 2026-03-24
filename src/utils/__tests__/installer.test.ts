@@ -141,6 +141,36 @@ describe('template file completeness', () => {
   })
 })
 
+describe('codex wait rule guards', () => {
+  const waitRulePromptIds = [
+    'cxg-analyze',
+    'cxg-plan',
+    'cxg-review',
+    'cxg-debug',
+    'cxg-optimize',
+    'cxg-feat',
+    'cxg-workflow',
+  ]
+
+  it('all related prompts include codex wait hard rule', () => {
+    for (const promptId of waitRulePromptIds) {
+      const promptPath = join(PROMPTS_DIR, `${promptId}.md`)
+      const content = readFileSync(promptPath, 'utf-8')
+      expect(content.includes('⛔ **Codex 结果必须等待**'), `${promptId} missing Codex wait heading`).toBe(true)
+      expect(
+        content.includes('禁止在 Codex 未返回结果时直接跳过或继续下一阶段'),
+        `${promptId} missing non-skip guard`,
+      ).toBe(true)
+    }
+  })
+
+  it('cxg-feat includes conditional scope for started codex subprocess', () => {
+    const featPromptPath = join(PROMPTS_DIR, 'cxg-feat.md')
+    const content = readFileSync(featPromptPath, 'utf-8')
+    expect(content.includes('仅当已启动 Codex 子进程任务时'), 'cxg-feat missing conditional scope').toBe(true)
+  })
+})
+
 // ─────────────────────────────────────────────────────────────
 // C. Template variable completeness
 // ─────────────────────────────────────────────────────────────
