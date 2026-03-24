@@ -43,6 +43,11 @@ EOF",
 
 **等待后台任务**：`TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })`
 
+**重要**：
+- 必须指定 `timeout: 600000`，否则默认只有 30 秒会导致提前超时。
+- 若 10 分钟后仍未完成，继续用 `TaskOutput` 轮询，**绝对不要 Kill 进程**。
+- ⛔ **Codex 结果必须等待**：Codex 执行时间较长（5-15 分钟）属于正常。TaskOutput 超时后必须继续用 TaskOutput 轮询，**绝对禁止在 Codex 未返回结果时直接跳过或继续下一阶段**。已启动的 Codex 任务若被跳过 = 浪费 token + 丢失结果。
+
 ---
 
 ## 执行工作流
