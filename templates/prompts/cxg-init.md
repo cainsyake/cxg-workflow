@@ -5,7 +5,7 @@
 ## 使用方法
 
 ```bash
-/cxg-init [项目摘要]
+/prompts:cxg-init [项目摘要]
 ```
 
 ---

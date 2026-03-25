@@ -95,16 +95,34 @@ describe('replaceHomePathsInTemplate', () => {
     expect(result).toBe('/home/testuser/.codex/.cxg/roles/codex/analyzer.md')
   })
 
+  it('replaces ROLE_ANALYZER_FRONTEND with absolute path', () => {
+    const input = '{{ROLE_ANALYZER_FRONTEND}}'
+    const result = replaceHomePathsInTemplate(input, codexHome)
+    expect(result).toBe('/home/testuser/.codex/.cxg/roles/codex/analyzer-frontend.md')
+  })
+
   it('replaces ROLE_ARCHITECT with absolute path', () => {
     const input = '{{ROLE_ARCHITECT}}'
     const result = replaceHomePathsInTemplate(input, codexHome)
     expect(result).toBe('/home/testuser/.codex/.cxg/roles/codex/architect.md')
   })
 
+  it('replaces ROLE_ARCHITECT_FRONTEND with absolute path', () => {
+    const input = '{{ROLE_ARCHITECT_FRONTEND}}'
+    const result = replaceHomePathsInTemplate(input, codexHome)
+    expect(result).toBe('/home/testuser/.codex/.cxg/roles/codex/architect-frontend.md')
+  })
+
   it('replaces ROLE_REVIEWER with absolute path', () => {
     const input = '{{ROLE_REVIEWER}}'
     const result = replaceHomePathsInTemplate(input, codexHome)
     expect(result).toBe('/home/testuser/.codex/.cxg/roles/codex/reviewer.md')
+  })
+
+  it('replaces ROLE_REVIEWER_FRONTEND with absolute path', () => {
+    const input = '{{ROLE_REVIEWER_FRONTEND}}'
+    const result = replaceHomePathsInTemplate(input, codexHome)
+    expect(result).toBe('/home/testuser/.codex/.cxg/roles/codex/reviewer-frontend.md')
   })
 
   it('replaces ~/.codex/.cxg with absolute path', () => {
@@ -126,10 +144,13 @@ describe('replaceHomePathsInTemplate', () => {
   })
 
   it('handles multiple replacements in one content', () => {
-    const input = 'wrapper: {{WRAPPER_BIN}}\nanalyzer: {{ROLE_ANALYZER}}\nconfig: ~/.codex/.cxg/config.toml'
+    const input = 'wrapper: {{WRAPPER_BIN}}\nanalyzer: {{ROLE_ANALYZER}}\nfrontend: {{ROLE_ANALYZER_FRONTEND}}\narchitectFrontend: {{ROLE_ARCHITECT_FRONTEND}}\nreviewerFrontend: {{ROLE_REVIEWER_FRONTEND}}\nconfig: ~/.codex/.cxg/config.toml'
     const result = replaceHomePathsInTemplate(input, codexHome)
     expect(result).toContain('/home/testuser/.codex/bin/codeagent-wrapper')
     expect(result).toContain('/home/testuser/.codex/.cxg/roles/codex/analyzer.md')
+    expect(result).toContain('/home/testuser/.codex/.cxg/roles/codex/analyzer-frontend.md')
+    expect(result).toContain('/home/testuser/.codex/.cxg/roles/codex/architect-frontend.md')
+    expect(result).toContain('/home/testuser/.codex/.cxg/roles/codex/reviewer-frontend.md')
     expect(result).toContain('/home/testuser/.codex/.cxg/config.toml')
     expect(result).not.toContain('~/')
     expect(result).not.toContain('{{')

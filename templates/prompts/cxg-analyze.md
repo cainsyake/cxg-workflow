@@ -5,7 +5,7 @@
 ## 使用方法
 
 ```bash
-/cxg-analyze <分析问题或任务>
+/prompts:cxg-analyze <分析问题或任务>
 ```
 
 ## 你的角色

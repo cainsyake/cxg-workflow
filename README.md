@@ -15,8 +15,9 @@ CXG is a Codex-first workflow package for Codex CLI. It installs a structured se
 - **Derived from `ccg-workflow`**: preserves the original workflow philosophy while simplifying it into a Codex-only package.
 - **Single-model by design**: no routing between different models, only Codex orchestration plus Codex subprocess roles.
 - **Prompt + skills runtime**: `init` installs prompts, migrated skills, roles, and wrapper.
-- **Structured delivery**: the main workflow follows `research -> plan -> execute -> optimize -> review`.
-- **Reusable expert roles**: built-in `analyzer`, `architect`, and `reviewer` role prompts drive subprocess work.
+- **Structured delivery**: the main workflow follows `research -> ideate -> plan -> execute -> optimize -> review`.
+- **Reusable expert roles**: built-in `analyzer` / `architect` / `reviewer`, with frontend variants (`*-frontend`) for UI-focused analysis, planning, and review.
+- **Frontend review stays on Codex**: frontend/UI review uses a dedicated Codex role prompt (`reviewer-frontend`) instead of model routing.
 - **Optional code retrieval**: supports `ace-tool`, can be prepared for `contextweaver`, and falls back to `Glob + Grep` when MCP is skipped.
 - **Ready-to-use slash commands**: installs 12 commands directly into `~/.codex/prompts/`.
 
@@ -29,7 +30,7 @@ Codex CLI
    |
    +-- codeagent-wrapper
           |
-          +-- Codex subprocess (analyzer / architect / reviewer)
+          +-- Codex subprocess (analyzer / analyzer-frontend / architect / architect-frontend / reviewer / reviewer-frontend)
 ```
 
 The main Codex session orchestrates the workflow. Subprocesses are used for focused analysis, planning, and review, then their output is fed back into the main session.
@@ -113,7 +114,7 @@ npx cxg-workflow uninstall
 
 | Command | Description |
 |---------|-------------|
-| `/cxg-workflow` | Full 5-phase structured workflow |
+| `/cxg-workflow` | Full 6-phase structured workflow |
 | `/cxg-plan` | Generate an implementation plan |
 | `/cxg-execute` | Execute an approved plan file |
 
@@ -194,8 +195,11 @@ This command generates root-level and module-level `AGENTS.md` files using a "co
     ├── config.toml
     └── roles/
         └── codex/
+            ├── analyzer-frontend.md
             ├── analyzer.md
+            ├── architect-frontend.md
             ├── architect.md
+            ├── reviewer-frontend.md
             └── reviewer.md
 ```
 

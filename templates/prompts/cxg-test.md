@@ -5,7 +5,7 @@
 ## 使用方法
 
 ```bash
-/cxg-test <测试目标描述>
+/prompts:cxg-test <测试目标描述>
 ```
 
 ## 你的角色

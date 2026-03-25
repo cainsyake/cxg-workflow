@@ -113,7 +113,7 @@ describe('template file completeness', () => {
   })
 
   it('role prompts exist', () => {
-    for (const role of ['analyzer', 'architect', 'reviewer']) {
+    for (const role of ['analyzer', 'analyzer-frontend', 'architect', 'architect-frontend', 'reviewer', 'reviewer-frontend']) {
       const rolePath = join(ROLES_DIR, `${role}.md`)
       expect(
         existsSync(rolePath),
@@ -201,8 +201,11 @@ describe('template variable completeness', () => {
         !v.includes('WORKDIR')
         && !v.includes('WRAPPER_BIN')
         && !v.includes('ROLE_ANALYZER')
+        && !v.includes('ROLE_ANALYZER_FRONTEND')
         && !v.includes('ROLE_ARCHITECT')
-        && !v.includes('ROLE_REVIEWER'),
+        && !v.includes('ROLE_ARCHITECT_FRONTEND')
+        && !v.includes('ROLE_REVIEWER')
+        && !v.includes('ROLE_REVIEWER_FRONTEND'),
       )
       expect(unprocessed, `unprocessed variables in ${relativePath}: ${unprocessed.join(', ')}`).toEqual([])
     })

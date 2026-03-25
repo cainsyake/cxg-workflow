@@ -5,7 +5,7 @@
 ## 使用方法
 
 ```bash
-/cxg-review [审查范围或文件]
+/prompts:cxg-review [审查范围或文件]
 ```
 
 ## 你的角色
@@ -19,7 +19,7 @@
 ```
 Bash({
   command: "{{WRAPPER_BIN}} {{LITE_MODE_FLAG}}--backend codex - \"{{WORKDIR}}\" <<'EOF'
-ROLE_FILE: {{ROLE_REVIEWER}}
+ROLE_FILE: {{ROLE_REVIEWER}}  # frontend/UI use {{ROLE_REVIEWER_FRONTEND}}
 <TASK>
 需求：审查以下代码变更
 变更内容：<diff 或代码>
@@ -34,6 +34,10 @@ EOF",
 ```
 
 **等待后台任务**：`TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })`
+
+**角色选择**：
+- 通用/后端审查：`{{ROLE_REVIEWER}}`
+- 前端/UI 审查：`{{ROLE_REVIEWER_FRONTEND}}`（仍然使用 `--backend codex`）
 
 **重要**：
 - 必须指定 `timeout: 600000`，否则默认只有 30 秒会导致提前超时。
@@ -59,10 +63,8 @@ EOF",
 `[模式：审查]`
 
 **调用子进程**（reviewer 角色）：
-- 安全性检查
-- 代码质量评估
-- 性能分析
-- 可维护性评估
+- 通用/后端：安全性检查、代码质量评估、性能分析、可维护性评估
+- 前端/UI：可访问性、设计一致性、响应式、前端性能
 
 ### 阶段 3：综合报告
 

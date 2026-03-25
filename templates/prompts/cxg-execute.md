@@ -5,7 +5,7 @@
 ## 使用方法
 
 ```bash
-/cxg-execute [计划文件路径]
+/prompts:cxg-execute [计划文件路径]
 ```
 
 ## 你的角色

@@ -5,7 +5,7 @@
 ## 使用方法
 
 ```bash
-/cxg-enhance <原始需求描述>
+/prompts:cxg-enhance <原始需求描述>
 ```
 
 ## 你的角色

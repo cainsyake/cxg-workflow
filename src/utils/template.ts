@@ -9,8 +9,11 @@ import { isWindows, normalizePath } from './platform'
  * Variables injected at install time:
  * - {{WRAPPER_BIN}} - codeagent-wrapper binary path
  * - {{ROLE_ANALYZER}} - analyzer role prompt path
+ * - {{ROLE_ANALYZER_FRONTEND}} - frontend analyzer role prompt path
  * - {{ROLE_ARCHITECT}} - architect role prompt path
+ * - {{ROLE_ARCHITECT_FRONTEND}} - frontend architect role prompt path
  * - {{ROLE_REVIEWER}} - reviewer role prompt path
+ * - {{ROLE_REVIEWER_FRONTEND}} - frontend reviewer role prompt path
  * - {{LITE_MODE_FLAG}} - "--lite " or ""
  * - {{MCP_SEARCH_TOOL}} - MCP tool name or fallback
  * - {{MCP_SEARCH_PARAM}} - MCP parameter key
@@ -65,8 +68,11 @@ export function replaceHomePathsInTemplate(content: string, codexHome: string): 
 
   // Replace role prompt paths
   processed = processed.replace(/\{\{ROLE_ANALYZER\}\}/g, `${norm(rolesDir)}/analyzer.md`)
+  processed = processed.replace(/\{\{ROLE_ANALYZER_FRONTEND\}\}/g, `${norm(rolesDir)}/analyzer-frontend.md`)
   processed = processed.replace(/\{\{ROLE_ARCHITECT\}\}/g, `${norm(rolesDir)}/architect.md`)
+  processed = processed.replace(/\{\{ROLE_ARCHITECT_FRONTEND\}\}/g, `${norm(rolesDir)}/architect-frontend.md`)
   processed = processed.replace(/\{\{ROLE_REVIEWER\}\}/g, `${norm(rolesDir)}/reviewer.md`)
+  processed = processed.replace(/\{\{ROLE_REVIEWER_FRONTEND\}\}/g, `${norm(rolesDir)}/reviewer-frontend.md`)
 
   // Replace ~/.codex/.cxg with absolute path
   processed = processed.replace(/~\/\.codex\/\.cxg/g, norm(cxgDir))

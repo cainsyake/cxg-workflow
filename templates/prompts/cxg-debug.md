@@ -5,7 +5,7 @@
 ## 使用方法
 
 ```bash
-/cxg-debug <问题描述或错误信息>
+/prompts:cxg-debug <问题描述或错误信息>
 ```
 
 ## 你的角色

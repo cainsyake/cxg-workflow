@@ -5,7 +5,7 @@
 ## 使用方法
 
 ```bash
-/cxg-optimize <优化目标或性能问题>
+/prompts:cxg-optimize <优化目标或性能问题>
 ```
 
 ## 你的角色
@@ -19,7 +19,7 @@
 ```
 Bash({
   command: "{{WRAPPER_BIN}} {{LITE_MODE_FLAG}}--backend codex - \"{{WORKDIR}}\" <<'EOF'
-ROLE_FILE: {{ROLE_REVIEWER}}
+ROLE_FILE: {{ROLE_REVIEWER}}  # frontend use {{ROLE_REVIEWER_FRONTEND}}
 <TASK>
 需求：性能分析与优化建议
 目标：<优化目标>
@@ -34,6 +34,10 @@ EOF",
 ```
 
 **等待后台任务**：`TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })`
+
+**角色选择**：
+- 通用/后端性能优化：`{{ROLE_REVIEWER}}`
+- 前端性能优化：`{{ROLE_REVIEWER_FRONTEND}}`（仍然使用 `--backend codex`）
 
 **重要**：
 - 必须指定 `timeout: 600000`，否则默认只有 30 秒会导致提前超时。

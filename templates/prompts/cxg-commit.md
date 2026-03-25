@@ -5,7 +5,7 @@
 ## 使用方法
 
 ```bash
-/cxg-commit [options]
+/prompts:cxg-commit [options]
 ```
 
 ## 选项
