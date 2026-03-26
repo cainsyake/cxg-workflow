@@ -33,7 +33,7 @@
 
 **调用语法**（统一后台执行）：
 
-```js
+```text
 Bash({
   command: "{{WRAPPER_BIN}} {{LITE_MODE_FLAG}}--backend codex - \"{{WORKDIR}}\" <<'EOF'
 ROLE_FILE: <角色提示词路径>
@@ -88,7 +88,7 @@ EOF",
 
 优先调用 `{{MCP_SEARCH_TOOL}}`：
 
-```js
+```text
 {{MCP_SEARCH_TOOL}}({
   query: "<基于增强后需求构建的语义查询>",
   project_root_path: "{{WORKDIR}}"
@@ -109,7 +109,6 @@ EOF",
 
 - 若需求仍有模糊空间，**必须**向用户输出引导性问题列表
 - 直至需求边界清晰（无遗漏、无冗余）
-
 
 ### 💡 阶段 2：多进程协作分析
 

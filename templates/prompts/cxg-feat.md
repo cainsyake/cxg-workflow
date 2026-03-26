@@ -26,7 +26,7 @@
 
 **调用语法**：
 
-```js
+```text
 # 新会话
 Bash({
   command: "{{WRAPPER_BIN}} {{LITE_MODE_FLAG}}--backend codex - \"{{WORKDIR}}\" <<'EOF'

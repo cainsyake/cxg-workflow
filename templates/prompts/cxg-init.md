@@ -20,7 +20,7 @@
 
 当项目规模大或模块复杂时，可调用分析/规划子进程生成文档草案，再由主 Codex 落盘：
 
-```js
+```text
 Bash({
   command: "{{WRAPPER_BIN}} {{LITE_MODE_FLAG}}--backend codex - \"{{WORKDIR}}\" <<'EOF'
 ROLE_FILE: {{ROLE_ANALYZER}}

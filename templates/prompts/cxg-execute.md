@@ -28,7 +28,7 @@
 
 **原型调用语法**：
 
-```js
+```text
 # 复用会话（推荐）
 Bash({
   command: "{{WRAPPER_BIN}} {{LITE_MODE_FLAG}}--backend codex resume <SESSION_ID> - \"{{WORKDIR}}\" <<'EOF'
@@ -62,7 +62,7 @@ EOF",
 
 **审计调用语法**：
 
-```js
+```text
 Bash({
   command: "{{WRAPPER_BIN}} {{LITE_MODE_FLAG}}--backend codex resume <SESSION_ID> - \"{{WORKDIR}}\" <<'EOF'
 ROLE_FILE: <角色提示词路径>

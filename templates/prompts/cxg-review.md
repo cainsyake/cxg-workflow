@@ -15,7 +15,7 @@
 
 ## 子进程调用规范
 
-```js
+```text
 Bash({
   command: "{{WRAPPER_BIN}} {{LITE_MODE_FLAG}}--backend codex - \"{{WORKDIR}}\" <<'EOF'
 ROLE_FILE: <角色提示词路径>

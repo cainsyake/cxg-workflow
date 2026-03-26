@@ -25,7 +25,7 @@
 
 **调用语法**（并行用 `run_in_background: true`）：
 
-```js
+```text
 # 新会话调用
 Bash({
   command: "{{WRAPPER_BIN}} {{LITE_MODE_FLAG}}--backend codex - \"{{WORKDIR}}\" <<'EOF'
