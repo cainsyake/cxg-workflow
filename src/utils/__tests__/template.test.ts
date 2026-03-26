@@ -113,6 +113,36 @@ describe('replaceHomePathsInTemplate', () => {
     expect(result).toBe('/home/testuser/.codex/.cxg/roles/codex/architect-frontend.md')
   })
 
+  it('replaces ROLE_DEBUGGER with absolute path', () => {
+    const input = '{{ROLE_DEBUGGER}}'
+    const result = replaceHomePathsInTemplate(input, codexHome)
+    expect(result).toBe('/home/testuser/.codex/.cxg/roles/codex/debugger.md')
+  })
+
+  it('replaces ROLE_DEBUGGER_FRONTEND with absolute path', () => {
+    const input = '{{ROLE_DEBUGGER_FRONTEND}}'
+    const result = replaceHomePathsInTemplate(input, codexHome)
+    expect(result).toBe('/home/testuser/.codex/.cxg/roles/codex/debugger-frontend.md')
+  })
+
+  it('replaces ROLE_FRONTEND with absolute path', () => {
+    const input = '{{ROLE_FRONTEND}}'
+    const result = replaceHomePathsInTemplate(input, codexHome)
+    expect(result).toBe('/home/testuser/.codex/.cxg/roles/codex/frontend.md')
+  })
+
+  it('replaces ROLE_OPTIMIZER with absolute path', () => {
+    const input = '{{ROLE_OPTIMIZER}}'
+    const result = replaceHomePathsInTemplate(input, codexHome)
+    expect(result).toBe('/home/testuser/.codex/.cxg/roles/codex/optimizer.md')
+  })
+
+  it('replaces ROLE_OPTIMIZER_FRONTEND with absolute path', () => {
+    const input = '{{ROLE_OPTIMIZER_FRONTEND}}'
+    const result = replaceHomePathsInTemplate(input, codexHome)
+    expect(result).toBe('/home/testuser/.codex/.cxg/roles/codex/optimizer-frontend.md')
+  })
+
   it('replaces ROLE_REVIEWER with absolute path', () => {
     const input = '{{ROLE_REVIEWER}}'
     const result = replaceHomePathsInTemplate(input, codexHome)
@@ -123,6 +153,18 @@ describe('replaceHomePathsInTemplate', () => {
     const input = '{{ROLE_REVIEWER_FRONTEND}}'
     const result = replaceHomePathsInTemplate(input, codexHome)
     expect(result).toBe('/home/testuser/.codex/.cxg/roles/codex/reviewer-frontend.md')
+  })
+
+  it('replaces ROLE_TESTER with absolute path', () => {
+    const input = '{{ROLE_TESTER}}'
+    const result = replaceHomePathsInTemplate(input, codexHome)
+    expect(result).toBe('/home/testuser/.codex/.cxg/roles/codex/tester.md')
+  })
+
+  it('replaces ROLE_TESTER_FRONTEND with absolute path', () => {
+    const input = '{{ROLE_TESTER_FRONTEND}}'
+    const result = replaceHomePathsInTemplate(input, codexHome)
+    expect(result).toBe('/home/testuser/.codex/.cxg/roles/codex/tester-frontend.md')
   })
 
   it('replaces ~/.codex/.cxg with absolute path', () => {
@@ -144,13 +186,20 @@ describe('replaceHomePathsInTemplate', () => {
   })
 
   it('handles multiple replacements in one content', () => {
-    const input = 'wrapper: {{WRAPPER_BIN}}\nanalyzer: {{ROLE_ANALYZER}}\nfrontend: {{ROLE_ANALYZER_FRONTEND}}\narchitectFrontend: {{ROLE_ARCHITECT_FRONTEND}}\nreviewerFrontend: {{ROLE_REVIEWER_FRONTEND}}\nconfig: ~/.codex/.cxg/config.toml'
+    const input = 'wrapper: {{WRAPPER_BIN}}\nanalyzer: {{ROLE_ANALYZER}}\nanalyzerFrontend: {{ROLE_ANALYZER_FRONTEND}}\narchitectFrontend: {{ROLE_ARCHITECT_FRONTEND}}\ndebugger: {{ROLE_DEBUGGER}}\ndebuggerFrontend: {{ROLE_DEBUGGER_FRONTEND}}\nfrontend: {{ROLE_FRONTEND}}\noptimizer: {{ROLE_OPTIMIZER}}\noptimizerFrontend: {{ROLE_OPTIMIZER_FRONTEND}}\nreviewerFrontend: {{ROLE_REVIEWER_FRONTEND}}\ntester: {{ROLE_TESTER}}\ntesterFrontend: {{ROLE_TESTER_FRONTEND}}\nconfig: ~/.codex/.cxg/config.toml'
     const result = replaceHomePathsInTemplate(input, codexHome)
     expect(result).toContain('/home/testuser/.codex/bin/codeagent-wrapper')
     expect(result).toContain('/home/testuser/.codex/.cxg/roles/codex/analyzer.md')
     expect(result).toContain('/home/testuser/.codex/.cxg/roles/codex/analyzer-frontend.md')
     expect(result).toContain('/home/testuser/.codex/.cxg/roles/codex/architect-frontend.md')
+    expect(result).toContain('/home/testuser/.codex/.cxg/roles/codex/debugger.md')
+    expect(result).toContain('/home/testuser/.codex/.cxg/roles/codex/debugger-frontend.md')
+    expect(result).toContain('/home/testuser/.codex/.cxg/roles/codex/frontend.md')
+    expect(result).toContain('/home/testuser/.codex/.cxg/roles/codex/optimizer.md')
+    expect(result).toContain('/home/testuser/.codex/.cxg/roles/codex/optimizer-frontend.md')
     expect(result).toContain('/home/testuser/.codex/.cxg/roles/codex/reviewer-frontend.md')
+    expect(result).toContain('/home/testuser/.codex/.cxg/roles/codex/tester.md')
+    expect(result).toContain('/home/testuser/.codex/.cxg/roles/codex/tester-frontend.md')
     expect(result).toContain('/home/testuser/.codex/.cxg/config.toml')
     expect(result).not.toContain('~/')
     expect(result).not.toContain('{{')

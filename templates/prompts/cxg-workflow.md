@@ -75,21 +75,32 @@ EOF",
 | 规划 | `{{ROLE_ARCHITECT}}` | `{{ROLE_ARCHITECT_FRONTEND}}` |
 | 审查 | `{{ROLE_REVIEWER}}` | `{{ROLE_REVIEWER_FRONTEND}}` |
 
+**前端专项角色**：
+- 前端实施：`{{ROLE_FRONTEND}}`（用于 `/prompts:cxg-feat` 或阶段 4 的 UI 实施建议）
+- 前端调试：`{{ROLE_DEBUGGER_FRONTEND}}`（用于 `/prompts:cxg-debug`）
+- 前端优化：`{{ROLE_OPTIMIZER_FRONTEND}}`（用于 `/prompts:cxg-optimize` 或阶段 5）
+- 前端测试：`{{ROLE_TESTER_FRONTEND}}`（用于 `/prompts:cxg-test`）
+
+**后端专项角色**：
+- 后端调试：`{{ROLE_DEBUGGER}}`（用于 `/prompts:cxg-debug`）
+- 后端优化：`{{ROLE_OPTIMIZER}}`（用于 `/prompts:cxg-optimize`）
+- 后端测试：`{{ROLE_TESTER}}`（用于 `/prompts:cxg-test`）
+
 **会话复用**：每次调用返回 `SESSION_ID: xxx`，后续阶段用 `resume xxx` 子命令复用上下文。
 
 **并行调用**：使用 `run_in_background: true` 启动。**必须等所有模型返回后才能进入下一阶段**。
 
-**等待后台任务**（使用最大超时 600000ms = 10 分钟）：
+**等待后台任务**（建议单次等待超时 600000ms = 10 分钟）：
 
-```
-TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
+```text
+基于返回的 task_id 或 session_id 轮询后台任务输出（单次等待 600000ms）
 ```
 
 **重要**：
 - 必须指定 `timeout: 600000`，否则默认只有 30 秒会导致提前超时。
-- 如果 10 分钟后仍未完成，继续用 `TaskOutput` 轮询，**绝对不要 Kill 进程**。
+- 如果 10 分钟后仍未完成，继续轮询后台结果，**绝对不要 Kill 进程**。
 - 若等待时间过长导致用户希望中断，必须先用自然语言询问用户并取得明确确认后再处理中断，禁止直接 Kill Task。
-- ⛔ **Codex 结果必须等待**：Codex 执行时间较长（5-15 分钟）属于正常。TaskOutput 超时后必须继续用 TaskOutput 轮询，**绝对禁止在 Codex 未返回结果时直接跳过或继续下一阶段**。已启动的 Codex 任务若被跳过 = 浪费 token + 丢失结果。
+- ⛔ **Codex 结果必须等待**：Codex 执行时间较长（5-15 分钟）属于正常。单次查询超时后必须继续轮询后台结果，**绝对禁止在 Codex 未返回结果时直接跳过或继续下一阶段**。已启动的 Codex 任务若被跳过 = 浪费 token + 丢失结果。
 
 ---
 
@@ -150,6 +161,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 
 - 严格按批准的计划实施
 - 遵循项目现有代码规范
+- 前端/UI 开发可选调用 `{{ROLE_FRONTEND}}` 生成补丁建议，再由主 Codex 落盘
 - 在关键里程碑请求反馈
 
 ### 🚀 阶段 5：代码优化
@@ -158,7 +170,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 
 **调用子进程**：
 - 后端/通用任务：使用 `{{ROLE_REVIEWER}}`，关注安全、性能、错误处理、代码质量
-- 前端任务：使用 `{{ROLE_REVIEWER_FRONTEND}}`，关注可访问性、设计一致性、响应式和前端性能（仍由 Codex 执行）
+- 前端任务：使用 `{{ROLE_OPTIMIZER_FRONTEND}}`，关注渲染性能、包体积、Core Web Vitals 和加载策略（仍由 Codex 执行）
 
 等待结果。
 

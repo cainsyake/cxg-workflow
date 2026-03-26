@@ -16,8 +16,8 @@ CXG is a Codex-first workflow package for Codex CLI. It installs a structured se
 - **Single-model by design**: no routing between different models, only Codex orchestration plus Codex subprocess roles.
 - **Prompt + skills runtime**: `init` installs prompts, migrated skills, roles, and wrapper.
 - **Structured delivery**: the main workflow follows `research -> ideate -> plan -> execute -> optimize -> review`.
-- **Reusable expert roles**: built-in `analyzer` / `architect` / `reviewer`, with frontend variants (`*-frontend`) for UI-focused analysis, planning, and review.
-- **Frontend review stays on Codex**: frontend/UI review uses a dedicated Codex role prompt (`reviewer-frontend`) instead of model routing.
+- **Reusable expert roles**: built-in `analyzer` / `architect` / `debugger` / `optimizer` / `reviewer` / `tester`, plus frontend-specialized roles (`analyzer-frontend`, `architect-frontend`, `debugger-frontend`, `frontend`, `optimizer-frontend`, `reviewer-frontend`, `tester-frontend`).
+- **Frontend workflows stay on Codex**: frontend implementation/debug/optimize/test/review all use dedicated Codex role prompts instead of model routing.
 - **Optional code retrieval**: supports `ace-tool`, can be prepared for `contextweaver`, and falls back to `Glob + Grep` when MCP is skipped.
 - **Ready-to-use slash commands**: installs 12 commands directly into `~/.codex/prompts/`.
 
@@ -30,7 +30,7 @@ Codex CLI
    |
    +-- codeagent-wrapper
           |
-          +-- Codex subprocess (analyzer / analyzer-frontend / architect / architect-frontend / reviewer / reviewer-frontend)
+          +-- Codex subprocess (analyzer / analyzer-frontend / architect / architect-frontend / debugger / debugger-frontend / frontend / optimizer / optimizer-frontend / reviewer / reviewer-frontend / tester / tester-frontend)
 ```
 
 The main Codex session orchestrates the workflow. Subprocesses are used for focused analysis, planning, and review, then their output is fed back into the main session.
@@ -199,8 +199,15 @@ This command generates root-level and module-level `AGENTS.md` files using a "co
             ├── analyzer.md
             ├── architect-frontend.md
             ├── architect.md
+            ├── debugger.md
+            ├── debugger-frontend.md
+            ├── frontend.md
+            ├── optimizer.md
+            ├── optimizer-frontend.md
             ├── reviewer-frontend.md
-            └── reviewer.md
+            ├── reviewer.md
+            ├── tester.md
+            └── tester-frontend.md
 ```
 
 ### Repository Assets

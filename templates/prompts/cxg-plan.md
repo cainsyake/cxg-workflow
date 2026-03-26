@@ -58,17 +58,17 @@ EOF",
 
 **会话复用**：每次调用返回 `SESSION_ID: xxx`，必须保存并在后续阶段使用 `resume <SESSION_ID>` 复用上下文。
 
-**等待后台任务**（最大超时 600000ms = 10 分钟）：
+**等待后台任务**（建议单次等待超时 600000ms = 10 分钟）：
 
-```js
-TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
+```text
+基于返回的 task_id 或 session_id 轮询后台任务输出（单次等待 600000ms）
 ```
 
 **重要**：
 - 必须指定 `timeout: 600000`，否则默认只有 30 秒会导致提前超时
-- 若 10 分钟后仍未完成，继续用 `TaskOutput` 轮询，**绝对不要 Kill 进程**
+- 若 10 分钟后仍未完成，继续轮询后台结果，**绝对不要 Kill 进程**
 - 若等待时间过长导致用户希望中断，必须先用自然语言询问用户并取得明确确认后再处理中断，禁止直接 Kill Task
-- ⛔ **Codex 结果必须等待**：Codex 执行时间较长（5-15 分钟）属于正常。TaskOutput 超时后必须继续用 TaskOutput 轮询，**绝对禁止在 Codex 未返回结果时直接跳过或继续下一阶段**。已启动的 Codex 任务若被跳过 = 浪费 token + 丢失结果。
+- ⛔ **Codex 结果必须等待**：Codex 执行时间较长（5-15 分钟）属于正常。单次查询超时后必须继续轮询后台结果，**绝对禁止在 Codex 未返回结果时直接跳过或继续下一阶段**。已启动的 Codex 任务若被跳过 = 浪费 token + 丢失结果。
 
 ---
 
@@ -131,7 +131,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
    - 关注：UI/UX 影响、用户体验、视觉设计
    - OUTPUT: 多角度解决方案 + 优劣势分析
 
-用 `TaskOutput` 等待两个子进程的完整结果。**📌 保存 SESSION_ID** `CODEX_SESSION` 和 `CODEX_FRONTEND_SESSION`）。
+使用后台结果轮询机制等待两个子进程的完整结果。**📌 保存 SESSION_ID**（`CODEX_SESSION` 和 `CODEX_FRONTEND_SESSION`）。
 
 #### 2.2 交叉验证
 
@@ -154,7 +154,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
    - ROLE_FILE: `{{ROLE_ARCHITECT_FRONTEND}}`
    - OUTPUT: Step-by-step plan + pseudo-code（重点：信息架构/交互/可访问性/视觉一致性）
 
-用 `TaskOutput` 等待两个子进程的完整结果，并记录其建议的关键差异点。
+使用后台结果轮询机制等待两个子进程的完整结果，并记录其建议的关键差异点。
 
 #### 2.4 生成实施计划（Codex 最终版）
 

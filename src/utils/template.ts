@@ -12,8 +12,15 @@ import { isWindows, normalizePath } from './platform'
  * - {{ROLE_ANALYZER_FRONTEND}} - frontend analyzer role prompt path
  * - {{ROLE_ARCHITECT}} - architect role prompt path
  * - {{ROLE_ARCHITECT_FRONTEND}} - frontend architect role prompt path
+ * - {{ROLE_DEBUGGER}} - debugger role prompt path
+ * - {{ROLE_DEBUGGER_FRONTEND}} - frontend debugger role prompt path
+ * - {{ROLE_FRONTEND}} - frontend implementation role prompt path
+ * - {{ROLE_OPTIMIZER}} - optimizer role prompt path
+ * - {{ROLE_OPTIMIZER_FRONTEND}} - frontend optimizer role prompt path
  * - {{ROLE_REVIEWER}} - reviewer role prompt path
  * - {{ROLE_REVIEWER_FRONTEND}} - frontend reviewer role prompt path
+ * - {{ROLE_TESTER}} - tester role prompt path
+ * - {{ROLE_TESTER_FRONTEND}} - frontend tester role prompt path
  * - {{LITE_MODE_FLAG}} - "--lite " or ""
  * - {{MCP_SEARCH_TOOL}} - MCP tool name or fallback
  * - {{MCP_SEARCH_PARAM}} - MCP parameter key
@@ -71,8 +78,15 @@ export function replaceHomePathsInTemplate(content: string, codexHome: string): 
   processed = processed.replace(/\{\{ROLE_ANALYZER_FRONTEND\}\}/g, `${norm(rolesDir)}/analyzer-frontend.md`)
   processed = processed.replace(/\{\{ROLE_ARCHITECT\}\}/g, `${norm(rolesDir)}/architect.md`)
   processed = processed.replace(/\{\{ROLE_ARCHITECT_FRONTEND\}\}/g, `${norm(rolesDir)}/architect-frontend.md`)
+  processed = processed.replace(/\{\{ROLE_DEBUGGER\}\}/g, `${norm(rolesDir)}/debugger.md`)
+  processed = processed.replace(/\{\{ROLE_DEBUGGER_FRONTEND\}\}/g, `${norm(rolesDir)}/debugger-frontend.md`)
+  processed = processed.replace(/\{\{ROLE_FRONTEND\}\}/g, `${norm(rolesDir)}/frontend.md`)
+  processed = processed.replace(/\{\{ROLE_OPTIMIZER\}\}/g, `${norm(rolesDir)}/optimizer.md`)
+  processed = processed.replace(/\{\{ROLE_OPTIMIZER_FRONTEND\}\}/g, `${norm(rolesDir)}/optimizer-frontend.md`)
   processed = processed.replace(/\{\{ROLE_REVIEWER\}\}/g, `${norm(rolesDir)}/reviewer.md`)
   processed = processed.replace(/\{\{ROLE_REVIEWER_FRONTEND\}\}/g, `${norm(rolesDir)}/reviewer-frontend.md`)
+  processed = processed.replace(/\{\{ROLE_TESTER\}\}/g, `${norm(rolesDir)}/tester.md`)
+  processed = processed.replace(/\{\{ROLE_TESTER_FRONTEND\}\}/g, `${norm(rolesDir)}/tester-frontend.md`)
 
   // Replace ~/.codex/.cxg with absolute path
   processed = processed.replace(/~\/\.codex\/\.cxg/g, norm(cxgDir))
