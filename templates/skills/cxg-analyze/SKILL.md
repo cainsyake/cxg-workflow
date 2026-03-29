@@ -1,7 +1,7 @@
 ---
 name: cxg-analyze
-description: 'Migrated from custom prompt ''cxg-analyze''. Use when Codex should follow
-  this prompt workflow: CXG Analyze - 多视角技术分析. Key intent: 使用 Codex 双子进程并行分析，交叉验证后输出综合技术结论。**仅分析，不修改代码。**.'
+description: 'Skill workflow ''cxg-analyze''. Use when Codex should follow
+  this skill workflow: CXG Analyze - 多视角技术分析. Key intent: 使用 Codex 双子进程并行分析，交叉验证后输出综合技术结论。**仅分析，不修改代码。**.'
 ---
 
 # CXG Analyze - 多视角技术分析

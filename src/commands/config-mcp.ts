@@ -1,9 +1,6 @@
 import type { AuxiliaryMcpDef } from '../types'
 import ansis from 'ansis'
 import inquirer from 'inquirer'
-import fs from 'fs-extra'
-import { homedir } from 'node:os'
-import { join } from 'pathe'
 import { installAceTool, installAceToolRs, installContextWeaver, installMcpServer, uninstallMcpServer } from '../utils/mcp'
 
 /**
@@ -145,22 +142,6 @@ async function handleInstallContextWeaver(): Promise<void> {
 // Grok Search MCP
 // ═══════════════════════════════════════════════════════
 
-const GROK_SEARCH_PROMPT = `## Search and Evidence Standards
-
-- Use the \`mcp__grok-search\` tool for web searches
-- Execute independent search requests in parallel
-- Key factual claims must be supported by >=2 independent sources
-- Conflicting sources: Present evidence from both sides
-- Citation format: [Author/Organization, Year/Date, URL]
-`
-
-async function writeGrokPromptToPrompts(): Promise<void> {
-  const promptsDir = join(homedir(), '.codex', 'prompts')
-  const promptPath = join(promptsDir, 'cxg-grok-search.md')
-  await fs.ensureDir(promptsDir)
-  await fs.writeFile(promptPath, GROK_SEARCH_PROMPT, 'utf-8')
-}
-
 async function handleGrokSearch(): Promise<void> {
   console.log()
   console.log(ansis.cyan.bold('  🔍 联网搜索 MCP (grok-search)'))
@@ -210,9 +191,8 @@ async function handleGrokSearch(): Promise<void> {
 
   console.log()
   if (result.success) {
-    await writeGrokPromptToPrompts()
     console.log(ansis.green('✓ grok-search MCP 配置成功！'))
-    console.log(ansis.green('✓ 搜索提示词已写入 ~/.codex/prompts/cxg-grok-search.md'))
+    console.log(ansis.gray('  提示: 在任务中直接要求使用 mcp__grok-search 并附上证据标准'))
     console.log(ansis.gray('  重启 Codex CLI 使配置生效'))
   }
   else {

@@ -1,7 +1,7 @@
 ---
 name: cxg-init
-description: 'Migrated from custom prompt ''cxg-init''. Use when Codex should follow
-  this prompt workflow: CXG Init - 初始化项目上下文. Key intent: 以「根级简明 + 模块级详尽」策略生成项目 `AGENTS.md`
+description: 'Skill workflow ''cxg-init''. Use when Codex should follow
+  this skill workflow: CXG Init - 初始化项目上下文. Key intent: 以「根级简明 + 模块级详尽」策略生成项目 `AGENTS.md`
   文档体系。.'
 ---
 

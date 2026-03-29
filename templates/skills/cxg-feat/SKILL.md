@@ -1,7 +1,7 @@
 ---
 name: cxg-feat
-description: 'Migrated from custom prompt ''cxg-feat''. Use when Codex should follow
-  this prompt workflow: CXG Feat - 智能功能开发. Key intent: 自动识别输入类型，完成规划、讨论迭代与实施交付。.'
+description: 'Skill workflow ''cxg-feat''. Use when Codex should follow
+  this skill workflow: CXG Feat - 智能功能开发. Key intent: 自动识别输入类型，完成规划、讨论迭代与实施交付。.'
 ---
 
 # CXG Feat - 智能功能开发

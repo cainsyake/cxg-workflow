@@ -1,7 +1,7 @@
 ---
 name: cxg-plan
-description: 'Migrated from custom prompt ''cxg-plan''. Use when Codex should follow
-  this prompt workflow: CXG Plan - 单模型结构化规划. Key intent: 在保持单模型架构（Codex）前提下，完成上下文检索、技术分析与可执行计划产出。.'
+description: 'Skill workflow ''cxg-plan''. Use when Codex should follow
+  this skill workflow: CXG Plan - 单模型结构化规划. Key intent: 在保持单模型架构（Codex）前提下，完成上下文检索、技术分析与可执行计划产出。.'
 ---
 
 # CXG Plan - 单模型结构化规划

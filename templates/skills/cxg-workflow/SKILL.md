@@ -1,7 +1,7 @@
 ---
 name: cxg-workflow
-description: 'Migrated from custom prompt ''cxg-workflow''. Use when Codex should
-  follow this prompt workflow: CXG Workflow - 单模型结构化开发工作流. Key intent: 使用质量把关、MCP
+description: 'Skill workflow ''cxg-workflow''. Use when Codex should
+  follow this skill workflow: CXG Workflow - 单模型结构化开发工作流. Key intent: 使用质量把关、MCP
   服务和 Codex 子进程执行结构化开发工作流。.'
 ---
 

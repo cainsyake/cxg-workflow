@@ -1,7 +1,7 @@
 ---
 name: cxg-execute
-description: 'Migrated from custom prompt ''cxg-execute''. Use when Codex should follow
-  this prompt workflow: CXG Execute - 按计划执行与交付. Key intent: 读取已批准计划，获取 Codex 子进程原型，主
+description: 'Skill workflow ''cxg-execute''. Use when Codex should follow
+  this skill workflow: CXG Execute - 按计划执行与交付. Key intent: 读取已批准计划，获取 Codex 子进程原型，主
   Codex 重构实施并完成审计交付。.'
 ---
 

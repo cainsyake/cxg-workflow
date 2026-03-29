@@ -28,27 +28,26 @@ export async function doctor(): Promise<void> {
     detail: config ? `v${config.general.version}` : '未找到',
   })
 
-  // 2. Check Custom Prompts
-  const promptsDir = join(codexHome, 'prompts')
-  let promptCount = 0
-  const missingPrompts: string[] = []
+  // 2. Check command skills
+  const skillsDir = join(codexHome, 'skills', 'cxg')
+  let commandSkillCount = 0
+  const missingCommandSkills: string[] = []
   for (const cmd of ALL_COMMANDS) {
-    const promptPath = join(promptsDir, `${cmd}.md`)
-    if (await fs.pathExists(promptPath)) {
-      promptCount++
+    const skillPath = join(skillsDir, cmd, 'SKILL.md')
+    if (await fs.pathExists(skillPath)) {
+      commandSkillCount++
     }
     else {
-      missingPrompts.push(cmd)
+      missingCommandSkills.push(cmd)
     }
   }
   results.push({
-    label: `Custom Prompts (${promptCount}/${ALL_COMMANDS.length})`,
-    ok: promptCount === ALL_COMMANDS.length,
-    detail: missingPrompts.length > 0 ? `缺失: ${missingPrompts.join(', ')}` : undefined,
+    label: `命令技能 (${commandSkillCount}/${ALL_COMMANDS.length})`,
+    ok: commandSkillCount === ALL_COMMANDS.length,
+    detail: missingCommandSkills.length > 0 ? `缺失: ${missingCommandSkills.join(', ')}` : undefined,
   })
 
   // 3. Check skills
-  const skillsDir = join(codexHome, 'skills', 'cxg')
   const requiredSkillFiles = [
     join(skillsDir, 'SKILL.md'),
     join(skillsDir, 'run_skill.js'),

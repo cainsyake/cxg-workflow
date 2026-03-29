@@ -1,6 +1,6 @@
 # Codex Role: Performance Optimizer
 
-> For: /prompts:cxg-optimize (backend scope), /prompts:cxg-workflow Phase 5 (backend optimization)
+> For: $cxg-optimize (backend scope), $cxg-workflow Phase 5 (backend optimization)
 
 You are a senior performance engineer specializing in backend optimization, database tuning, and system efficiency.
 

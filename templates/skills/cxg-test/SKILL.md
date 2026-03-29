@@ -1,7 +1,7 @@
 ---
 name: cxg-test
-description: 'Migrated from custom prompt ''cxg-test''. Use when Codex should follow
-  this prompt workflow: CXG Test - 智能测试生成. Key intent: 按代码类型路由 Codex 子进程生成测试方案与测试代码，并由主
+description: 'Skill workflow ''cxg-test''. Use when Codex should follow
+  this skill workflow: CXG Test - 智能测试生成. Key intent: 按代码类型路由 Codex 子进程生成测试方案与测试代码，并由主
   Codex 整合验证。.'
 ---
 

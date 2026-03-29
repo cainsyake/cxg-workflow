@@ -1,7 +1,7 @@
 ---
 name: cxg-enhance
-description: 'Migrated from custom prompt ''cxg-enhance''. Use when Codex should follow
-  this prompt workflow: CXG Enhance - 内置 Prompt 增强. Key intent: 将模糊需求转化为结构化、可执行任务描述。.'
+description: 'Skill workflow ''cxg-enhance''. Use when Codex should follow
+  this skill workflow: CXG Enhance - 内置 Prompt 增强. Key intent: 将模糊需求转化为结构化、可执行任务描述。.'
 ---
 
 # CXG Enhance - 内置 Prompt 增强

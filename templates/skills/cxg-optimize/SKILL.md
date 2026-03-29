@@ -1,7 +1,7 @@
 ---
 name: cxg-optimize
-description: 'Migrated from custom prompt ''cxg-optimize''. Use when Codex should
-  follow this prompt workflow: CXG Optimize - 多视角性能优化. Key intent: 使用 Codex 后端/前端双子进程并行分析性能瓶颈，按性价比排序并实施优化。.'
+description: 'Skill workflow ''cxg-optimize''. Use when Codex should
+  follow this skill workflow: CXG Optimize - 多视角性能优化. Key intent: 使用 Codex 后端/前端双子进程并行分析性能瓶颈，按性价比排序并实施优化。.'
 ---
 
 # CXG Optimize - 多视角性能优化

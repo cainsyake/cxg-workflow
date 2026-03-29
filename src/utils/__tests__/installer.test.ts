@@ -35,7 +35,6 @@ function collectMarkdownFiles(dir: string): string[] {
 }
 
 const PACKAGE_ROOT = findPackageRoot()
-const PROMPTS_DIR = join(PACKAGE_ROOT, 'templates', 'prompts')
 const SKILLS_DIR = join(PACKAGE_ROOT, 'templates', 'skills')
 const ROLES_DIR = join(PACKAGE_ROOT, 'templates', 'roles', 'codex')
 const REQUIRED_SKILL_FILES = [
@@ -102,12 +101,12 @@ describe('command registry', () => {
 // B. Template file completeness
 // ─────────────────────────────────────────────────────────────
 describe('template file completeness', () => {
-  it('every command has a matching Custom Prompt template', () => {
+  it('every command has a matching skill template', () => {
     for (const cmd of ALL_COMMANDS) {
-      const templatePath = join(PROMPTS_DIR, `${cmd}.md`)
+      const templatePath = join(SKILLS_DIR, cmd, 'SKILL.md')
       expect(
         existsSync(templatePath),
-        `prompt template missing: templates/prompts/${cmd}.md`,
+        `skill template missing: templates/skills/${cmd}/SKILL.md`,
       ).toBe(true)
     }
   })
@@ -142,7 +141,7 @@ describe('template file completeness', () => {
 })
 
 describe('codex wait rule guards', () => {
-  const waitRulePromptIds = [
+  const waitRuleSkillIds = [
     'cxg-analyze',
     'cxg-plan',
     'cxg-review',
@@ -152,21 +151,21 @@ describe('codex wait rule guards', () => {
     'cxg-workflow',
   ]
 
-  it('all related prompts include codex wait hard rule', () => {
-    for (const promptId of waitRulePromptIds) {
-      const promptPath = join(PROMPTS_DIR, `${promptId}.md`)
-      const content = readFileSync(promptPath, 'utf-8')
-      expect(content.includes('⛔ **Codex 结果必须等待**'), `${promptId} missing Codex wait heading`).toBe(true)
+  it('all related skills include codex wait hard rule', () => {
+    for (const skillId of waitRuleSkillIds) {
+      const skillPath = join(SKILLS_DIR, skillId, 'SKILL.md')
+      const content = readFileSync(skillPath, 'utf-8')
+      expect(content.includes('⛔ **Codex 结果必须等待**'), `${skillId} missing Codex wait heading`).toBe(true)
       expect(
         content.includes('禁止在 Codex 未返回结果时直接跳过或继续下一阶段'),
-        `${promptId} missing non-skip guard`,
+        `${skillId} missing non-skip guard`,
       ).toBe(true)
     }
   })
 
   it('cxg-feat includes conditional scope for started codex subprocess', () => {
-    const featPromptPath = join(PROMPTS_DIR, 'cxg-feat.md')
-    const content = readFileSync(featPromptPath, 'utf-8')
+    const featSkillPath = join(SKILLS_DIR, 'cxg-feat', 'SKILL.md')
+    const content = readFileSync(featSkillPath, 'utf-8')
     expect(content.includes('仅当已启动 Codex 子进程任务时'), 'cxg-feat missing conditional scope').toBe(true)
   })
 })
@@ -175,10 +174,9 @@ describe('codex wait rule guards', () => {
 // C. Template variable completeness
 // ─────────────────────────────────────────────────────────────
 describe('template variable completeness', () => {
-  const allPrompts = collectMarkdownFiles(PROMPTS_DIR)
   const allSkills = collectMarkdownFiles(SKILLS_DIR)
   const allRoles = collectMarkdownFiles(ROLES_DIR)
-  const allTemplates = [...allPrompts, ...allSkills, ...allRoles]
+  const allTemplates = [...allSkills, ...allRoles]
 
   it('finds template files', () => {
     expect(allTemplates.length).toBeGreaterThan(0)

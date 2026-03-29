@@ -1,7 +1,7 @@
 ---
 name: cxg-review
-description: 'Migrated from custom prompt ''cxg-review''. Use when Codex should follow
-  this prompt workflow: CXG Review - 多视角代码审查. Key intent: 使用 Codex 后端/前端双子进程并行审查，交叉验证后输出综合审查结论。.'
+description: 'Skill workflow ''cxg-review''. Use when Codex should follow
+  this skill workflow: CXG Review - 多视角代码审查. Key intent: 使用 Codex 后端/前端双子进程并行审查，交叉验证后输出综合审查结论。.'
 ---
 
 # CXG Review - 多视角代码审查

@@ -1,7 +1,7 @@
 ---
 name: cxg-commit
-description: 'Migrated from custom prompt ''cxg-commit''. Use when Codex should follow
-  this prompt workflow: CXG Commit - 智能 Git 提交. Key intent: 分析当前改动，生成 Conventional
+description: 'Skill workflow ''cxg-commit''. Use when Codex should follow
+  this skill workflow: CXG Commit - 智能 Git 提交. Key intent: 分析当前改动，生成 Conventional
   Commits 风格的提交信息。.'
 ---
 

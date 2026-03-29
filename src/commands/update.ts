@@ -109,15 +109,6 @@ async function performAtomicUpdate(
     await fs.remove(backupRoot).catch(() => {})
     await fs.ensureDir(backupRoot)
 
-    const promptsDir = join(codexHome, 'prompts')
-    for (const cmd of ALL_COMMANDS) {
-      await moveIfExists(
-        join(promptsDir, `${cmd}.md`),
-        join(backupRoot, 'prompts', `${cmd}.md`),
-        records,
-      )
-    }
-
     // Keep skills backup for rollback compatibility.
     await moveIfExists(join(codexHome, 'skills', 'cxg'), join(backupRoot, 'skills', 'cxg'), records)
     await moveIfExists(join(codexHome, '.cxg'), join(backupRoot, '.cxg'), records)

@@ -180,9 +180,9 @@ describe('replaceHomePathsInTemplate', () => {
   })
 
   it('replaces ~/.codex with absolute path', () => {
-    const input = '~/.codex/prompts'
+    const input = '~/.codex/skills'
     const result = replaceHomePathsInTemplate(input, codexHome)
-    expect(result).toBe('/home/testuser/.codex/prompts')
+    expect(result).toBe('/home/testuser/.codex/skills')
   })
 
   it('handles multiple replacements in one content', () => {

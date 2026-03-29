@@ -2,7 +2,7 @@ import type { CxgConfig } from '../types'
 import ansis from 'ansis'
 import inquirer from 'inquirer'
 import { version } from '../../package.json'
-import { DEFAULT_MCP_PROVIDER } from '../utils/constants'
+import { ALL_COMMANDS, DEFAULT_MCP_PROVIDER } from '../utils/constants'
 import { configMcp } from './config-mcp'
 import { init } from './init'
 import { uninstall } from './uninstall'
@@ -41,6 +41,11 @@ function pad(s: string, w: number): string {
   return diff > 0 ? s + ' '.repeat(diff) : s
 }
 
+function resolveInstalledCommands(installedSkills: string[]): string[] {
+  const installedSet = new Set(installedSkills)
+  return ALL_COMMANDS.filter(cmd => installedSet.has(cmd))
+}
+
 // ═══════════════════════════════════════════════════════
 // Main Menu
 // ═══════════════════════════════════════════════════════
@@ -59,7 +64,7 @@ export async function showMainMenu(): Promise<void> {
 
     // Status line
     const statusParts = [
-      `${cmdCount} commands`,
+      `${cmdCount} skills`,
     ]
     if (mcpProvider && mcpProvider !== '—' && mcpProvider !== 'skip') {
       statusParts.push(ansis.magenta(mcpProvider))
@@ -181,7 +186,7 @@ async function toggleLiteMode(config: CxgConfig | null): Promise<void> {
   }
 
   console.log()
-  console.log(ansis.yellow('  ⏳ 正在重渲染 prompts/skills/roles...'))
+  console.log(ansis.yellow('  ⏳ 正在重渲染 skills/roles...'))
 
   const result = await installCxg({
     force: true,
@@ -194,8 +199,9 @@ async function toggleLiteMode(config: CxgConfig | null): Promise<void> {
     mcpProvider: provider,
     liteMode: next,
   })
-  nextConfig.commands.installed = result.installedPrompts.length > 0
-    ? result.installedPrompts
+  const installedCommands = resolveInstalledCommands(result.installedSkills)
+  nextConfig.commands.installed = installedCommands.length > 0
+    ? installedCommands
     : (config.commands?.installed || [])
 
   await writeCxgConfig(nextConfig)
