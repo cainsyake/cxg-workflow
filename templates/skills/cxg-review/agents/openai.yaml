@@ -1,0 +1,4 @@
+interface:
+  display_name: "CXG Review"
+  short_description: "Use migrated prompt for CXG Review"
+  default_prompt: "Use $cxg-review to run the migrated custom prompt workflow."

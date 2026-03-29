@@ -212,7 +212,7 @@ This command generates root-level and module-level `AGENTS.md` files using a "co
 
 ### Repository Assets
 
-- `templates/skills/` contains migrated skill assets from `ccg-workflow/templates/skills`.
+- `templates/skills/` contains migrated skill assets from `~/.codex/skills/cxg`.
 - `cxg-workflow init` installs these assets into `~/.codex/skills/cxg/`.
 
 ### CXG Config

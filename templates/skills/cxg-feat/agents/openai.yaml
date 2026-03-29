@@ -1,0 +1,4 @@
+interface:
+  display_name: "CXG Feat"
+  short_description: "Use migrated prompt for CXG Feat"
+  default_prompt: "Use $cxg-feat to run the migrated custom prompt workflow."

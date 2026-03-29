@@ -1,0 +1,4 @@
+interface:
+  display_name: "CXG Commit"
+  short_description: "Use migrated prompt for CXG Commit"
+  default_prompt: "Use $cxg-commit to run the migrated custom prompt workflow."

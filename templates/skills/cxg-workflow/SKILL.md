@@ -1,3 +1,10 @@
+---
+name: cxg-workflow
+description: 'Migrated from custom prompt ''cxg-workflow''. Use when Codex should
+  follow this prompt workflow: CXG Workflow - 单模型结构化开发工作流. Key intent: 使用质量把关、MCP
+  服务和 Codex 子进程执行结构化开发工作流。.'
+---
+
 # CXG Workflow - 单模型结构化开发工作流
 
 使用质量把关、MCP 服务和 Codex 子进程执行结构化开发工作流。
@@ -5,7 +12,7 @@
 ## 使用方法
 
 ```bash
-/prompts:cxg-workflow <任务描述>
+$cxg-workflow <任务描述>
 ```
 
 ## 上下文
@@ -110,7 +117,7 @@ EOF",
 
 `[模式：研究]` - 理解需求并收集上下文：
 
-1. **Prompt 增强**（按 `/prompts:cxg-enhance` 的逻辑执行）：分析 $ARGUMENTS 的意图、缺失信息、隐含假设，补全为结构化需求（明确目标、技术约束、范围边界、验收标准），**用增强结果替代原始 $ARGUMENTS，后续调用 Codex 子进程时传入增强后的需求**
+1. **Prompt 增强**（按 `$cxg-enhance` 的逻辑执行）：分析 $ARGUMENTS 的意图、缺失信息、隐含假设，补全为结构化需求（明确目标、技术约束、范围边界、验收标准），**用增强结果替代原始 $ARGUMENTS，后续调用 Codex 子进程时传入增强后的需求**
 2. **上下文检索**：调用 `{{MCP_SEARCH_TOOL}}`
 3. **需求完整性评分**（0-10 分）：
    - 目标明确性（0-3）、预期结果（0-3）、边界范围（0-2）、约束条件（0-2）

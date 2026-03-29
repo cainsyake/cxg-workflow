@@ -1,0 +1,4 @@
+interface:
+  display_name: "CXG Workflow"
+  short_description: "Use migrated prompt for CXG Workflow"
+  default_prompt: "Use $cxg-workflow to run the migrated custom prompt workflow."

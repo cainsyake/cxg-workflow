@@ -1,0 +1,4 @@
+interface:
+  display_name: "CXG Debug"
+  short_description: "Use migrated prompt for CXG Debug"
+  default_prompt: "Use $cxg-debug to run the migrated custom prompt workflow."

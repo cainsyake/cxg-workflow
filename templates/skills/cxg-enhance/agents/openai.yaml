@@ -1,0 +1,4 @@
+interface:
+  display_name: "CXG Enhance"
+  short_description: "Use migrated prompt for CXG Enhance"
+  default_prompt: "Use $cxg-enhance to run the migrated custom prompt workflow."

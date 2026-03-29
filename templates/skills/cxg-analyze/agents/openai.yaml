@@ -1,0 +1,4 @@
+interface:
+  display_name: "CXG Analyze"
+  short_description: "Use migrated prompt for CXG Analyze"
+  default_prompt: "Use $cxg-analyze to run the migrated custom prompt workflow."

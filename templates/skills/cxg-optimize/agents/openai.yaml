@@ -1,0 +1,4 @@
+interface:
+  display_name: "CXG Optimize"
+  short_description: "Use migrated prompt for CXG Optimize"
+  default_prompt: "Use $cxg-optimize to run the migrated custom prompt workflow."

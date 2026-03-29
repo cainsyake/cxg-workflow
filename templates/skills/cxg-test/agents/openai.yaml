@@ -1,0 +1,4 @@
+interface:
+  display_name: "CXG Test"
+  short_description: "Use migrated prompt for CXG Test"
+  default_prompt: "Use $cxg-test to run the migrated custom prompt workflow."

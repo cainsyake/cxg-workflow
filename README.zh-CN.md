@@ -216,7 +216,7 @@ npx cxg-workflow uninstall
 
 ### 仓库资产
 
-- `templates/skills/` 包含从 `ccg-workflow/templates/skills` 迁入的 skills 资产。
+- `templates/skills/` 包含从 `~/.codex/skills/cxg` 迁入的 skills 资产。
 - `cxg-workflow init` 会将其安装到 `~/.codex/skills/cxg/`。
 
 ### CXG 配置文件

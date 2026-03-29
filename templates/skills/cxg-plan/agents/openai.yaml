@@ -1,0 +1,4 @@
+interface:
+  display_name: "CXG Plan"
+  short_description: "Use migrated prompt for CXG Plan"
+  default_prompt: "Use $cxg-plan to run the migrated custom prompt workflow."
