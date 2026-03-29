@@ -1,12 +1,12 @@
 ---
 name: cxg-debug
 description: 'Skill workflow ''cxg-debug''. Use when Codex should follow
-  this skill workflow: CXG Debug - 多视角问题诊断. Key intent: 使用 Codex 后端/前端双子进程并行诊断，交叉验证后定位根因并实施修复。.'
+  this skill workflow: CXG Debug - 多视角问题诊断. Key intent: 使用 Codex 后端/前端子进程并行诊断，交叉验证后定位根因并实施修复。.'
 ---
 
 # CXG Debug - 多视角问题诊断
 
-使用 Codex 后端/前端双子进程并行诊断，交叉验证后定位根因并实施修复。
+使用 Codex 后端/前端子进程并行诊断，交叉验证后定位根因并实施修复。
 
 ## 使用方法
 
