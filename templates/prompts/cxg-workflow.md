@@ -146,8 +146,8 @@ EOF",
 `[模式：计划]` - 双子进程协作规划：
 
 **并行调用**（复用会话 `resume <SESSION_ID>`）：
-- Codex 后端：使用规划提示词 + `resume $CODEX_SESSION`，输出后端架构
-- Codex 前端：使用规划提示词 + `resume $CODEX_FRONTEND_SESSION`，输出前端架构
+- Codex 后端：使用规划提示词 + `resume <<CODEX_SESSION>>`，输出后端架构
+- Codex 前端：使用规划提示词 + `resume <<CODEX_FRONTEND_SESSION>>`，输出前端架构
 
 等待结果。
 
