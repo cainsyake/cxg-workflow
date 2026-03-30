@@ -38,6 +38,7 @@ const PACKAGE_ROOT = findPackageRoot()
 const PROMPTS_DIR = join(PACKAGE_ROOT, 'templates', 'prompts')
 const SKILLS_DIR = join(PACKAGE_ROOT, 'templates', 'skills')
 const ROLES_DIR = join(PACKAGE_ROOT, 'templates', 'roles', 'codex')
+const AGENTS_DIR = join(PACKAGE_ROOT, 'templates', 'commands', 'agents')
 const REQUIRED_SKILL_FILES = [
   join(SKILLS_DIR, 'SKILL.md'),
   join(SKILLS_DIR, 'run_skill.js'),
@@ -52,6 +53,12 @@ const REQUIRED_SKILL_FILES = [
   join(SKILLS_DIR, 'tools', 'verify-quality', 'scripts', 'quality_checker.js'),
   join(SKILLS_DIR, 'tools', 'verify-security', 'SKILL.md'),
   join(SKILLS_DIR, 'tools', 'verify-security', 'scripts', 'security_scanner.js'),
+]
+const REQUIRED_AGENT_FILES = [
+  join(AGENTS_DIR, 'get-current-datetime.md'),
+  join(AGENTS_DIR, 'init-architect.md'),
+  join(AGENTS_DIR, 'planner.md'),
+  join(AGENTS_DIR, 'ui-ux-designer.md'),
 ]
 
 // ─────────────────────────────────────────────────────────────
@@ -139,6 +146,15 @@ describe('template file completeness', () => {
       'at least one nested skill definition should exist in templates/skills/',
     ).toBeGreaterThan(0)
   })
+
+  it('agent templates exist', () => {
+    for (const requiredFile of REQUIRED_AGENT_FILES) {
+      expect(
+        existsSync(requiredFile),
+        `required agent template missing: ${requiredFile.replace(`${PACKAGE_ROOT}/`, '')}`,
+      ).toBe(true)
+    }
+  })
 })
 
 describe('codex wait rule guards', () => {
@@ -178,7 +194,8 @@ describe('template variable completeness', () => {
   const allPrompts = collectMarkdownFiles(PROMPTS_DIR)
   const allSkills = collectMarkdownFiles(SKILLS_DIR)
   const allRoles = collectMarkdownFiles(ROLES_DIR)
-  const allTemplates = [...allPrompts, ...allSkills, ...allRoles]
+  const allAgents = collectMarkdownFiles(AGENTS_DIR)
+  const allTemplates = [...allPrompts, ...allSkills, ...allRoles, ...allAgents]
 
   it('finds template files', () => {
     expect(allTemplates.length).toBeGreaterThan(0)
@@ -212,7 +229,11 @@ describe('template variable completeness', () => {
         && !v.includes('ROLE_REVIEWER')
         && !v.includes('ROLE_REVIEWER_FRONTEND')
         && !v.includes('ROLE_TESTER')
-        && !v.includes('ROLE_TESTER_FRONTEND'),
+        && !v.includes('ROLE_TESTER_FRONTEND')
+        && !v.includes('AGENT_GET_CURRENT_DATETIME')
+        && !v.includes('AGENT_INIT_ARCHITECT')
+        && !v.includes('AGENT_PLANNER')
+        && !v.includes('AGENT_UI_UX_DESIGNER'),
       )
       expect(unprocessed, `unprocessed variables in ${relativePath}: ${unprocessed.join(', ')}`).toEqual([])
     })
@@ -236,4 +257,39 @@ describe('skills template migration guards', () => {
       }
     })
   }
+})
+
+describe('agent template migration guards', () => {
+  const legacyMarkers = [
+    '.claude/plan/',
+    '.claude/index.json',
+    'CLAUDE.md',
+  ]
+  const agentDocs = collectMarkdownFiles(AGENTS_DIR)
+
+  for (const file of agentDocs) {
+    const relativePath = file.replace(`${PACKAGE_ROOT}/`, '')
+    it(`${relativePath}: no legacy CLAUDE markers`, () => {
+      const content = readFileSync(file, 'utf-8')
+      for (const marker of legacyMarkers) {
+        expect(content.includes(marker), `found legacy marker "${marker}" in ${relativePath}`).toBe(false)
+      }
+    })
+  }
+})
+
+describe('agent template skip-mcp guards', () => {
+  it('rendered tools frontmatter remains valid in skip mode', () => {
+    const skipConfig = { mcpProvider: 'skip' as const }
+
+    for (const file of REQUIRED_AGENT_FILES) {
+      const content = readFileSync(file, 'utf-8')
+      const rendered = injectTemplateVariables(content, skipConfig)
+      const toolsLine = rendered.split('\n').find(line => line.startsWith('tools:'))
+
+      expect(toolsLine, `${file} should contain tools frontmatter`).toBeTruthy()
+      expect(toolsLine?.includes('{{MCP_SEARCH_TOOL}}'), `${file} should not keep MCP placeholder in tools`).toBe(false)
+      expect(toolsLine?.includes('Glob + Grep'), `${file} tools frontmatter should not include "Glob + Grep"`).toBe(false)
+    }
+  })
 })

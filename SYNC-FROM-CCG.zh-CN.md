@@ -14,6 +14,7 @@ cxg 基线版本：v0.1.7（commit: `49c99da`）
 | 模块 | 来源（ccg-workflow） | CXG 落点 | 同步方式 | 当前状态 |
 |---|---|---|---|---|
 | Skills 资产 | `templates/skills/**` | `templates/skills/**` | 资产迁入并在 `init` 安装 | 已同步 |
+| 子 Agent 模板资产 | `templates/commands/agents/**` | `templates/commands/agents/**` | 资产迁入并在 `init` 安装到 `~/.codex/.cxg/agents/codex` | 已同步 |
 | 结构化流程模板 | `templates/commands/workflow.md` 的 workflow 编排思路 | `templates/prompts/cxg-workflow.md` | 保留流程骨架并收敛为单模型 | 已同步 |
 | 子进程角色分工 | 原项目子进程编排思路 | `templates/roles/codex/{analyzer,analyzer-frontend,architect,architect-frontend,debugger,debugger-frontend,frontend,optimizer,optimizer-frontend,reviewer,reviewer-frontend,tester,tester-frontend}.md` | 复用角色化分工并扩展前后端专用角色 | 已同步 |
 | Wrapper 下载发布源 | `fengshao1227/ccg-workflow` Release `preset` | `src/utils/constants.ts` | 共享二进制发布源 | 仍依赖上游 |
@@ -45,12 +46,13 @@ cxg 基线版本：v0.1.7（commit: `49c99da`）
 当以下内容发生变更时，必须同步更新本文件：
 
 1. `templates/skills/**` 的迁入或结构变化
-2. `templates/prompts/cxg-workflow.md` 的阶段定义变化
-3. `templates/roles/codex/**` 的角色职责变化
-4. `src/utils/constants.ts` 中 wrapper 发布源相关字段变化
-5. 命令体系或安装目录发生设计级变化
-6. `README.zh-CN.md` 中“衍生关系/仓库资产”相关说明变化
-7. `src/utils/__tests__/installer.test.ts` 中迁移守卫（legacy markers）变化
+2. `templates/commands/agents/**` 的迁入或结构变化
+3. `templates/prompts/cxg-workflow.md` 的阶段定义变化
+4. `templates/roles/codex/**` 的角色职责变化
+5. `src/utils/constants.ts` 中 wrapper 发布源相关字段变化
+6. 命令体系或安装目录发生设计级变化
+7. `README.zh-CN.md` 中“衍生关系/仓库资产”相关说明变化
+8. `src/utils/__tests__/installer.test.ts` 中迁移守卫（legacy markers）变化
 
 建议更新格式：
 

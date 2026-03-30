@@ -16,17 +16,38 @@
 
 ---
 
-## 子进程调用规范（可选增强）
+## 子进程调用规范（支持写入，受范围约束）
 
-当项目规模大或模块复杂时，可调用分析/规划子进程生成文档草案，再由主 Codex 落盘：
+当项目规模大或模块复杂时，使用预置子 Agent 模板协同：
+
+- 时间戳子 Agent：`{{AGENT_GET_CURRENT_DATETIME}}`
+- 初始化架构子 Agent：`{{AGENT_INIT_ARCHITECT}}`
+- 写入范围：仅允许更新 `AGENTS.md` 与 `.codex/index.json` 等文档资产，禁止修改业务源码。
+- 执行约束：写入前回显白名单并获确认；写入后校验变更文件均在白名单范围内。
 
 ```text
+# 步骤 1：获取时间戳
 Bash({
   command: "{{WRAPPER_BIN}} {{LITE_MODE_FLAG}}--backend codex - \"{{WORKDIR}}\" <<'EOF'
-ROLE_FILE: {{ROLE_ANALYZER}}
+ROLE_FILE: {{AGENT_GET_CURRENT_DATETIME}}
+<TASK>
+需求：获取当前时间戳，用于 AGENTS 文档变更记录
+</TASK>
+OUTPUT: YYYY-MM-DD HH:mm:ss
+EOF",
+  run_in_background: false,
+  timeout: 3600000,
+  description: "获取时间戳"
+})
+
+# 步骤 2：生成/更新 AGENTS 文档
+Bash({
+  command: "{{WRAPPER_BIN}} {{LITE_MODE_FLAG}}--backend codex - \"{{WORKDIR}}\" <<'EOF'
+ROLE_FILE: {{AGENT_INIT_ARCHITECT}}
 <TASK>
 需求：扫描仓库并生成 AGENTS 文档草案
-上下文：<项目摘要 + 仓库结构 + 关键入口>
+上下文：<项目摘要 + 仓库结构 + 时间戳 + 关键入口>
+约束：只允许写 AGENTS.md 与 .codex/index.json
 </TASK>
 OUTPUT: 根级与模块级 AGENTS.md 草案（Markdown）
 EOF",
@@ -124,4 +145,5 @@ EOF",
 
 1. **只写文档** - 不修改业务源代码
 2. **增量更新** - 已存在文档优先合并更新而非覆盖
-3. **可追踪** - 明确标注扫描范围、覆盖率与未覆盖原因
+3. **范围校验** - 写入后必须核验变更文件全部落在白名单内
+4. **可追踪** - 明确标注扫描范围、覆盖率与未覆盖原因

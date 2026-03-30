@@ -1,7 +1,7 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-`src/` contains the TypeScript source for CLI entrypoints, commands, shared utilities, and exported types. Use `src/commands/` for user-facing actions, `src/utils/` for reusable logic, and `src/types/` for shared interfaces. Runtime templates live in `templates/prompts/`, `templates/skills/`, and `templates/roles/codex/`. Treat `dist/` as generated output.
+`src/` contains the TypeScript source for CLI entrypoints, commands, shared utilities, and exported types. Use `src/commands/` for user-facing actions, `src/utils/` for reusable logic, and `src/types/` for shared interfaces. Runtime templates live in `templates/prompts/`, `templates/commands/agents/`, `templates/skills/`, and `templates/roles/codex/`. Treat `dist/` as generated output.
 
 Tests are colocated under `src/**/__tests__/*.test.ts`. An empty top-level `test/` directory exists, but current coverage is maintained beside the modules it validates.
 

@@ -14,6 +14,7 @@ export interface CxgConfig {
     prompts: string
     skills: string
     roles: string
+    agents: string
     wrapper: string
   }
   commands: {
@@ -35,6 +36,7 @@ export interface InstallResult {
   installedPrompts: string[]
   installedSkills: string[]
   installedRoles: string[]
+  installedAgents: string[]
   errors: string[]
   binInstalled?: boolean
   binPath?: string
@@ -48,6 +50,7 @@ export interface UninstallResult {
   removedPrompts: string[]
   removedSkills: string[]
   removedRoles: string[]
+  removedAgents: string[]
   removedBin: boolean
   errors: string[]
 }

@@ -35,6 +35,7 @@
   "files": [
     "bin/cxg.mjs",
     "dist",
+    "templates/commands/",
     "templates/prompts/",
     "templates/roles/",
     "templates/skills/"

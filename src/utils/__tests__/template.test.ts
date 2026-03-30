@@ -41,6 +41,26 @@ describe('injectTemplateVariables — mcpProvider=skip', () => {
     const result = injectTemplateVariables(input, config)
     expect(result).toBe('')
   })
+
+  it('removes MCP tool placeholder from tools frontmatter list', () => {
+    const input = 'tools: Read, Write, {{MCP_SEARCH_TOOL}}'
+    const result = injectTemplateVariables(input, config)
+    expect(result).toBe('tools: Read, Write')
+  })
+
+  it('replaces MCP tool code block with fallback guidance', () => {
+    const input = [
+      '```text',
+      '{{MCP_SEARCH_TOOL}} {',
+      '  "project_root_path": "{{PROJECT_ROOT}}",',
+      '  "query": "keyword"',
+      '}',
+      '```',
+    ].join('\n')
+    const result = injectTemplateVariables(input, config)
+    expect(result).toContain('MCP 未配置')
+    expect(result).not.toContain('{{MCP_SEARCH_TOOL}}')
+  })
 })
 
 describe('injectTemplateVariables — mcpProvider=ace-tool', () => {
@@ -167,6 +187,30 @@ describe('replaceHomePathsInTemplate', () => {
     expect(result).toBe('/home/testuser/.codex/.cxg/roles/codex/tester-frontend.md')
   })
 
+  it('replaces AGENT_GET_CURRENT_DATETIME with absolute path', () => {
+    const input = '{{AGENT_GET_CURRENT_DATETIME}}'
+    const result = replaceHomePathsInTemplate(input, codexHome)
+    expect(result).toBe('/home/testuser/.codex/.cxg/agents/codex/get-current-datetime.md')
+  })
+
+  it('replaces AGENT_INIT_ARCHITECT with absolute path', () => {
+    const input = '{{AGENT_INIT_ARCHITECT}}'
+    const result = replaceHomePathsInTemplate(input, codexHome)
+    expect(result).toBe('/home/testuser/.codex/.cxg/agents/codex/init-architect.md')
+  })
+
+  it('replaces AGENT_PLANNER with absolute path', () => {
+    const input = '{{AGENT_PLANNER}}'
+    const result = replaceHomePathsInTemplate(input, codexHome)
+    expect(result).toBe('/home/testuser/.codex/.cxg/agents/codex/planner.md')
+  })
+
+  it('replaces AGENT_UI_UX_DESIGNER with absolute path', () => {
+    const input = '{{AGENT_UI_UX_DESIGNER}}'
+    const result = replaceHomePathsInTemplate(input, codexHome)
+    expect(result).toBe('/home/testuser/.codex/.cxg/agents/codex/ui-ux-designer.md')
+  })
+
   it('replaces ~/.codex/.cxg with absolute path', () => {
     const input = '~/.codex/.cxg/config.toml'
     const result = replaceHomePathsInTemplate(input, codexHome)
@@ -186,7 +230,7 @@ describe('replaceHomePathsInTemplate', () => {
   })
 
   it('handles multiple replacements in one content', () => {
-    const input = 'wrapper: {{WRAPPER_BIN}}\nanalyzer: {{ROLE_ANALYZER}}\nanalyzerFrontend: {{ROLE_ANALYZER_FRONTEND}}\narchitectFrontend: {{ROLE_ARCHITECT_FRONTEND}}\ndebugger: {{ROLE_DEBUGGER}}\ndebuggerFrontend: {{ROLE_DEBUGGER_FRONTEND}}\nfrontend: {{ROLE_FRONTEND}}\noptimizer: {{ROLE_OPTIMIZER}}\noptimizerFrontend: {{ROLE_OPTIMIZER_FRONTEND}}\nreviewerFrontend: {{ROLE_REVIEWER_FRONTEND}}\ntester: {{ROLE_TESTER}}\ntesterFrontend: {{ROLE_TESTER_FRONTEND}}\nconfig: ~/.codex/.cxg/config.toml'
+    const input = 'wrapper: {{WRAPPER_BIN}}\nanalyzer: {{ROLE_ANALYZER}}\nanalyzerFrontend: {{ROLE_ANALYZER_FRONTEND}}\narchitectFrontend: {{ROLE_ARCHITECT_FRONTEND}}\ndebugger: {{ROLE_DEBUGGER}}\ndebuggerFrontend: {{ROLE_DEBUGGER_FRONTEND}}\nfrontend: {{ROLE_FRONTEND}}\noptimizer: {{ROLE_OPTIMIZER}}\noptimizerFrontend: {{ROLE_OPTIMIZER_FRONTEND}}\nreviewerFrontend: {{ROLE_REVIEWER_FRONTEND}}\ntester: {{ROLE_TESTER}}\ntesterFrontend: {{ROLE_TESTER_FRONTEND}}\nagentDatetime: {{AGENT_GET_CURRENT_DATETIME}}\nagentInitArchitect: {{AGENT_INIT_ARCHITECT}}\nagentPlanner: {{AGENT_PLANNER}}\nagentUiUxDesigner: {{AGENT_UI_UX_DESIGNER}}\nconfig: ~/.codex/.cxg/config.toml'
     const result = replaceHomePathsInTemplate(input, codexHome)
     expect(result).toContain('/home/testuser/.codex/bin/codeagent-wrapper')
     expect(result).toContain('/home/testuser/.codex/.cxg/roles/codex/analyzer.md')
@@ -200,6 +244,10 @@ describe('replaceHomePathsInTemplate', () => {
     expect(result).toContain('/home/testuser/.codex/.cxg/roles/codex/reviewer-frontend.md')
     expect(result).toContain('/home/testuser/.codex/.cxg/roles/codex/tester.md')
     expect(result).toContain('/home/testuser/.codex/.cxg/roles/codex/tester-frontend.md')
+    expect(result).toContain('/home/testuser/.codex/.cxg/agents/codex/get-current-datetime.md')
+    expect(result).toContain('/home/testuser/.codex/.cxg/agents/codex/init-architect.md')
+    expect(result).toContain('/home/testuser/.codex/.cxg/agents/codex/planner.md')
+    expect(result).toContain('/home/testuser/.codex/.cxg/agents/codex/ui-ux-designer.md')
     expect(result).toContain('/home/testuser/.codex/.cxg/config.toml')
     expect(result).not.toContain('~/')
     expect(result).not.toContain('{{')

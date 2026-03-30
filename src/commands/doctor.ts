@@ -2,7 +2,7 @@ import fs from 'fs-extra'
 import { homedir } from 'node:os'
 import { join } from 'pathe'
 import { version } from '../../package.json'
-import { ALL_COMMANDS } from '../utils/constants'
+import { AGENT_TEMPLATES, ALL_COMMANDS } from '../utils/constants'
 import { readCxgConfig } from '../utils/config'
 import { isWindows } from '../utils/platform'
 
@@ -114,7 +114,21 @@ export async function doctor(): Promise<void> {
     detail: missingRoles.length > 0 ? `缺失: ${missingRoles.join(', ')}` : undefined,
   })
 
-  // 5. Check binary
+  // 5. Check built-in agent templates
+  const agentsDir = join(codexHome, '.cxg', 'agents', 'codex')
+  const missingAgents: string[] = []
+  for (const agent of AGENT_TEMPLATES) {
+    if (!(await fs.pathExists(join(agentsDir, `${agent}.md`)))) {
+      missingAgents.push(agent)
+    }
+  }
+  results.push({
+    label: `子 Agent 模板 (${AGENT_TEMPLATES.length - missingAgents.length}/${AGENT_TEMPLATES.length})`,
+    ok: missingAgents.length === 0,
+    detail: missingAgents.length > 0 ? `缺失: ${missingAgents.join(', ')}` : undefined,
+  })
+
+  // 6. Check binary
   const wrapperName = isWindows() ? 'codeagent-wrapper.exe' : 'codeagent-wrapper'
   const wrapperPath = join(codexHome, 'bin', wrapperName)
   const binExists = await fs.pathExists(wrapperPath)
@@ -139,7 +153,7 @@ export async function doctor(): Promise<void> {
     detail: binExists ? details : '未安装',
   })
 
-  // 6. Check MCP config
+  // 7. Check MCP config
   if (config?.mcp?.provider && config.mcp.provider !== 'skip') {
     const codexConfig = join(codexHome, 'config.toml')
     const codexConfigExists = await fs.pathExists(codexConfig)

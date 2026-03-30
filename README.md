@@ -6,7 +6,7 @@ English | [简体中文](./README.zh-CN.md)
 
 </div>
 
-CXG is a Codex-first workflow package for Codex CLI. It installs a structured set of slash commands, skills, role prompts, and a `codeagent-wrapper` binary so Codex can handle research, planning, execution, optimization, and review in a consistent single-model workflow.
+CXG is a Codex-first workflow package for Codex CLI. It installs a structured set of slash commands, skills, role prompts, agent prompt templates, and a `codeagent-wrapper` binary so Codex can handle research, planning, execution, optimization, and review in a consistent single-model workflow.
 
 > Note: CXG is a Codex-only simplified derivative of [`ccg-workflow`](https://github.com/fengshao1227/ccg-workflow). It keeps the structured workflow and wrapper-based orchestration ideas from the original project, while narrowing the scope to a leaner single-model experience built around Codex.
 
@@ -14,9 +14,10 @@ CXG is a Codex-first workflow package for Codex CLI. It installs a structured se
 
 - **Derived from `ccg-workflow`**: preserves the original workflow philosophy while simplifying it into a Codex-only package.
 - **Single-model by design**: no routing between different models, only Codex orchestration plus Codex subprocess roles.
-- **Prompt + skills runtime**: `init` installs prompts, migrated skills, roles, and wrapper.
+- **Prompt + skills runtime**: `init` installs prompts, migrated skills, roles, agent templates, and wrapper.
 - **Structured delivery**: the main workflow follows `research -> ideate -> plan -> execute -> optimize -> review`.
 - **Reusable expert roles**: built-in `analyzer` / `architect` / `debugger` / `optimizer` / `reviewer` / `tester`, plus frontend-specialized roles (`analyzer-frontend`, `architect-frontend`, `debugger-frontend`, `frontend`, `optimizer-frontend`, `reviewer-frontend`, `tester-frontend`).
+- **Prebuilt agent templates**: includes `get-current-datetime`, `init-architect`, `planner`, and `ui-ux-designer` for `cxg-init`/`cxg-feat` collaboration.
 - **Frontend workflows stay on Codex**: frontend implementation/debug/optimize/test/review all use dedicated Codex role prompts instead of model routing.
 - **Optional code retrieval**: supports `ace-tool`, can be prepared for `contextweaver`, and falls back to `Glob + Grep` when MCP is skipped.
 - **Ready-to-use slash commands**: installs 12 commands directly into `~/.codex/prompts/`.
@@ -193,6 +194,12 @@ This command generates root-level and module-level `AGENTS.md` files using a "co
 ├── config.toml              # Codex MCP config when ace-tool is enabled
 └── .cxg/
     ├── config.toml
+    ├── agents/
+    │   └── codex/
+    │       ├── get-current-datetime.md
+    │       ├── init-architect.md
+    │       ├── planner.md
+    │       └── ui-ux-designer.md
     └── roles/
         └── codex/
             ├── analyzer-frontend.md
@@ -213,7 +220,9 @@ This command generates root-level and module-level `AGENTS.md` files using a "co
 ### Repository Assets
 
 - `templates/skills/` contains migrated skill assets from `ccg-workflow/templates/skills`.
+- `templates/commands/agents/` contains migrated sub-agent prompt templates from `ccg-workflow/templates/commands/agents`.
 - `cxg-workflow init` installs these assets into `~/.codex/skills/cxg/`.
+- `cxg-workflow init` installs agent templates into `~/.codex/.cxg/agents/codex/`.
 
 ### CXG Config
 
@@ -222,6 +231,7 @@ CXG stores its own state in `~/.codex/.cxg/config.toml`, including:
 - installed command list
 - wrapper path
 - role prompt paths
+- agent prompt paths
 - selected MCP provider
 - whether lite mode is enabled (defaults to `true`)
 

@@ -19,6 +19,15 @@ export const ALL_COMMANDS = [
 
 export type CxgCommandId = typeof ALL_COMMANDS[number]
 
+export const AGENT_TEMPLATES = [
+  'get-current-datetime',
+  'init-architect',
+  'planner',
+  'ui-ux-designer',
+] as const
+
+export type CxgAgentTemplateId = typeof AGENT_TEMPLATES[number]
+
 export const WORKFLOW_CONFIGS: WorkflowConfig[] = [
   { id: 'cxg-workflow', name: '主工作流', nameEn: 'Main Workflow', category: 'core', description: '5阶段单模型开发主流程（研究→计划→执行→优化→评审）', descriptionEn: '5-phase single-model workflow', order: 1 },
   { id: 'cxg-plan', name: '规划', nameEn: 'Plan', category: 'core', description: '生成实施计划', descriptionEn: 'Generate implementation plan', order: 2 },

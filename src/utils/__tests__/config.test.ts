@@ -33,6 +33,7 @@ describe('createDefaultConfig', () => {
     expect(config.paths.prompts).toContain('.codex')
     expect(config.paths.skills).toContain('.codex')
     expect(config.paths.roles).toContain('.cxg')
+    expect(config.paths.agents).toContain('.cxg')
     expect(config.paths.wrapper).toContain('codeagent-wrapper')
   })
 

@@ -75,16 +75,11 @@ EOF",
 | 规划 | `{{ROLE_ARCHITECT}}` | `{{ROLE_ARCHITECT_FRONTEND}}` |
 | 审查 | `{{ROLE_REVIEWER}}` | `{{ROLE_REVIEWER_FRONTEND}}` |
 
-**前端专项角色**：
-- 前端实施：`{{ROLE_FRONTEND}}`（用于 `/prompts:cxg-feat` 或阶段 4 的 UI 实施建议）
-- 前端调试：`{{ROLE_DEBUGGER_FRONTEND}}`（用于 `/prompts:cxg-debug`）
-- 前端优化：`{{ROLE_OPTIMIZER_FRONTEND}}`（用于 `/prompts:cxg-optimize` 或阶段 5）
-- 前端测试：`{{ROLE_TESTER_FRONTEND}}`（用于 `/prompts:cxg-test`）
-
-**后端专项角色**：
-- 后端调试：`{{ROLE_DEBUGGER}}`（用于 `/prompts:cxg-debug`）
-- 后端优化：`{{ROLE_OPTIMIZER}}`（用于 `/prompts:cxg-optimize`）
-- 后端测试：`{{ROLE_TESTER}}`（用于 `/prompts:cxg-test`）
+**预置子 Agent 模板**：
+- `{{AGENT_GET_CURRENT_DATETIME}}`：时间戳获取
+- `{{AGENT_INIT_ARCHITECT}}`：初始化文档扫描与生成
+- `{{AGENT_PLANNER}}`：WBS 任务分解与计划草案
+- `{{AGENT_UI_UX_DESIGNER}}`：前端 UI/UX 方案草案
 
 **会话复用**：每次调用返回 `SESSION_ID: xxx`，后续阶段用 `resume xxx` 子命令复用上下文。
 
@@ -97,7 +92,7 @@ EOF",
 ```
 
 **重要**：
-- 必须指定 `timeout: 600000`，否则默认只有 30 秒会导致提前超时。
+- 必须显式指定 `timeout`（建议 `600000`；长任务可设为 `3600000`），否则默认只有 30 秒会导致提前超时。
 - 如果 10 分钟后仍未完成，继续轮询后台结果，**绝对不要 Kill 进程**。
 - 若等待时间过长导致用户希望中断，必须先用自然语言询问用户并取得明确确认后再处理中断，禁止直接 Kill Task。
 - ⛔ **Codex 结果必须等待**：Codex 执行时间较长（5-15 分钟）属于正常。单次查询超时后必须继续轮询后台结果，**绝对禁止在 Codex 未返回结果时直接跳过或继续下一阶段**。已启动的 Codex 任务若被跳过 = 浪费 token + 丢失结果。
@@ -129,7 +124,7 @@ EOF",
 
 ### 💡 阶段 2：方案构思
 
-`[模式：构思]` - 双子进程并行分析：
+`[模式：构思]` - 子进程并行分析：
 
 **并行调用**（`run_in_background: true`）：
 - Codex 后端：使用分析提示词，输出技术可行性、方案、风险
@@ -143,7 +138,7 @@ EOF",
 
 ### 📋 阶段 3：详细规划
 
-`[模式：计划]` - 双子进程协作规划：
+`[模式：计划]` - 子进程协作规划：
 
 **并行调用**（复用会话 `resume <SESSION_ID>`）：
 - Codex 后端：使用规划提示词 + `resume <<CODEX_SESSION>>`，输出后端架构
@@ -153,6 +148,8 @@ EOF",
 
 **务必遵循上方 `子进程调用规范` 的 `重要` 指示**
 
+可选增强：调用 `ROLE_FILE: {{AGENT_PLANNER}}` 生成任务分解草案，再由主 Codex 综合到最终计划。
+
 **Codex(自己) 综合规划**：采纳 Codex 后端规划 + Codex 前端规划，用户批准后存入 `.codex/plan/任务名.md`
 
 ### ⚡ 阶段 4：实施
@@ -161,7 +158,7 @@ EOF",
 
 - 严格按批准的计划实施
 - 遵循项目现有代码规范
-- 前端/UI 开发可选调用 `{{ROLE_FRONTEND}}` 生成补丁建议，再由主 Codex 落盘
+- 前端/UI 开发可选调用 `{{ROLE_FRONTEND}}`；若用户已批准，可在白名单内直接写入，主 Codex 负责复核
 - 在关键里程碑请求反馈
 
 ### 🚀 阶段 5：代码优化
@@ -192,6 +189,6 @@ EOF",
 ## 关键规则
 
 1. 阶段顺序不可跳过（除非用户明确指令）
-2. 子进程对文件系统**零写入权限**，所有修改由主 Codex 执行
+2. 子进程支持写入文件，但需遵循阶段约束：研究/构思/计划默认只读，执行阶段仅允许写入批准计划白名单文件，且写入前需回显确认、写入后需范围校验
 3. 评分 <7 或用户未批准时**强制停止**
 4. 若已启动 Codex 子进程任务，必须先等待 Codex 返回结果后才可进入下一阶段；该规则优先于阶段跳过规则。
