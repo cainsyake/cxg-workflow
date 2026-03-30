@@ -74,7 +74,7 @@ EOF",
 | `ui-ux-designer` | `{{AGENT_UI_UX_DESIGNER}}` | 前端/全栈任务的 UI 方案草案 |
 | `planner` | `{{AGENT_PLANNER}}` | WBS 任务分解与可执行计划 |
 
-**并行调用**：使用 `run_in_background: true` 启动，随后通过运行时后台结果查询机制持续轮询。**必须等所有子进程返回后才能进入下一阶段**。
+**并行调用**：使用 `run_in_background: true` 启动，随后通过运行时后台结果查询机制持续轮询。**必须等已启动的所有子进程返回后才能进入下一阶段**。
 
 **重要**：
 - 必须显式指定 `timeout`（建议 `600000`；长任务可设为 `3600000`），否则默认只有 30 秒会导致提前超时。
@@ -99,7 +99,12 @@ EOF",
 
 #### 2.0 Prompt 增强
 
-按 `/prompts:cxg-enhance` 的逻辑增强 $ARGUMENTS，后续阶段统一使用增强需求。
+按 `/prompts:cxg-enhance` 的逻辑增强：在分析阶段，禁止机械性（强制）并行调用后端和前端子进程；必须基于任务类型、修改范围按需调用。重点排查并统一修正以下模板及同类模板：
+- `templates/prompts/cxg-analyze.md`
+- `templates/prompts/cxg-workflow.md`
+- 其他存在类似“强制双调用”规则的模板
+
+后续阶段统一使用增强需求。
 
 #### 2.1 上下文检索
 
