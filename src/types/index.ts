@@ -13,6 +13,7 @@ export interface CxgConfig {
   paths: {
     skills: string
     roles: string
+    agents: string
     wrapper: string
   }
   commands: {
@@ -33,6 +34,7 @@ export interface InstallResult {
   success: boolean
   installedSkills: string[]
   installedRoles: string[]
+  installedAgents: string[]
   errors: string[]
   binInstalled?: boolean
   binPath?: string
@@ -45,6 +47,7 @@ export interface UninstallResult {
   success: boolean
   removedSkills: string[]
   removedRoles: string[]
+  removedAgents: string[]
   removedBin: boolean
   errors: string[]
 }

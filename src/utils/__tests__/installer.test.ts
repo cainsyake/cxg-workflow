@@ -37,6 +37,7 @@ function collectMarkdownFiles(dir: string): string[] {
 const PACKAGE_ROOT = findPackageRoot()
 const SKILLS_DIR = join(PACKAGE_ROOT, 'templates', 'skills')
 const ROLES_DIR = join(PACKAGE_ROOT, 'templates', 'roles', 'codex')
+const AGENTS_DIR = join(PACKAGE_ROOT, 'templates', 'agents', 'codex')
 const REQUIRED_SKILL_FILES = [
   join(SKILLS_DIR, 'SKILL.md'),
   join(SKILLS_DIR, 'run_skill.js'),
@@ -121,6 +122,16 @@ describe('template file completeness', () => {
     }
   })
 
+  it('agent prompt templates exist', () => {
+    for (const agent of ['get-current-datetime', 'init-architect', 'planner', 'ui-ux-designer']) {
+      const agentPath = join(AGENTS_DIR, `${agent}.md`)
+      expect(
+        existsSync(agentPath),
+        `agent template missing: ${agent}.md`,
+      ).toBe(true)
+    }
+  })
+
   it('skills assets exist', () => {
     for (const requiredFile of REQUIRED_SKILL_FILES) {
       expect(
@@ -176,7 +187,8 @@ describe('codex wait rule guards', () => {
 describe('template variable completeness', () => {
   const allSkills = collectMarkdownFiles(SKILLS_DIR)
   const allRoles = collectMarkdownFiles(ROLES_DIR)
-  const allTemplates = [...allSkills, ...allRoles]
+  const allAgents = collectMarkdownFiles(AGENTS_DIR)
+  const allTemplates = [...allSkills, ...allRoles, ...allAgents]
 
   it('finds template files', () => {
     expect(allTemplates.length).toBeGreaterThan(0)
@@ -210,7 +222,11 @@ describe('template variable completeness', () => {
         && !v.includes('ROLE_REVIEWER')
         && !v.includes('ROLE_REVIEWER_FRONTEND')
         && !v.includes('ROLE_TESTER')
-        && !v.includes('ROLE_TESTER_FRONTEND'),
+        && !v.includes('ROLE_TESTER_FRONTEND')
+        && !v.includes('AGENT_GET_CURRENT_DATETIME')
+        && !v.includes('AGENT_INIT_ARCHITECT')
+        && !v.includes('AGENT_PLANNER')
+        && !v.includes('AGENT_UI_UX_DESIGNER'),
       )
       expect(unprocessed, `unprocessed variables in ${relativePath}: ${unprocessed.join(', ')}`).toEqual([])
     })

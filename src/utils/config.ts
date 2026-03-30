@@ -69,6 +69,7 @@ export function createDefaultConfig(options?: {
     paths: {
       skills: join(CODEX_HOME, 'skills', 'cxg'),
       roles: join(CXG_DIR, 'roles', 'codex'),
+      agents: join(CXG_DIR, 'agents', 'codex'),
       wrapper: join(CODEX_HOME, 'bin', isWindows() ? 'codeagent-wrapper.exe' : 'codeagent-wrapper'),
     },
     commands: {

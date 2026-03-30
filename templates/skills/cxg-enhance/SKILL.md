@@ -8,15 +8,15 @@ description: 'Skill workflow ''cxg-enhance''. Use when Codex should follow
 
 将模糊需求转化为结构化、可执行任务描述。
 
+## Input interpretation
+用户在 $cxg-enhance 显式skill调用指令后的输入内容是**原始需求**
+
+
 ## 使用方法
 
 ```bash
 $cxg-enhance <原始需求>
 ```
-
-## 上下文
-
-- 原始需求：$ARGUMENTS
 
 ## 你的角色
 

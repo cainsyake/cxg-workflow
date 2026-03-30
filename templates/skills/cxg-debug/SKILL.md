@@ -8,6 +8,9 @@ description: 'Skill workflow ''cxg-debug''. Use when Codex should follow
 
 使用 Codex 后端/前端子进程并行诊断，交叉验证后定位根因并实施修复。
 
+## Input interpretation
+用户在 `$cxg-debug` 显式 skill 调用指令后的输入内容是**原始问题描述**。
+
 ## 使用方法
 
 ```bash
@@ -82,13 +85,13 @@ EOF",
 
 ## 执行工作流
 
-**问题描述**：$ARGUMENTS
+**问题描述**：来自 Input interpretation 的原始问题描述
 
 ### 阶段 0：Prompt 增强（可选）
 
 `[模式：准备]`
 
-按 `$cxg-enhance` 的逻辑分析 $ARGUMENTS，补全目标、约束、边界和验收标准。后续子进程统一使用增强后的需求。
+按 `$cxg-enhance` 的逻辑分析原始问题描述，补全目标、约束、边界和验收标准。后续子进程统一使用增强后的需求。
 
 ### 阶段 1：上下文收集
 

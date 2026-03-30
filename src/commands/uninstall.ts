@@ -17,6 +17,9 @@ export async function uninstall(): Promise<void> {
   if (result.removedRoles.length > 0) {
     console.log(`  ✓ 已移除角色提示词: ${result.removedRoles.join(', ')}`)
   }
+  if (result.removedAgents.length > 0) {
+    console.log(`  ✓ 已移除子agent提示词模板: ${result.removedAgents.join(', ')}`)
+  }
   if (result.removedBin) {
     console.log('  ✓ 已移除 codeagent-wrapper')
   }

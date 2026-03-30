@@ -9,6 +9,9 @@ description: 'Skill workflow ''cxg-init''. Use when Codex should follow
 
 以「根级简明 + 模块级详尽」策略生成项目 `AGENTS.md` 文档体系。
 
+## Input interpretation
+用户在 `$cxg-init` 显式 skill 调用指令后的输入内容是**项目摘要或名称**。
+
 ## 使用方法
 
 ```bash
@@ -17,29 +20,36 @@ $cxg-init <项目摘要或名称>
 
 ## 上下文
 
-- 项目摘要：$ARGUMENTS
+- 项目摘要：<项目摘要或名称>
 - 目标：生成/更新根级与模块级 `AGENTS.md`
 - 输出包含结构图、模块索引、开发规范和覆盖率摘要
 
 ---
 
-## 子进程调用规范（可选增强）
+## 子进程调用规范（预置子agent模板）
 
-当项目规模大或模块复杂时，可调用分析/规划子进程生成文档草案，再由主 Codex 落盘：
+`$cxg-init` 默认配合以下预置子agent提示词模板（均通过 `codeagent-wrapper` 调用）：
+
+| 场景 | 子agent模板 |
+|------|-------------|
+| 时间戳获取 | `{{AGENT_GET_CURRENT_DATETIME}}` |
+| 仓库扫描与文档草案 | `{{AGENT_INIT_ARCHITECT}}` |
+
+标准调用语法：
 
 ```text
 Bash({
   command: "{{WRAPPER_BIN}} {{LITE_MODE_FLAG}}--backend codex - \"{{WORKDIR}}\" <<'EOF'
-ROLE_FILE: {{ROLE_ANALYZER}}
+ROLE_FILE: <子agent提示词路径>
 <TASK>
-需求：扫描仓库并生成 AGENTS 文档草案
-上下文：<项目摘要 + 仓库结构 + 关键入口>
+需求：<增强后的需求或阶段任务>
+上下文：<项目摘要 + 已收集上下文>
 </TASK>
-OUTPUT: 根级与模块级 AGENTS.md 草案（Markdown）
+OUTPUT: 期望输出格式
 EOF",
   run_in_background: false,
   timeout: 3600000,
-  description: "初始化文档草案"
+  description: "cxg-init 子进程协作"
 })
 ```
 
@@ -56,6 +66,13 @@ EOF",
 3. 统计目录结构、入口文件、核心模块
 4. 跳过生成物与大体积依赖目录（如 `node_modules`、`dist`）
 
+建议先调用一次时间戳子agent：
+
+```text
+ROLE_FILE: {{AGENT_GET_CURRENT_DATETIME}}
+OUTPUT: 原始时间戳字符串（例如 2026-03-30 10:21:00）
+```
+
 ### 阶段 2：模块级分析
 
 `[模式：分析]`
@@ -66,6 +83,17 @@ EOF",
 - 依赖关系
 - 测试与验证方式
 - 已知约束与风险
+
+建议调用初始化架构子agent完成全仓扫描并输出草案：
+
+```text
+ROLE_FILE: {{AGENT_INIT_ARCHITECT}}
+<TASK>
+需求：扫描仓库并生成根级与模块级 AGENTS.md 草案
+上下文：项目摘要：来自 Input interpretation 的原始项目摘要；时间戳：$TIMESTAMP；工作目录：{{WORKDIR}}
+</TASK>
+OUTPUT: 覆盖率报告 + AGENTS.md 草案
+```
 
 ### 阶段 3：生成文档
 

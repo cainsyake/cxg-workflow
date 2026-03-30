@@ -85,6 +85,17 @@ async function collectInstalledSkills(skillsDir: string): Promise<string[]> {
   return skillIds.sort()
 }
 
+async function collectInstalledMarkdownFiles(dir: string): Promise<string[]> {
+  if (!(await fs.pathExists(dir))) {
+    return []
+  }
+  const files = await fs.readdir(dir)
+  return files
+    .filter(file => file.endsWith('.md'))
+    .map(file => file.replace('.md', ''))
+    .sort()
+}
+
 async function preflightCheck(templateDir: string, skipBinary: boolean): Promise<string[]> {
   const errors: string[] = []
   if (!(await fs.pathExists(templateDir))) {
@@ -110,7 +121,15 @@ async function postflightCheck(
 ): Promise<string[]> {
   const errors: string[] = []
   const skillsDir = join(codexHome, 'skills', 'cxg')
+  const agentsDir = join(codexHome, '.cxg', 'agents', 'codex')
   const missingSkills: string[] = []
+  const missingAgents: string[] = []
+  const requiredAgents = [
+    'get-current-datetime',
+    'init-architect',
+    'planner',
+    'ui-ux-designer',
+  ]
 
   for (const cmd of ALL_COMMANDS) {
     if (!(await fs.pathExists(join(skillsDir, cmd, 'SKILL.md')))) {
@@ -120,6 +139,16 @@ async function postflightCheck(
 
   if (missingSkills.length > 0) {
     errors.push(`Missing skill definitions after install: ${missingSkills.join(', ')}`)
+  }
+
+  for (const agent of requiredAgents) {
+    if (!(await fs.pathExists(join(agentsDir, `${agent}.md`)))) {
+      missingAgents.push(agent)
+    }
+  }
+
+  if (missingAgents.length > 0) {
+    errors.push(`Missing agent prompt templates after install: ${missingAgents.join(', ')}`)
   }
 
   if (!skipBinary && !result.binInstalled) {
@@ -150,6 +179,7 @@ export async function installCxg(options: {
   const codexHome = join(homedir(), '.codex')
   const skillsDir = join(codexHome, 'skills', 'cxg')
   const rolesDir = join(codexHome, '.cxg', 'roles', 'codex')
+  const agentsDir = join(codexHome, '.cxg', 'agents', 'codex')
   const binDir = join(codexHome, 'bin')
   const templateDir = join(PACKAGE_ROOT, 'templates')
   const installConfig = { liteMode, mcpProvider }
@@ -158,6 +188,7 @@ export async function installCxg(options: {
     success: true,
     installedSkills: [],
     installedRoles: [],
+    installedAgents: [],
     errors: [],
   }
 
@@ -170,6 +201,7 @@ export async function installCxg(options: {
 
   await fs.ensureDir(skillsDir)
   await fs.ensureDir(rolesDir)
+  await fs.ensureDir(agentsDir)
   await fs.ensureDir(binDir)
 
   // 1. Install skills
@@ -226,7 +258,32 @@ export async function installCxg(options: {
     result.success = false
   }
 
-  // 3. Install codeagent-wrapper binary
+  // 3. Install agent prompt templates
+  const agentsTemplateDir = join(templateDir, 'agents', 'codex')
+  if (await fs.pathExists(agentsTemplateDir)) {
+    try {
+      if (force && await fs.pathExists(agentsDir)) {
+        await fs.remove(agentsDir)
+        await fs.ensureDir(agentsDir)
+      }
+      await fs.copy(agentsTemplateDir, agentsDir, {
+        overwrite: force,
+        errorOnExist: false,
+      })
+      await replacePathsInMarkdownFiles(agentsDir, codexHome, installConfig)
+      result.installedAgents = await collectInstalledMarkdownFiles(agentsDir)
+    }
+    catch (error) {
+      result.errors.push(`Failed to install agents: ${error}`)
+      result.success = false
+    }
+  }
+  else {
+    result.errors.push(`Agents template directory not found: ${agentsTemplateDir}`)
+    result.success = false
+  }
+
+  // 4. Install codeagent-wrapper binary
   if (!skipBinary) {
     const binaryName = resolveBinaryName()
     const destBinary = getWrapperPath(binDir)
@@ -287,6 +344,7 @@ export async function uninstallCxg(options?: { preserveBinary?: boolean }): Prom
   const codexHome = join(homedir(), '.codex')
   const skillsDir = join(codexHome, 'skills', 'cxg')
   const rolesDir = join(codexHome, '.cxg', 'roles')
+  const agentsDir = join(codexHome, '.cxg', 'agents')
   const cxgDir = join(codexHome, '.cxg')
   const binDir = join(codexHome, 'bin')
 
@@ -294,6 +352,7 @@ export async function uninstallCxg(options?: { preserveBinary?: boolean }): Prom
     success: true,
     removedSkills: [],
     removedRoles: [],
+    removedAgents: [],
     removedBin: false,
     errors: [],
   }
@@ -323,6 +382,14 @@ export async function uninstallCxg(options?: { preserveBinary?: boolean }): Prom
         for (const file of files) {
           if (typeof file === 'string') {
             result.removedRoles.push(file.replace('.md', ''))
+          }
+        }
+      }
+      if (await fs.pathExists(agentsDir)) {
+        const files = await fs.readdir(join(agentsDir, 'codex')).catch(() => [])
+        for (const file of files) {
+          if (typeof file === 'string') {
+            result.removedAgents.push(file.replace('.md', ''))
           }
         }
       }

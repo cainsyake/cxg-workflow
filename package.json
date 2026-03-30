@@ -35,6 +35,7 @@
   "files": [
     "bin/cxg.mjs",
     "dist",
+    "templates/agents/",
     "templates/roles/",
     "templates/skills/"
   ],

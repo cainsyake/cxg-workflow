@@ -21,6 +21,10 @@ import { isWindows, normalizePath } from './platform'
  * - {{ROLE_REVIEWER_FRONTEND}} - frontend reviewer role prompt path
  * - {{ROLE_TESTER}} - tester role prompt path
  * - {{ROLE_TESTER_FRONTEND}} - frontend tester role prompt path
+ * - {{AGENT_GET_CURRENT_DATETIME}} - datetime agent prompt path
+ * - {{AGENT_INIT_ARCHITECT}} - init architect agent prompt path
+ * - {{AGENT_PLANNER}} - planner agent prompt path
+ * - {{AGENT_UI_UX_DESIGNER}} - UI/UX agent prompt path
  * - {{LITE_MODE_FLAG}} - "--lite " or ""
  * - {{MCP_SEARCH_TOOL}} - MCP tool name or fallback
  * - {{MCP_SEARCH_PARAM}} - MCP parameter key
@@ -62,6 +66,7 @@ export function replaceHomePathsInTemplate(content: string, codexHome: string): 
   const userHome = homedir()
   const cxgDir = join(codexHome, '.cxg')
   const rolesDir = join(cxgDir, 'roles', 'codex')
+  const agentsDir = join(cxgDir, 'agents', 'codex')
   const binDir = join(codexHome, 'bin')
 
   const norm = (path: string) => normalizePath(path)
@@ -87,6 +92,10 @@ export function replaceHomePathsInTemplate(content: string, codexHome: string): 
   processed = processed.replace(/\{\{ROLE_REVIEWER_FRONTEND\}\}/g, `${norm(rolesDir)}/reviewer-frontend.md`)
   processed = processed.replace(/\{\{ROLE_TESTER\}\}/g, `${norm(rolesDir)}/tester.md`)
   processed = processed.replace(/\{\{ROLE_TESTER_FRONTEND\}\}/g, `${norm(rolesDir)}/tester-frontend.md`)
+  processed = processed.replace(/\{\{AGENT_GET_CURRENT_DATETIME\}\}/g, `${norm(agentsDir)}/get-current-datetime.md`)
+  processed = processed.replace(/\{\{AGENT_INIT_ARCHITECT\}\}/g, `${norm(agentsDir)}/init-architect.md`)
+  processed = processed.replace(/\{\{AGENT_PLANNER\}\}/g, `${norm(agentsDir)}/planner.md`)
+  processed = processed.replace(/\{\{AGENT_UI_UX_DESIGNER\}\}/g, `${norm(agentsDir)}/ui-ux-designer.md`)
 
   // Replace ~/.codex/.cxg with absolute path
   processed = processed.replace(/~\/\.codex\/\.cxg/g, norm(cxgDir))

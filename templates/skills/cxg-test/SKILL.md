@@ -9,15 +9,18 @@ description: 'Skill workflow ''cxg-test''. Use when Codex should follow
 
 按代码类型路由 Codex 子进程生成测试方案与测试代码，并由主 Codex 整合验证。
 
+## Input interpretation
+用户在 `$cxg-test` 显式 skill 调用指令后的输入内容是**原始需求**。
+
 ## 使用方法
 
 ```bash
-$cxg-test <测试目标>
+$cxg-test <原始需求>
 ```
 
 ## 上下文
 
-- 测试目标：$ARGUMENTS
+- 测试目标：<原始需求>
 - 智能路由：后端 → `{{ROLE_TESTER}}`，前端 → `{{ROLE_TESTER_FRONTEND}}`，全栈 → 并行
 - 遵循项目现有测试框架与风格
 

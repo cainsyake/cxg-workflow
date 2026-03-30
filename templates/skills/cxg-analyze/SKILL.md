@@ -8,6 +8,9 @@ description: 'Skill workflow ''cxg-analyze''. Use when Codex should follow
 
 使用 Codex 子进程并行分析，交叉验证后输出综合技术结论。**仅分析，不修改代码。**
 
+## Input interpretation
+用户在 `$cxg-analyze` 显式 skill 调用指令后的输入内容是**原始需求**。
+
 ## 使用方法
 
 ```bash
@@ -38,7 +41,7 @@ Bash({
   command: "{{WRAPPER_BIN}} {{LITE_MODE_FLAG}}--backend codex - \"{{WORKDIR}}\" <<'EOF'
 ROLE_FILE: <角色提示词路径>
 <TASK>
-需求：<增强后的需求（如未增强则用 $ARGUMENTS）>
+需求：<增强后的需求（如未增强则使用原始需求）>
 上下文：<前序阶段检索到的代码上下文>
 </TASK>
 OUTPUT: 期望输出格式
@@ -74,13 +77,13 @@ EOF",
 
 ## 执行工作流
 
-**分析任务**：$ARGUMENTS
+**分析任务**：来自 Input interpretation 的原始需求
 
 ### 阶段 0：Prompt 增强（可选）
 
 `[模式：准备]`
 
-按 `$cxg-enhance` 的逻辑分析 $ARGUMENTS 的意图、缺失信息、隐含假设，补全为结构化需求（明确目标、技术约束、范围边界、验收标准）。后续子进程调用统一传入增强后的需求。
+按 `$cxg-enhance` 的逻辑分析原始需求的意图、缺失信息、隐含假设，补全为结构化需求（明确目标、技术约束、范围边界、验收标准）。后续子进程调用统一传入增强后的需求。
 
 ### 阶段 1：上下文检索
 

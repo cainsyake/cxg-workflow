@@ -17,6 +17,7 @@ CXG is a Codex-first workflow package for Codex CLI. It installs a structured se
 - **Skill-only runtime**: `init` installs skills, roles, and wrapper.
 - **Structured delivery**: the main workflow follows `research -> ideate -> plan -> execute -> optimize -> review`.
 - **Reusable expert roles**: built-in `analyzer` / `architect` / `debugger` / `optimizer` / `reviewer` / `tester`, plus frontend-specialized roles (`analyzer-frontend`, `architect-frontend`, `debugger-frontend`, `frontend`, `optimizer-frontend`, `reviewer-frontend`, `tester-frontend`).
+- **Built-in sub-agent prompt templates**: ships `get-current-datetime`, `init-architect`, `planner`, and `ui-ux-designer`, reusable in workflows such as `$cxg-init` and `$cxg-feat`.
 - **Frontend workflows stay on Codex**: frontend implementation/debug/optimize/test/review all use dedicated Codex role prompts instead of model routing.
 - **Optional code retrieval**: supports `ace-tool`, can be prepared for `contextweaver`, and falls back to `Glob + Grep` when MCP is skipped.
 - **Ready-to-use workflow skills**: installs 12 command skills into `~/.codex/skills/cxg/`.
@@ -189,6 +190,12 @@ This command generates root-level and module-level `AGENTS.md` files using a "co
 ├── config.toml              # Codex MCP config when ace-tool is enabled
 └── .cxg/
     ├── config.toml
+    ├── agents/
+    │   └── codex/
+    │       ├── get-current-datetime.md
+    │       ├── init-architect.md
+    │       ├── planner.md
+    │       └── ui-ux-designer.md
     └── roles/
         └── codex/
             ├── analyzer-frontend.md
@@ -209,7 +216,8 @@ This command generates root-level and module-level `AGENTS.md` files using a "co
 ### Repository Assets
 
 - `templates/skills/` contains migrated skill assets from `~/.codex/skills/cxg`.
-- `cxg-workflow init` installs these assets into `~/.codex/skills/cxg/`.
+- `templates/agents/codex/` contains reusable sub-agent prompt templates invoked via `codeagent-wrapper`.
+- `cxg-workflow init` installs these assets into `~/.codex/skills/cxg/` and `~/.codex/.cxg/agents/codex/`.
 
 ### CXG Config
 

@@ -21,7 +21,7 @@ export async function init(options: InitOptions = {}): Promise<void> {
 
   const { force = false, liteMode = true, mcpProvider = DEFAULT_MCP_PROVIDER } = options
 
-  // 1. Install skills + roles + binary
+  // 1. Install skills + roles + agents + binary
   console.log('  [1/3] 安装工作流组件...')
   const result = await installCxg({ force, liteMode, mcpProvider })
 
@@ -30,6 +30,9 @@ export async function init(options: InitOptions = {}): Promise<void> {
   }
   if (result.installedRoles.length > 0) {
     console.log(`    ✓ 角色提示词: ${result.installedRoles.join(', ')}`)
+  }
+  if (result.installedAgents.length > 0) {
+    console.log(`    ✓ 子agent提示词模板: ${result.installedAgents.join(', ')}`)
   }
   if (result.binInstalled) {
     console.log(`    ✓ codeagent-wrapper → ${result.binPath}`)
@@ -70,6 +73,7 @@ export async function init(options: InitOptions = {}): Promise<void> {
   const hasInstalledArtifacts = installedCommands.length > 0
     || result.installedSkills.length > 0
     || result.installedRoles.length > 0
+    || result.installedAgents.length > 0
     || Boolean(result.binInstalled)
 
   if (hasInstalledArtifacts) {

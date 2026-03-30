@@ -9,6 +9,9 @@ description: 'Skill workflow ''cxg-execute''. Use when Codex should follow
 
 读取已批准计划，获取 Codex 子进程原型，主 Codex 重构实施并完成审计交付。
 
+## Input interpretation
+用户在 `$cxg-execute` 显式 skill 调用指令后的输入内容是**原始需求**。
+
 ## 使用方法
 
 ```bash
@@ -113,7 +116,7 @@ EOF",
 
 ## 执行工作流
 
-**执行任务**：$ARGUMENTS
+**执行任务**：<原始需求>
 
 ### 阶段 0：读取计划
 

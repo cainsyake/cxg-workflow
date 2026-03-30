@@ -8,6 +8,9 @@ description: 'Skill workflow ''cxg-optimize''. Use when Codex should
 
 使用 Codex 后端/前端子进程并行分析性能瓶颈，按性价比排序并实施优化。
 
+## Input interpretation
+用户在 `$cxg-optimize` 显式 skill 调用指令后的输入内容是**原始需求**。
+
 ## 使用方法
 
 ```bash
@@ -60,7 +63,7 @@ EOF",
 
 ## 执行工作流
 
-**优化目标**：$ARGUMENTS
+**优化目标**：<原始需求>
 
 ### 阶段 0：Prompt 增强（可选）
 

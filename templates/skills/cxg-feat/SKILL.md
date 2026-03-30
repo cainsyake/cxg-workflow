@@ -8,6 +8,9 @@ description: 'Skill workflow ''cxg-feat''. Use when Codex should follow
 
 自动识别输入类型，完成规划、讨论迭代与实施交付。
 
+## Input interpretation
+用户在 `$cxg-feat` 显式 skill 调用指令后的输入内容是**原始需求**。
+
 ## 使用方法
 
 ```bash
@@ -73,6 +76,13 @@ EOF",
 | 实施原型 | `{{ROLE_ARCHITECT}}` | `{{ROLE_FRONTEND}}` |
 | 审查 | `{{ROLE_REVIEWER}}` | `{{ROLE_REVIEWER_FRONTEND}}` |
 
+**预置子agent提示词模板**：
+
+| 规划阶段场景 | 子agent模板 |
+|--------------|-------------|
+| UI/UX 方案设计 | `{{AGENT_UI_UX_DESIGNER}}` |
+| WBS 任务规划 | `{{AGENT_PLANNER}}` |
+
 **并行调用**：使用 `run_in_background: true` 启动，随后通过运行时后台结果查询机制持续轮询。**必须等所有子进程返回后才能进入下一阶段**。
 
 **重要**：
@@ -98,7 +108,7 @@ EOF",
 
 #### 2.0 Prompt 增强
 
-按 `$cxg-enhance` 的逻辑增强 $ARGUMENTS，后续阶段统一使用增强需求。
+按 `$cxg-enhance` 的逻辑增强<原始需求>，后续阶段统一使用增强需求。
 
 #### 2.1 上下文检索
 
@@ -114,8 +124,9 @@ EOF",
 
 #### 2.3 子进程协作规划
 
-- 前端/全栈：先调用 `{{ROLE_ANALYZER_FRONTEND}}`，产出 UI/UX 方案
-- 所有任务：调用 `{{ROLE_ARCHITECT}}` 或 `{{ROLE_ARCHITECT_FRONTEND}}`，产出可执行计划
+- 前端/全栈：先调用 `{{AGENT_UI_UX_DESIGNER}}`，产出 UI/UX 设计方案
+- 所有任务：调用 `{{AGENT_PLANNER}}`，产出 WBS 可执行计划
+- 复杂架构场景：可追加调用 `{{ROLE_ARCHITECT}}` 或 `{{ROLE_ARCHITECT_FRONTEND}}` 补充技术架构决策
 
 #### 2.4 保存计划
 
