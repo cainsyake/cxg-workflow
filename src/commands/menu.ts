@@ -48,7 +48,7 @@ function pad(s: string, w: number): string {
 export async function showMainMenu(): Promise<void> {
   while (true) {
     const config = await readCxgConfig()
-    const cmdCount = config?.commands?.installed?.length || 0
+    const cmdCount = config?.skills.installed.length || 0
     const mcpProvider = config?.mcp?.provider || '—'
     const liteMode = config?.runtime?.lite_mode ?? true
 
@@ -59,7 +59,7 @@ export async function showMainMenu(): Promise<void> {
 
     // Status line
     const statusParts = [
-      `${cmdCount} commands`,
+      `${cmdCount} skills`,
     ]
     if (mcpProvider && mcpProvider !== '—' && mcpProvider !== 'skip') {
       statusParts.push(ansis.magenta(mcpProvider))
@@ -83,7 +83,7 @@ export async function showMainMenu(): Promise<void> {
         item('2', '配置 MCP', 'MCP 工具配置'),
         item('3', '诊断安装', '检查安装完整性'),
         item('4', '卸载', '移除 CXG 配置'),
-        item('5', '设置 Lite 模式', '选择子进程 --lite 开关并重渲染模板'),
+        item('5', '设置 Lite 模式', '选择子进程 --lite 开关并重写托管 assets'),
         item('6', '更新', '执行原子更新，失败自动回滚'),
         item('7', '版本状态', '查看 CLI/本地/binary 版本'),
         new inquirer.Separator(ansis.gray('─'.repeat(42))),
@@ -181,7 +181,7 @@ async function toggleLiteMode(config: CxgConfig | null): Promise<void> {
   }
 
   console.log()
-  console.log(ansis.yellow('  ⏳ 正在重渲染 prompts/skills/roles/agents...'))
+  console.log(ansis.yellow('  ⏳ 正在重渲染 skills/roles/agents...'))
 
   const result = await installCxg({
     force: true,
@@ -194,9 +194,10 @@ async function toggleLiteMode(config: CxgConfig | null): Promise<void> {
     mcpProvider: provider,
     liteMode: next,
   })
-  nextConfig.commands.installed = result.installedPrompts.length > 0
-    ? result.installedPrompts
-    : (config.commands?.installed || [])
+  nextConfig.skills.installed = result.installedSkills.length > 0
+    ? result.installedSkills
+        .filter(skillId => skillId.startsWith('cxg-'))
+    : config.skills.installed
 
   await writeCxgConfig(nextConfig)
 
@@ -210,5 +211,5 @@ async function toggleLiteMode(config: CxgConfig | null): Promise<void> {
   else {
     console.log(ansis.green(`  ✓ Lite 模式已切换为: ${next ? '开启' : '关闭'}`))
   }
-  console.log(ansis.gray('  提示: 重启 Codex CLI 使新模板生效'))
+  console.log(ansis.gray('  提示: 重启 Codex CLI 使新的 skills/roles/agents 配置生效'))
 }

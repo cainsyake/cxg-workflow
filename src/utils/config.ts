@@ -1,4 +1,4 @@
-import type { CxgConfig, McpProvider } from '../types'
+import type { CxgConfig, McpProvider, RawCxgConfig } from '../types'
 import fs from 'fs-extra'
 import { homedir } from 'node:os'
 import { join } from 'pathe'
@@ -27,11 +27,29 @@ export async function ensureCxgDir(): Promise<void> {
   await fs.ensureDir(CXG_DIR)
 }
 
+export function normalizeCxgConfig(config: RawCxgConfig): CxgConfig {
+  return {
+    general: config.general,
+    runtime: config.runtime,
+    paths: {
+      skills: config.paths.skills,
+      roles: config.paths.roles,
+      agents: config.paths.agents,
+      wrapper: config.paths.wrapper,
+    },
+    skills: {
+      installed: config.skills?.installed ?? config.commands?.installed ?? [],
+    },
+    binary: config.binary,
+    mcp: config.mcp,
+  }
+}
+
 export async function readCxgConfig(): Promise<CxgConfig | null> {
   try {
     if (await fs.pathExists(CONFIG_FILE)) {
       const content = await fs.readFile(CONFIG_FILE, 'utf-8')
-      return parse(content) as unknown as CxgConfig
+      return normalizeCxgConfig(parse(content) as unknown as RawCxgConfig)
     }
   }
   catch {
@@ -67,13 +85,12 @@ export function createDefaultConfig(options?: {
       lite_mode: options?.liteMode ?? true,
     },
     paths: {
-      prompts: join(CODEX_HOME, 'prompts'),
       skills: join(CODEX_HOME, 'skills', 'cxg'),
       roles: join(CXG_DIR, 'roles', 'codex'),
       agents: join(CXG_DIR, 'agents', 'codex'),
       wrapper: join(CODEX_HOME, 'bin', isWindows() ? 'codeagent-wrapper.exe' : 'codeagent-wrapper'),
     },
-    commands: {
+    skills: {
       installed: [],
     },
     binary: options?.binary,

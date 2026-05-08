@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { injectTemplateVariables, replaceHomePathsInTemplate } from '../template'
 
 // ─────────────────────────────────────────────────────────────
@@ -251,5 +253,24 @@ describe('replaceHomePathsInTemplate', () => {
     expect(result).toContain('/home/testuser/.codex/.cxg/config.toml')
     expect(result).not.toContain('~/')
     expect(result).not.toContain('{{')
+  })
+})
+
+describe('runtime helper artifacts', () => {
+  it('writes grok helper references under the installed cxg skills tree, not ~/.codex/prompts', () => {
+    const configMcpSource = readFileSync(
+      join(import.meta.dirname, '..', '..', 'commands', 'config-mcp.ts'),
+      'utf-8',
+    )
+
+    expect(configMcpSource.includes('cxg-grok-search.md')).toBe(false)
+    expect(configMcpSource.includes('~/.codex/prompts/cxg-grok-search.md')).toBe(false)
+    expect(configMcpSource.includes('.codex/prompts')).toBe(false)
+    expect(configMcpSource.includes('CXG-managed reference guidance')).toBe(true)
+    expect(configMcpSource.includes('.codex')).toBe(true)
+    expect(configMcpSource.includes('skills')).toBe(true)
+    expect(configMcpSource.includes('references')).toBe(true)
+    expect(configMcpSource.includes('grok-search-reference.md')).toBe(true)
+    expect(configMcpSource.includes('custom prompt entrypoint')).toBe(true)
   })
 })

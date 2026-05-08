@@ -16,13 +16,10 @@ export async function init(options: InitOptions = {}): Promise<void> {
 
   const { force = false, liteMode = true, mcpProvider = DEFAULT_MCP_PROVIDER } = options
 
-  // 1. Install prompts + skills + roles + agents + binary
+  // 1. Install skills + roles + agents + binary
   console.log('  [1/3] 安装工作流组件...')
   const result = await installCxg({ force, liteMode, mcpProvider })
 
-  if (result.installedPrompts.length > 0) {
-    console.log(`    ✓ Custom Prompts: ${result.installedPrompts.length} 个`)
-  }
   if (result.installedSkills.length > 0) {
     console.log(`    ✓ Skills: ${result.installedSkills.length} 个定义`)
   }
@@ -66,7 +63,9 @@ export async function init(options: InitOptions = {}): Promise<void> {
   console.log('  [3/3] 保存配置...')
   const installedCommands = result.success
     ? [...ALL_COMMANDS]
-    : result.installedPrompts
+    : result.installedSkills
+        .filter(skillId => ALL_COMMANDS.includes(skillId as typeof ALL_COMMANDS[number]))
+        .sort((a, b) => ALL_COMMANDS.indexOf(a as typeof ALL_COMMANDS[number]) - ALL_COMMANDS.indexOf(b as typeof ALL_COMMANDS[number]))
 
   const hasInstalledArtifacts = installedCommands.length > 0
     || result.installedSkills.length > 0
@@ -85,7 +84,7 @@ export async function init(options: InitOptions = {}): Promise<void> {
         version: result.binVersion,
       },
     })
-    config.commands.installed = installedCommands
+    config.skills.installed = installedCommands
     await writeCxgConfig(config)
     console.log('    ✓ ~/.codex/.cxg/config.toml')
   }
@@ -110,17 +109,17 @@ export async function init(options: InitOptions = {}): Promise<void> {
   }
 
   console.log()
-  console.log('  已安装命令:')
+  console.log('  已安装工作流技能:')
   if (installedCommands.length === 0) {
     console.log('    (无)')
   }
   else {
-    for (const cmd of installedCommands) {
-      console.log(`    /${cmd}`)
+    for (const skillId of installedCommands) {
+      console.log(`    ${skillId}`)
     }
   }
 
   console.log()
-  console.log('  使用方法: 在 Codex CLI 中输入 /<命令名> 调用')
+  console.log('  使用方式: 在 Codex 中调用已安装的 CXG skills，并配合 ~/.codex/.cxg 下的角色、agents 与 wrapper 运行')
   console.log()
 }

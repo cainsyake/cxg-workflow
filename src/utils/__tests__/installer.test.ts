@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { ALL_COMMANDS, WORKFLOW_CONFIGS } from '../constants'
-import { getAllCommandIds, getWorkflowConfigs } from '../installer'
+import { getAllCommandIds, getManagedPostflightPaths, getWorkflowConfigs } from '../installer'
 import { injectTemplateVariables } from '../template'
 
 // Helper: find package root
@@ -35,13 +35,42 @@ function collectMarkdownFiles(dir: string): string[] {
 }
 
 const PACKAGE_ROOT = findPackageRoot()
+const PACKAGE_JSON_PATH = join(PACKAGE_ROOT, 'package.json')
+const README_EN_PATH = join(PACKAGE_ROOT, 'README.md')
+const README_ZH_PATH = join(PACKAGE_ROOT, 'README.zh-CN.md')
 const PROMPTS_DIR = join(PACKAGE_ROOT, 'templates', 'prompts')
 const SKILLS_DIR = join(PACKAGE_ROOT, 'templates', 'skills')
 const ROLES_DIR = join(PACKAGE_ROOT, 'templates', 'roles', 'codex')
 const AGENTS_DIR = join(PACKAGE_ROOT, 'templates', 'commands', 'agents')
+const PACKAGE_JSON = JSON.parse(readFileSync(PACKAGE_JSON_PATH, 'utf-8')) as { files?: string[] }
+const README_PATHS = [README_EN_PATH, README_ZH_PATH]
+const TARGET_ROLE_FILES = [
+  'analyzer.md',
+  'analyzer-frontend.md',
+  'architect.md',
+  'architect-frontend.md',
+  'debugger.md',
+  'debugger-frontend.md',
+  'frontend.md',
+  'optimizer.md',
+  'optimizer-frontend.md',
+  'reviewer.md',
+  'reviewer-frontend.md',
+  'tester.md',
+  'tester-frontend.md',
+]
+const README_PROMPT_ERA_PHRASES = [
+  'Prompt templates use',
+  'Prompt templates fall back',
+  '命令模板内部调用',
+  '命令模板自动退回',
+]
 const REQUIRED_SKILL_FILES = [
   join(SKILLS_DIR, 'SKILL.md'),
   join(SKILLS_DIR, 'run_skill.js'),
+  join(SKILLS_DIR, 'shared', 'workflow-rules.md'),
+  join(SKILLS_DIR, 'shared', 'interaction-checkpoints.md'),
+  join(SKILLS_DIR, 'shared', 'output-contracts.md'),
   join(SKILLS_DIR, 'orchestration', 'multi-agent', 'SKILL.md'),
   join(SKILLS_DIR, 'tools', 'gen-docs', 'SKILL.md'),
   join(SKILLS_DIR, 'tools', 'gen-docs', 'scripts', 'doc_generator.js'),
@@ -59,6 +88,17 @@ const REQUIRED_AGENT_FILES = [
   join(AGENTS_DIR, 'init-architect.md'),
   join(AGENTS_DIR, 'planner.md'),
   join(AGENTS_DIR, 'ui-ux-designer.md'),
+]
+const REQUIRED_WORKFLOW_SKILL_SECTIONS = [
+  '## Purpose',
+  '## Expected Input',
+  '## Workflow',
+  '## Deliverable',
+]
+const REQUIRED_WORKFLOW_SHARED_REFERENCES = [
+  '../shared/workflow-rules.md',
+  '../shared/interaction-checkpoints.md',
+  '../shared/output-contracts.md',
 ]
 
 // ─────────────────────────────────────────────────────────────
@@ -109,6 +149,11 @@ describe('command registry', () => {
 // B. Template file completeness
 // ─────────────────────────────────────────────────────────────
 describe('template file completeness', () => {
+  it('package publish list excludes templates/prompts', () => {
+    expect(PACKAGE_JSON.files).toBeTruthy()
+    expect(PACKAGE_JSON.files).not.toContain('templates/prompts/')
+  })
+
   it('every command has a matching Custom Prompt template', () => {
     for (const cmd of ALL_COMMANDS) {
       const templatePath = join(PROMPTS_DIR, `${cmd}.md`)
@@ -137,14 +182,63 @@ describe('template file completeness', () => {
       ).toBe(true)
     }
 
+    for (const commandId of ALL_COMMANDS) {
+      const skillEntryPath = join(SKILLS_DIR, commandId, 'SKILL.md')
+      expect(
+        existsSync(skillEntryPath),
+        `workflow skill entry missing: templates/skills/${commandId}/SKILL.md`,
+      ).toBe(true)
+    }
+
     const skillDefinitionFiles = collectMarkdownFiles(SKILLS_DIR)
       .filter(path => /[\\/]SKILL\.md$/.test(path))
       .filter(path => path !== join(SKILLS_DIR, 'SKILL.md'))
 
     expect(
       skillDefinitionFiles.length,
-      'at least one nested skill definition should exist in templates/skills/',
-    ).toBeGreaterThan(0)
+      'expected workflow skill entrypoints plus nested supporting skills in templates/skills/',
+    ).toBeGreaterThanOrEqual(ALL_COMMANDS.length + 6)
+  })
+
+  it('workflow skill entrypoints include the shared content contract', () => {
+    for (const commandId of ALL_COMMANDS) {
+      const skillEntryPath = join(SKILLS_DIR, commandId, 'SKILL.md')
+      const content = readFileSync(skillEntryPath, 'utf-8')
+
+      for (const section of REQUIRED_WORKFLOW_SKILL_SECTIONS) {
+        expect(
+          content.includes(section),
+          `${commandId} missing required section: ${section}`,
+        ).toBe(true)
+      }
+
+      for (const sharedReference of REQUIRED_WORKFLOW_SHARED_REFERENCES) {
+        expect(
+          content.includes(sharedReference),
+          `${commandId} missing shared guidance reference: ${sharedReference}`,
+        ).toBe(true)
+      }
+    }
+  })
+
+  it('top-level shipped skill docs advertise $cxg-* entrypoints instead of slash commands', () => {
+    for (const commandId of ALL_COMMANDS) {
+      const skillEntryPath = join(SKILLS_DIR, commandId, 'SKILL.md')
+      const content = readFileSync(skillEntryPath, 'utf-8')
+
+      expect(
+        content.includes(`# $${commandId}`),
+        `${commandId} should advertise the $${commandId} entrypoint`,
+      ).toBe(true)
+      expect(
+        content.includes(`$${commandId}`),
+        `${commandId} should mention the $${commandId} entrypoint`,
+      ).toBe(true)
+      expect(
+        content.includes(`/${commandId}`),
+        `${commandId} should not advertise slash-command entrypoints`,
+      ).toBe(false)
+    }
   })
 
   it('agent templates exist', () => {
@@ -152,6 +246,88 @@ describe('template file completeness', () => {
       expect(
         existsSync(requiredFile),
         `required agent template missing: ${requiredFile.replace(`${PACKAGE_ROOT}/`, '')}`,
+      ).toBe(true)
+    }
+  })
+
+  it('installer completeness remains anchored on skills assets instead of prompt artifacts', () => {
+    expect(existsSync(PROMPTS_DIR), 'legacy prompt references should stay in the repo').toBe(true)
+    expect(REQUIRED_SKILL_FILES.length).toBeGreaterThan(0)
+    expect(REQUIRED_WORKFLOW_SKILL_SECTIONS.length).toBeGreaterThan(0)
+    expect(REQUIRED_WORKFLOW_SHARED_REFERENCES.length).toBeGreaterThan(0)
+    expect(REQUIRED_AGENT_FILES.length).toBeGreaterThan(0)
+
+    const codexHome = '/mock-codex-home'
+    const { skillAssets, agentAssets } = getManagedPostflightPaths(codexHome)
+
+    expect(skillAssets).toEqual(expect.arrayContaining([
+      join(codexHome, 'skills', 'cxg', 'SKILL.md'),
+      join(codexHome, 'skills', 'cxg', 'run_skill.js'),
+      join(codexHome, 'skills', 'cxg', 'shared', 'workflow-rules.md'),
+      join(codexHome, 'skills', 'cxg', 'orchestration', 'multi-agent', 'SKILL.md'),
+      join(codexHome, 'skills', 'cxg', 'tools', 'lib', 'shared.js'),
+      join(codexHome, 'skills', 'cxg', 'tools', 'verify-security', 'scripts', 'security_scanner.js'),
+    ]))
+    expect(agentAssets).toEqual(expect.arrayContaining([
+      join(codexHome, '.cxg', 'agents', 'codex', 'get-current-datetime.md'),
+      join(codexHome, '.cxg', 'agents', 'codex', 'planner.md'),
+    ]))
+    expect(skillAssets.some(path => path.includes('/prompts/'))).toBe(false)
+    expect(agentAssets.some(path => path.includes('/prompts/'))).toBe(false)
+
+    for (const commandId of ALL_COMMANDS) {
+      expect(skillAssets).toContain(join(codexHome, 'skills', 'cxg', commandId, 'SKILL.md'))
+    }
+  })
+
+  it('both READMEs use skills-native $cxg-* examples instead of slash commands', () => {
+    for (const readmePath of README_PATHS) {
+      const content = readFileSync(readmePath, 'utf-8')
+
+      expect(
+        ALL_COMMANDS.some(commandId => content.includes(`$${commandId}`)),
+        `${readmePath.replace(`${PACKAGE_ROOT}/`, '')} should include at least one $cxg-* example`,
+      ).toBe(true)
+
+      for (const commandId of ALL_COMMANDS) {
+        expect(
+          content.includes(`/${commandId}`),
+          `${readmePath.replace(`${PACKAGE_ROOT}/`, '')} should not advertise /${commandId} examples`,
+        ).toBe(false)
+      }
+    }
+  })
+
+  it('both READMEs stop describing ~/.codex/prompts/ as the runtime entrypoint', () => {
+    for (const readmePath of README_PATHS) {
+      const content = readFileSync(readmePath, 'utf-8')
+
+      expect(
+        content.includes('~/.codex/prompts/'),
+        `${readmePath.replace(`${PACKAGE_ROOT}/`, '')} should not describe ~/.codex/prompts/ as the runtime entrypoint`,
+      ).toBe(false)
+
+      for (const promptEraPhrase of README_PROMPT_ERA_PHRASES) {
+        expect(
+          content.includes(promptEraPhrase),
+          `${readmePath.replace(`${PACKAGE_ROOT}/`, '')} should not use prompt-era README wording: ${promptEraPhrase}`,
+        ).toBe(false)
+      }
+    }
+  })
+
+  it('listed role docs no longer use prompt-era For headers', () => {
+    for (const roleFile of TARGET_ROLE_FILES) {
+      const rolePath = join(ROLES_DIR, roleFile)
+      const content = readFileSync(rolePath, 'utf-8')
+
+      expect(
+        content.includes('> For: /prompts:cxg-'),
+        `${roleFile} should not use prompt-era For headers`,
+      ).toBe(false)
+      expect(
+        content.includes('For: $cxg-'),
+        `${roleFile} should describe $cxg-* skill entrypoints in the For header`,
       ).toBe(true)
     }
   })

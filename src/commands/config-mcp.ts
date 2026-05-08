@@ -145,7 +145,12 @@ async function handleInstallContextWeaver(): Promise<void> {
 // Grok Search MCP
 // ═══════════════════════════════════════════════════════
 
-const GROK_SEARCH_PROMPT = `## Search and Evidence Standards
+const GROK_SEARCH_REFERENCE = `# Grok Search Reference Guidance
+
+This file is CXG-managed reference guidance for the \`grok-search\` MCP setup.
+It is not a custom prompt entrypoint.
+
+## Search and Evidence Standards
 
 - Use the \`mcp__grok-search\` tool for web searches
 - Execute independent search requests in parallel
@@ -154,11 +159,17 @@ const GROK_SEARCH_PROMPT = `## Search and Evidence Standards
 - Citation format: [Author/Organization, Year/Date, URL]
 `
 
-async function writeGrokPromptToPrompts(): Promise<void> {
-  const promptsDir = join(homedir(), '.codex', 'prompts')
-  const promptPath = join(promptsDir, 'cxg-grok-search.md')
-  await fs.ensureDir(promptsDir)
-  await fs.writeFile(promptPath, GROK_SEARCH_PROMPT, 'utf-8')
+async function writeGrokSearchReference(): Promise<string> {
+  const referencesDir = join(homedir(), '.codex', 'skills', 'cxg', 'references')
+  const referencePath = join(referencesDir, 'grok-search-reference.md')
+  await fs.ensureDir(referencesDir)
+  await fs.writeFile(referencePath, GROK_SEARCH_REFERENCE, 'utf-8')
+  return referencePath
+}
+
+async function removeGrokSearchReference(): Promise<void> {
+  const referencePath = join(homedir(), '.codex', 'skills', 'cxg', 'references', 'grok-search-reference.md')
+  await fs.remove(referencePath)
 }
 
 async function handleGrokSearch(): Promise<void> {
@@ -210,9 +221,10 @@ async function handleGrokSearch(): Promise<void> {
 
   console.log()
   if (result.success) {
-    await writeGrokPromptToPrompts()
+    const referencePath = await writeGrokSearchReference()
     console.log(ansis.green('✓ grok-search MCP 配置成功！'))
-    console.log(ansis.green('✓ 搜索提示词已写入 ~/.codex/prompts/cxg-grok-search.md'))
+    console.log(ansis.green(`✓ 参考资料已写入 ${referencePath}`))
+    console.log(ansis.gray('  该文件位于 CXG skills 支持目录，不是自定义 Prompt 或技能入口'))
     console.log(ansis.gray('  重启 Codex CLI 使配置生效'))
   }
   else {
@@ -318,6 +330,9 @@ async function handleUninstall(): Promise<void> {
     const result = await uninstallMcpServer(target)
 
     if (result.success) {
+      if (target === 'grok-search') {
+        await removeGrokSearchReference()
+      }
       console.log(ansis.green(`✓ ${target} 已卸载`))
     }
     else {
