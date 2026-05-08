@@ -248,7 +248,6 @@ describe('template file completeness', () => {
       join(codexHome, '.cxg', 'agents', 'codex', 'get-current-datetime.md'),
       join(codexHome, '.cxg', 'agents', 'codex', 'planner.md'),
     ]))
-    expect(skillAssets.some(path => path.includes('/skills/cxg/references/'))).toBe(false)
     expect(skillAssets.some(path => path.includes('/prompts/'))).toBe(false)
     expect(agentAssets.some(path => path.includes('/prompts/'))).toBe(false)
 

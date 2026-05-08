@@ -167,6 +167,11 @@ async function writeGrokSearchReference(): Promise<string> {
   return referencePath
 }
 
+async function removeGrokSearchReference(): Promise<void> {
+  const referencePath = join(homedir(), '.codex', 'skills', 'cxg', 'references', 'grok-search-reference.md')
+  await fs.remove(referencePath)
+}
+
 async function handleGrokSearch(): Promise<void> {
   console.log()
   console.log(ansis.cyan.bold('  🔍 联网搜索 MCP (grok-search)'))
@@ -325,6 +330,9 @@ async function handleUninstall(): Promise<void> {
     const result = await uninstallMcpServer(target)
 
     if (result.success) {
+      if (target === 'grok-search') {
+        await removeGrokSearchReference()
+      }
       console.log(ansis.green(`✓ ${target} 已卸载`))
     }
     else {
