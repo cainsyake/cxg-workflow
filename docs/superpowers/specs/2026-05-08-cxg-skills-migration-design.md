@@ -1,10 +1,10 @@
-# CXG Workflow Skills-Native Migration Design
+# CXG Workflow Skills-Native 迁移设计
 
-## Summary
+## 概述
 
-CXG Workflow currently installs 12 `/cxg-*` custom prompts into `~/.codex/prompts/` and separately installs a small set of skills into `~/.codex/skills/cxg/`. New Codex versions no longer support the `/cxg-*` custom prompt invocation model. CXG therefore needs to migrate from a prompt-centered distribution model to a skills-native model built around explicit `$cxg-*` skill invocation.
+当前的 CXG Workflow 会将 12 个 `/cxg-*` custom prompts 安装到 `~/.codex/prompts/`，同时再把一小组 skills 安装到 `~/.codex/skills/cxg/`。新版本 Codex 已不再支持 `/cxg-*` 这种 custom prompt 调用模型，因此 CXG 需要从 prompt-centered 的分发与调用方式迁移为 skills-native 模型，并围绕显式的 `$cxg-*` skill 调用重新组织整体实现。
 
-This design keeps the 12 existing workflow entrypoints conceptually intact, but reintroduces them as top-level user-visible skills:
+这次迁移会保留现有 12 个工作流入口的概念边界，但会将它们重新实现为顶层、用户可见的 skills：
 
 - `$cxg-workflow`
 - `$cxg-plan`
@@ -19,31 +19,31 @@ This design keeps the 12 existing workflow entrypoints conceptually intact, but 
 - `$cxg-commit`
 - `$cxg-init`
 
-The migration is intentionally not a mechanical prompt-to-skill conversion. The new implementation will restructure the entire `templates/skills/` tree to better match Codex skills conventions, explicitly favor user-invoked skills, and reduce repeated workflow instructions through shared assets.
+这次迁移不是简单地把 prompt 原文包一层改成 skill。新的实现会重构整个 `templates/skills/` 树，使其更符合 Codex skills 的使用方式，明确偏向用户显式调用，并通过共享资产减少重复的工作流说明。
 
-## Goals
+## 目标
 
-- Replace `/cxg-*` custom prompt usage with explicit `$cxg-*` skill usage.
-- Preserve the current 12 workflow entrypoints as a one-to-one top-level skill surface.
-- Rebuild the CXG distribution model as `skills-only` for user-facing workflow entrypoints.
-- Unify and modernize the existing `templates/skills/` tree instead of only adding 12 wrapper skills.
-- Keep old `templates/prompts/` in the repository as migration reference material, but stop publishing and installing them.
-- Avoid destructive migration behavior on user machines by not deleting legacy `~/.codex/prompts/cxg-*.md` files.
+- 用显式的 `$cxg-*` skill 调用替代 `/cxg-*` custom prompt 调用。
+- 保持当前 12 个工作流入口的一对一顶层 skill 形态。
+- 将 CXG 的用户入口分发模型重构为 `skills-only`。
+- 统一并现代化现有的 `templates/skills/` 结构，而不是仅新增 12 个包装层 skills。
+- 将旧的 `templates/prompts/` 保留在仓库中作为迁移参考，但不再发布、不再安装。
+- 避免对用户机器做破坏性迁移，不主动删除已有的 `~/.codex/prompts/cxg-*.md`。
 
-## Non-Goals
+## 非目标
 
-- Maintaining `/cxg-*` runtime compatibility in new Codex versions.
-- Preserving prompt-era implementation structure when it conflicts with a cleaner skills-native design.
-- Automatically cleaning up legacy prompt files from user installations.
-- Redesigning the semantic purpose of the 12 workflow entrypoints.
+- 不再追求在新版本 Codex 中维持 `/cxg-*` 的运行时兼容。
+- 不强行保留 prompt 时代的实现结构；如果它与更清晰的 skills-native 结构冲突，应以后者为准。
+- 不自动清理用户机器上的 legacy prompt 文件。
+- 不重新定义这 12 个工作流入口的语义职责。
 
-## User Experience
+## 用户体验
 
-### Invocation Model
+### 调用模型
 
-Users will explicitly invoke top-level skills with `$cxg-*` names. The intended primary mode is direct invocation by name, not auto-selection by Codex.
+用户将通过 `$cxg-*` 名称显式调用顶层 skills。主要使用模式是按名字直接调用，而不是依赖 Codex 自动挑选。
 
-Examples:
+示例：
 
 ```text
 $cxg-workflow implement invoice export with audit logging
@@ -51,24 +51,24 @@ $cxg-plan refactor payment service
 $cxg-review
 ```
 
-### Behavior Expectations
+### 行为预期
 
-- Each top-level skill should remain recognizable to existing CXG users.
-- The names and broad responsibilities of the 12 entrypoints remain stable.
-- Internal workflow content may be rewritten to better fit skills semantics.
-- Tooling and orchestration skills continue to exist, but mostly as supporting assets rather than the primary user-facing interface.
+- 每个顶层 skill 对现有 CXG 用户来说都应当仍然可辨认。
+- 12 个入口的名称与总体职责保持稳定。
+- 内部工作流内容允许为了适配 skills 语义而重写。
+- tooling 和 orchestration skills 仍然保留，但它们主要是支撑资产，而不是首要的用户入口界面。
 
-## Repository Structure
+## 仓库结构
 
-### Current State
+### 当前状态
 
-- `templates/prompts/` contains the 12 user-facing workflow prompt files.
-- `templates/skills/` contains a root `cxg-skills` skill, `run_skill.js`, tool-like skills, and orchestration helpers.
-- Installer logic treats prompt files as the primary command surface and skills as a secondary asset group.
+- `templates/prompts/` 包含 12 个用户可见的工作流 prompt 文件。
+- `templates/skills/` 包含一个根级的 `cxg-skills` skill、`run_skill.js`、若干工具型 skills，以及 orchestration helpers。
+- 安装逻辑当前将 prompt 文件视为主命令面，将 skills 视为次级资产组。
 
-### Target State
+### 目标状态
 
-`templates/skills/` becomes the canonical workflow surface and is reorganized into four layers:
+`templates/skills/` 将成为唯一的工作流主入口，并重组为四层结构：
 
 ```text
 templates/skills/
@@ -104,43 +104,43 @@ templates/skills/
     └── ...
 ```
 
-The old root `templates/skills/SKILL.md` overview skill is removed as the primary user entrypoint. The canonical user-facing entrypoints are the 12 top-level `cxg-*` skills listed above.
+旧的根级 `templates/skills/SKILL.md` 总览 skill 不再作为主要用户入口。规范的用户入口是上面列出的 12 个顶层 `cxg-*` skills。
 
-### Layer Responsibilities
+### 分层职责
 
-#### Top-Level Entry Skills
+#### 顶层入口 skills
 
-The 12 `cxg-*` directories are immediate children of `templates/skills/` and each exposes one top-level user-visible skill. These are the only workflow entrypoints users are expected to invoke directly.
+这 12 个 `cxg-*` 目录应当作为 `templates/skills/` 的直接子目录，每个目录暴露一个顶层、用户可见的 skill。它们是用户应直接调用的唯一工作流入口。
 
-Each top-level entry skill should contain:
+每个顶层入口 skill 应包含：
 
-- the skill purpose and when to use it
-- the expected input format
-- the execution stages or workflow contract
-- the required outputs or deliverable format
-- references to shared rules or internal supporting skills where appropriate
+- skill 的用途与适用场景
+- 期望的输入形式
+- 执行阶段或工作流约定
+- 期望输出或交付格式
+- 对共享规则或内部支撑 skills 的必要引用
 
-Each top-level entry skill should avoid:
+每个顶层入口 skill 应避免：
 
-- duplicating large shared rule blocks
-- embedding tool implementation details that belong in `tools/`
-- acting as a thin wrapper around the old prompt text
+- 重复大段共享规则块
+- 内嵌本应属于 `tools/` 的工具实现细节
+- 仅作为旧 prompt 文本的薄包装层
 
-#### Shared Skills and Shared Assets
+#### Shared skills 与共享资产
 
-`templates/skills/shared/` will centralize repeated workflow rules currently duplicated across prompt templates. This includes:
+`templates/skills/shared/` 用于集中管理当前散落在多个 prompt 模板中的重复工作流规则，包括：
 
-- workflow stage transition conventions
-- subprocess waiting rules
-- user confirmation checkpoints
-- shared output formatting guidance
-- cross-cutting interaction policies
+- 工作流阶段流转约定
+- 子进程等待规则
+- 用户确认检查点
+- 共享输出格式指导
+- 跨入口的交互策略
 
-The purpose of `shared/` is to keep top-level skills readable and maintainable while ensuring consistency across the 12 entrypoints.
+`shared/` 的目标是让顶层 skills 更易读、更易维护，同时保证 12 个入口之间的一致性。
 
-#### Tool Skills
+#### Tool skills
 
-`templates/skills/tools/` remains the home for quality-gate and utility skills such as:
+`templates/skills/tools/` 继续作为质量关卡和实用型 skills 的归属位置，例如：
 
 - `verify-change`
 - `verify-module`
@@ -148,210 +148,210 @@ The purpose of `shared/` is to keep top-level skills readable and maintainable w
 - `verify-security`
 - `gen-docs`
 
-These skills are retained and refactored into the new information architecture rather than replaced.
+这些 skills 会被保留，并纳入新的信息架构统一整理，而不是被替换掉。
 
-The existing `run_skill.js` runner remains part of the published skill asset set, but it is treated as implementation support for tool-like workflows rather than as a user-facing workflow entrypoint. Its exact placement may remain at the skills root or move under a more explicit support location, but it must continue to function for tool skill execution after the migration.
+现有的 `run_skill.js` runner 仍然作为发布后的 skill 资产的一部分保留，但它的定位会调整为 tool-like workflows 的实现支撑，而不再是面向用户的工作流入口。它的具体放置位置可以继续留在 skills 根目录，也可以移动到更明确的 support 目录下，但迁移后它必须继续可用于工具型 skill 的执行。
 
-#### Orchestration Skills
+#### Orchestration skills
 
-`templates/skills/orchestration/` continues to host multi-agent or coordination logic such as `multi-agent`. These remain supporting capabilities and should be referenced by top-level skills or tools when needed.
+`templates/skills/orchestration/` 继续承载 `multi-agent` 这类多智能体或协同逻辑。它们仍然是支撑能力，应由顶层 skills 或 tool skills 在需要时引用。
 
-## Content Migration Strategy
+## 内容迁移策略
 
-The prompt templates in `templates/prompts/` remain in the repository as a reference source during migration, but they stop being production assets.
+`templates/prompts/` 中的 prompt 模板会继续保留在仓库里，作为迁移期间的参考来源，但不再属于生产资产。
 
-The migration strategy is:
+迁移策略如下：
 
-1. Treat each old prompt as source material, not as final skill content.
-2. Rewrite each top-level `SKILL.md` around skills-native usage and structure.
-3. Extract repeated rules into `shared/` instead of copying them into all 12 entry skills.
-4. Reorganize existing tool and orchestration skills to align with the new structure and naming expectations.
+1. 将每个旧 prompt 当作源材料，而不是最终 skill 内容。
+2. 围绕 skills-native 的使用方式和结构，重写每个顶层 `SKILL.md`。
+3. 将重复规则抽到 `shared/`，而不是复制到 12 个入口 skill 中。
+4. 对现有 tool skills 和 orchestration skills 做重组，使其与新的结构和命名预期对齐。
 
-This design deliberately favors clarity and maintainability over preserving prompt-era wording.
+该设计明确优先考虑清晰度和可维护性，而不是保留 prompt 时代的措辞。
 
-## Installation and Lifecycle Behavior
+## 安装与生命周期行为
 
 ### Installation
 
-`init` and `installCxg()` will move to a `skills-only` user-entrypoint model.
+`init` 与 `installCxg()` 将切换到 `skills-only` 的用户入口模型。
 
-Installed assets will be:
+安装产物包括：
 
 - `~/.codex/skills/cxg/`
 - `~/.codex/.cxg/roles/codex/`
 - `~/.codex/.cxg/agents/codex/`
 - `~/.codex/bin/codeagent-wrapper`
 
-Assets that will no longer be installed:
+不再安装的产物包括：
 
 - `~/.codex/prompts/cxg-*.md`
 
-User-facing install output should change accordingly:
+面向用户的安装输出应同步调整：
 
-- stop reporting installed custom prompts
-- report installed top-level skills and supporting skill assets
-- show `$cxg-*` invocation examples instead of `/cxg-*`
+- 不再报告已安装的 custom prompts
+- 改为报告已安装的顶层 skills 及支撑 skill 资产
+- 使用 `$cxg-*` 调用示例替代 `/cxg-*`
 
 ### Update
 
-`update` should stop treating `~/.codex/prompts/cxg-*.md` as managed assets.
+`update` 不再将 `~/.codex/prompts/cxg-*.md` 视为受管资产。
 
-Update backup and rollback scope should only include:
+更新时的备份和回滚范围仅包括：
 
 - `~/.codex/skills/cxg`
 - `~/.codex/.cxg`
 - `~/.codex/bin/codeagent-wrapper`
 
-Update behavior regarding legacy prompts:
+关于 legacy prompts 的更新行为：
 
-- do not delete legacy `~/.codex/prompts/cxg-*.md`
-- do not treat their existence as a failure condition
-- optionally warn that they are legacy artifacts no longer managed by CXG
+- 不删除已有的 `~/.codex/prompts/cxg-*.md`
+- 不将这些文件的存在视为失败条件
+- 可以输出一条非阻断提醒，说明这些文件是 legacy artifacts，已不再由 CXG 管理
 
 ### Uninstall
 
-`uninstall` should remove only assets still managed by the new version:
+`uninstall` 只移除新版本仍然管理的资产：
 
-- installed CXG skills
-- installed CXG roles
-- installed CXG agents
-- installed wrapper binary
-- installed CXG config
+- 已安装的 CXG skills
+- 已安装的 CXG roles
+- 已安装的 CXG agents
+- 已安装的 wrapper binary
+- 已安装的 CXG config
 
-`uninstall` should not delete legacy `~/.codex/prompts/cxg-*.md` files. It may print a reminder that these legacy prompt files can be removed manually if the user wants a fully clean Codex home.
+`uninstall` 不应删除 legacy 的 `~/.codex/prompts/cxg-*.md`。可以提示用户：如果希望完全清理 Codex home，可手动删除这些 legacy prompt 文件。
 
 ### Doctor
 
-`doctor` should switch from prompt-centric validation to skill-centric validation.
+`doctor` 需要从 prompt-centric 的校验方式切换为 skill-centric 的校验方式。
 
-Passing health checks should be based on:
+健康检查通过的依据应包括：
 
-- config existence and parseability
-- presence of the 12 top-level `cxg-*` skills
-- presence of required `tools/` assets
-- presence of required orchestration assets
-- presence of roles and agent templates
-- wrapper binary health
-- MCP configuration when enabled
+- config 是否存在且可解析
+- 12 个顶层 `cxg-*` skills 是否存在
+- 必需的 `tools/` 资产是否存在
+- 必需的 orchestration 资产是否存在
+- roles 与 agent templates 是否存在
+- wrapper binary 是否健康
+- 当 MCP 启用时，其配置是否存在
 
-Legacy prompt files should be reported only as informational or warning-level signals and should not make doctor fail.
+legacy prompt 文件只能作为 informational 或 warning 级别信号展示，不能导致 doctor 失败。
 
-## Configuration Model
+## 配置模型
 
-### Problems in the Current Config
+### 当前配置存在的问题
 
-The current config schema still reflects the prompt era:
+当前 config schema 仍然带有明显的 prompt 时代痕迹：
 
 - `paths.prompts`
 - `commands.installed`
 
-Both become misleading after the migration because the new runtime surface is skills, not prompt files.
+在迁移后，这两个字段都会变得具有误导性，因为实际的运行时入口已经变成了 skills，而不是 prompt 文件。
 
-### Target Config Shape
+### 目标配置形态
 
-The config schema should evolve to:
+config schema 应演进为：
 
-- remove `paths.prompts`
-- replace `commands.installed` with `skills.installed`
+- 移除 `paths.prompts`
+- 将 `commands.installed` 替换为 `skills.installed`
 
-The target managed paths are:
+最终受管路径应包括：
 
 - `paths.skills`
 - `paths.roles`
 - `paths.agents`
 - `paths.wrapper`
 
-This keeps the stored config aligned with the actual managed assets.
+这样才能让持久化的 config 与真实受管资产保持一致。
 
-### Compatibility Rules
+### 兼容规则
 
-Backward compatibility is required for users with existing config files.
+对已有用户的 config 需要提供向后兼容。
 
-Rules:
+规则如下：
 
-- Reading config must tolerate legacy `paths.prompts`.
-- Reading config must tolerate legacy `commands.installed`.
-- Any new write path such as `init --force`, `update`, or config rewrite should write the new config structure.
-- Consumers such as menu and doctor should prefer `skills.installed` and fall back to `commands.installed` when reading older configs.
+- 读取 config 时必须容忍 legacy 的 `paths.prompts`
+- 读取 config 时必须容忍 legacy 的 `commands.installed`
+- 任何新的写入路径，例如 `init --force`、`update` 或 config rewrite，都应写出新结构
+- `menu`、`doctor` 等消费方在读取时应优先使用 `skills.installed`，若不存在则回退到 `commands.installed`
 
-This provides safe in-place evolution without a one-off migration command.
+这样可以安全地原地演进配置结构，而不需要额外设计一次性迁移命令。
 
-## Packaging Changes
+## Packaging 变更
 
-`package.json` should stop publishing `templates/prompts/`.
+`package.json` 不再发布 `templates/prompts/`。
 
-Published assets should include:
+发布资产应包括：
 
 - `templates/skills/`
 - `templates/roles/`
 - `templates/commands/`
-- compiled runtime files
+- 编译后的运行时代码
 
-`templates/prompts/` remains in the repository only as source reference for maintainers.
+`templates/prompts/` 仅保留在仓库中，作为维护者的源参考材料。
 
-## Documentation Changes
+## 文档变更
 
-The English and Chinese README files must be updated to reflect the skills-native model.
+中英文 README 都需要更新，以反映 skills-native 模型。
 
-Required documentation updates:
+必要的文档调整包括：
 
-- replace `/cxg-*` examples with `$cxg-*`
-- remove statements that CXG installs prompt files into `~/.codex/prompts/`
-- describe the system as top-level Codex skills plus supporting roles and agents
-- update file tree examples to show the new skills layout
-- adjust install, upgrade, uninstall, and doctor behavior descriptions
+- 将 `/cxg-*` 示例替换为 `$cxg-*`
+- 删除“CXG 会将 prompt 文件安装到 `~/.codex/prompts/`”这类表述
+- 将系统描述为“顶层 Codex skills + supporting roles + agents”
+- 更新文件树示例，展示新的 skills 布局
+- 调整 install、upgrade、uninstall、doctor 的行为说明
 
-Documentation should clearly explain that:
+文档需要明确说明：
 
-- CXG no longer depends on custom prompts
-- legacy prompt files may still exist on a user machine after upgrade
-- new versions manage only the skills-native asset set
+- CXG 不再依赖 custom prompts
+- 用户升级后，机器上可能仍然保留 legacy prompt 文件
+- 新版本只管理 skills-native 这一套资产
 
-## Testing Strategy
+## 测试策略
 
-The test suite should be updated from prompt completeness checks to skill completeness checks.
+测试套件需要从 prompt 完整性检查转向 skill 完整性检查。
 
-### Installer and Asset Completeness Tests
+### Installer 与资产完整性测试
 
-Replace prompt-based assertions with:
+将基于 prompt 的断言替换为：
 
-- the 12 top-level `cxg-*` skill directories must exist
-- each top-level skill must contain a `SKILL.md`
-- required `tools/` assets must exist
-- required orchestration assets must exist
-- required role and agent templates must still exist
+- 12 个顶层 `cxg-*` skill 目录必须存在
+- 每个顶层 skill 都必须包含一个 `SKILL.md`
+- 必需的 `tools/` 资产必须存在
+- 必需的 orchestration 资产必须存在
+- 必需的 role 与 agent templates 必须继续存在
 
-### Template Variable Tests
+### Template variable 测试
 
-Continue validating that all published markdown-based templates render without unresolved variables after injection, but use the new set of skill files as the primary surface.
+仍然保留对 markdown 类模板在变量注入后不得残留未解析占位符的校验，但要将新的 skill 文件集合视为主要校验面。
 
-### Config Tests
+### Config 测试
 
-Add or update tests for:
+新增或调整以下测试：
 
-- default config no longer contains `paths.prompts`
-- default config initializes `skills.installed`
-- legacy config shapes can still be read safely
-- consumers correctly fall back from `skills.installed` to `commands.installed`
+- 默认 config 不再包含 `paths.prompts`
+- 默认 config 会初始化 `skills.installed`
+- legacy config 结构仍然可以安全读取
+- 消费方可以从 `skills.installed` 正确回退到 `commands.installed`
 
-### Doctor Behavior Tests
+### Doctor 行为测试
 
-Add or update tests so that:
+新增或调整以下测试：
 
-- missing top-level skills cause failure
-- missing tool assets cause failure
-- presence of legacy prompt files does not cause failure
+- 缺失顶层 skills 会导致失败
+- 缺失 tool 资产会导致失败
+- 存在 legacy prompt 文件不会导致失败
 
-### Package Manifest and Docs Checks
+### Package manifest 与文档检查
 
-Add assertions where practical that:
+在可行范围内增加断言：
 
-- `package.json` no longer publishes `templates/prompts/`
-- README examples and wording no longer describe `/cxg-*` prompt usage
+- `package.json` 不再发布 `templates/prompts/`
+- README 示例与措辞不再描述 `/cxg-*` prompt 用法
 
-## Implementation Scope
+## 实施范围
 
-The implementation is expected to touch at least:
+本次实现预计至少会涉及：
 
 - `templates/skills/`
 - `package.json`
@@ -366,22 +366,22 @@ The implementation is expected to touch at least:
 - `src/utils/__tests__/installer.test.ts`
 - `src/utils/__tests__/template.test.ts`
 - `src/utils/__tests__/config.test.ts`
-- README files
+- README 文件
 
-## Rollout Principles
+## Rollout 原则
 
-- The repository may temporarily contain both `templates/prompts/` and `templates/skills/`, but only skills remain part of the published and installed workflow surface.
-- User upgrades should be non-destructive with respect to legacy prompt files.
-- New code should treat skills as the sole managed user-entrypoint mechanism.
-- The migration should prioritize a coherent long-term structure over preserving prompt-era implementation details.
+- 仓库在一段时间内可以同时存在 `templates/prompts/` 和 `templates/skills/`，但只有 skills 继续作为发布与安装后的工作流主入口。
+- 对用户升级过程要保持非破坏性，尤其是不主动处理 legacy prompt 文件。
+- 新代码应将 skills 视为唯一受管的用户入口机制。
+- 迁移设计优先考虑长期清晰的结构，而不是保留 prompt 时代的实现细节。
 
-## Acceptance Criteria
+## 验收标准
 
-The migration is complete when all of the following are true:
+当以下条件全部满足时，可认为迁移完成：
 
-- CXG publishes and installs top-level `$cxg-*` skills instead of `/cxg-*` prompt files.
-- All 12 workflow entrypoints exist as top-level user-visible skills.
-- Existing tool and orchestration skills are integrated into the new structure.
-- Installer, update, uninstall, doctor, config, and docs all describe the system as skills-native.
-- Legacy prompt files are no longer installed or managed, but their presence does not break updates or diagnostics.
-- The repository still keeps old prompt templates only as migration reference material.
+- CXG 发布并安装的是顶层 `$cxg-*` skills，而不是 `/cxg-*` prompt 文件
+- 12 个工作流入口都以顶层、用户可见的 skill 形式存在
+- 现有 tool skills 与 orchestration skills 都已纳入新结构
+- installer、update、uninstall、doctor、config、docs 都将系统表述为 skills-native
+- legacy prompt 文件不再被安装或受管，但它们的存在不会破坏更新与诊断流程
+- 仓库仍然保留旧的 prompt 模板，仅作为迁移参考材料
