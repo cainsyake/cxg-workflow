@@ -42,6 +42,9 @@ const AGENTS_DIR = join(PACKAGE_ROOT, 'templates', 'commands', 'agents')
 const REQUIRED_SKILL_FILES = [
   join(SKILLS_DIR, 'SKILL.md'),
   join(SKILLS_DIR, 'run_skill.js'),
+  join(SKILLS_DIR, 'shared', 'workflow-rules.md'),
+  join(SKILLS_DIR, 'shared', 'interaction-checkpoints.md'),
+  join(SKILLS_DIR, 'shared', 'output-contracts.md'),
   join(SKILLS_DIR, 'orchestration', 'multi-agent', 'SKILL.md'),
   join(SKILLS_DIR, 'tools', 'gen-docs', 'SKILL.md'),
   join(SKILLS_DIR, 'tools', 'gen-docs', 'scripts', 'doc_generator.js'),
@@ -137,14 +140,22 @@ describe('template file completeness', () => {
       ).toBe(true)
     }
 
+    for (const commandId of ALL_COMMANDS) {
+      const skillEntryPath = join(SKILLS_DIR, commandId, 'SKILL.md')
+      expect(
+        existsSync(skillEntryPath),
+        `workflow skill entry missing: templates/skills/${commandId}/SKILL.md`,
+      ).toBe(true)
+    }
+
     const skillDefinitionFiles = collectMarkdownFiles(SKILLS_DIR)
       .filter(path => /[\\/]SKILL\.md$/.test(path))
       .filter(path => path !== join(SKILLS_DIR, 'SKILL.md'))
 
     expect(
       skillDefinitionFiles.length,
-      'at least one nested skill definition should exist in templates/skills/',
-    ).toBeGreaterThan(0)
+      'expected workflow skill entrypoints plus nested supporting skills in templates/skills/',
+    ).toBeGreaterThanOrEqual(ALL_COMMANDS.length + 6)
   })
 
   it('agent templates exist', () => {
