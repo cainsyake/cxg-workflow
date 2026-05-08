@@ -23,6 +23,21 @@ function findPackageRoot(startDir: string): string {
 }
 
 const PACKAGE_ROOT = findPackageRoot(__dirname)
+const MANAGED_ROLE_IDS = [
+  'analyzer',
+  'analyzer-frontend',
+  'architect',
+  'architect-frontend',
+  'debugger',
+  'debugger-frontend',
+  'frontend',
+  'optimizer',
+  'optimizer-frontend',
+  'reviewer',
+  'reviewer-frontend',
+  'tester',
+  'tester-frontend',
+] as const
 
 function getWrapperPath(binDir: string): string {
   return join(binDir, isWindows() ? 'codeagent-wrapper.exe' : 'codeagent-wrapper')
@@ -117,6 +132,7 @@ export function getManagedPostflightPaths(codexHome: string): {
     join(skillsDir, 'shared', 'interaction-checkpoints.md'),
     join(skillsDir, 'shared', 'output-contracts.md'),
     join(skillsDir, 'orchestration', 'multi-agent', 'SKILL.md'),
+    join(skillsDir, 'tools', 'lib', 'shared.js'),
     join(skillsDir, 'tools', 'gen-docs', 'SKILL.md'),
     join(skillsDir, 'tools', 'gen-docs', 'scripts', 'doc_generator.js'),
     join(skillsDir, 'tools', 'verify-change', 'SKILL.md'),
@@ -429,13 +445,15 @@ export async function uninstallCxg(options?: { preserveBinary?: boolean }): Prom
   // 3. Remove managed roles and agents subtrees only
   if (await fs.pathExists(rolesDir)) {
     try {
-      const files = await fs.readdir(rolesDir)
-      for (const file of files) {
-        if (file.endsWith('.md')) {
-          result.removedRoles.push(file.replace('.md', ''))
+      for (const roleId of MANAGED_ROLE_IDS) {
+        const rolePath = join(rolesDir, `${roleId}.md`)
+        if (await fs.pathExists(rolePath)) {
+          await fs.remove(rolePath)
+          result.removedRoles.push(roleId)
         }
       }
-      await fs.remove(rolesDir)
+      result.removedRoles.sort()
+      await removeIfEmpty(rolesDir)
       await removeIfEmpty(rolesRootDir)
     }
     catch (error) {
@@ -446,13 +464,15 @@ export async function uninstallCxg(options?: { preserveBinary?: boolean }): Prom
 
   if (await fs.pathExists(agentsDir)) {
     try {
-      const files = await fs.readdir(agentsDir)
-      for (const file of files) {
-        if (file.endsWith('.md')) {
-          result.removedAgents.push(file.replace('.md', ''))
+      for (const agentId of AGENT_TEMPLATES) {
+        const agentPath = join(agentsDir, `${agentId}.md`)
+        if (await fs.pathExists(agentPath)) {
+          await fs.remove(agentPath)
+          result.removedAgents.push(agentId)
         }
       }
-      await fs.remove(agentsDir)
+      result.removedAgents.sort()
+      await removeIfEmpty(agentsDir)
       await removeIfEmpty(agentsRootDir)
     }
     catch (error) {

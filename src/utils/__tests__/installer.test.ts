@@ -221,6 +221,7 @@ describe('template file completeness', () => {
       join(codexHome, 'skills', 'cxg', 'run_skill.js'),
       join(codexHome, 'skills', 'cxg', 'shared', 'workflow-rules.md'),
       join(codexHome, 'skills', 'cxg', 'orchestration', 'multi-agent', 'SKILL.md'),
+      join(codexHome, 'skills', 'cxg', 'tools', 'lib', 'shared.js'),
       join(codexHome, 'skills', 'cxg', 'tools', 'verify-security', 'scripts', 'security_scanner.js'),
     ]))
     expect(agentAssets).toEqual(expect.arrayContaining([
