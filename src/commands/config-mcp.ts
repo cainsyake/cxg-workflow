@@ -145,7 +145,12 @@ async function handleInstallContextWeaver(): Promise<void> {
 // Grok Search MCP
 // ═══════════════════════════════════════════════════════
 
-const GROK_SEARCH_PROMPT = `## Search and Evidence Standards
+const GROK_SEARCH_REFERENCE = `# Grok Search Reference Guidance
+
+This file is CXG-managed reference guidance for the \`grok-search\` MCP setup.
+It is not a custom prompt entrypoint.
+
+## Search and Evidence Standards
 
 - Use the \`mcp__grok-search\` tool for web searches
 - Execute independent search requests in parallel
@@ -154,11 +159,12 @@ const GROK_SEARCH_PROMPT = `## Search and Evidence Standards
 - Citation format: [Author/Organization, Year/Date, URL]
 `
 
-async function writeGrokPromptToPrompts(): Promise<void> {
-  const promptsDir = join(homedir(), '.codex', 'prompts')
-  const promptPath = join(promptsDir, 'cxg-grok-search.md')
-  await fs.ensureDir(promptsDir)
-  await fs.writeFile(promptPath, GROK_SEARCH_PROMPT, 'utf-8')
+async function writeGrokSearchReference(): Promise<string> {
+  const guidanceDir = join(homedir(), '.codex', '.cxg', 'guidance')
+  const guidancePath = join(guidanceDir, 'grok-search-reference.md')
+  await fs.ensureDir(guidanceDir)
+  await fs.writeFile(guidancePath, GROK_SEARCH_REFERENCE, 'utf-8')
+  return guidancePath
 }
 
 async function handleGrokSearch(): Promise<void> {
@@ -210,9 +216,10 @@ async function handleGrokSearch(): Promise<void> {
 
   console.log()
   if (result.success) {
-    await writeGrokPromptToPrompts()
+    const guidancePath = await writeGrokSearchReference()
     console.log(ansis.green('✓ grok-search MCP 配置成功！'))
-    console.log(ansis.green('✓ 搜索提示词已写入 ~/.codex/prompts/cxg-grok-search.md'))
+    console.log(ansis.green(`✓ 参考指引已写入 ${guidancePath}`))
+    console.log(ansis.gray('  该文件为参考资料，不是自定义 Prompt 入口'))
     console.log(ansis.gray('  重启 Codex CLI 使配置生效'))
   }
   else {

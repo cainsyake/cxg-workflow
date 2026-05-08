@@ -197,6 +197,26 @@ describe('template file completeness', () => {
     }
   })
 
+  it('top-level shipped skill docs advertise $cxg-* entrypoints instead of slash commands', () => {
+    for (const commandId of ALL_COMMANDS) {
+      const skillEntryPath = join(SKILLS_DIR, commandId, 'SKILL.md')
+      const content = readFileSync(skillEntryPath, 'utf-8')
+
+      expect(
+        content.includes(`# $${commandId}`),
+        `${commandId} should advertise the $${commandId} entrypoint`,
+      ).toBe(true)
+      expect(
+        content.includes(`$${commandId}`),
+        `${commandId} should mention the $${commandId} entrypoint`,
+      ).toBe(true)
+      expect(
+        content.includes(`/${commandId}`),
+        `${commandId} should not advertise slash-command entrypoints`,
+      ).toBe(false)
+    }
+  })
+
   it('agent templates exist', () => {
     for (const requiredFile of REQUIRED_AGENT_FILES) {
       expect(

@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { injectTemplateVariables, replaceHomePathsInTemplate } from '../template'
 
 // ─────────────────────────────────────────────────────────────
@@ -251,5 +253,18 @@ describe('replaceHomePathsInTemplate', () => {
     expect(result).toContain('/home/testuser/.codex/.cxg/config.toml')
     expect(result).not.toContain('~/')
     expect(result).not.toContain('{{')
+  })
+})
+
+describe('runtime helper artifacts', () => {
+  it('does not write cxg prompt helpers into ~/.codex/prompts', () => {
+    const configMcpSource = readFileSync(
+      join(import.meta.dirname, '..', '..', 'commands', 'config-mcp.ts'),
+      'utf-8',
+    )
+
+    expect(configMcpSource.includes('cxg-grok-search.md')).toBe(false)
+    expect(configMcpSource.includes("join(homedir(), '.codex', 'prompts')")).toBe(false)
+    expect(configMcpSource.includes('~/.codex/prompts/cxg-grok-search.md')).toBe(false)
   })
 })
