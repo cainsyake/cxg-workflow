@@ -33,7 +33,6 @@ export interface CxgConfig {
 
 export interface InstallResult {
   success: boolean
-  installedPrompts: string[]
   installedSkills: string[]
   installedRoles: string[]
   installedAgents: string[]
@@ -47,12 +46,12 @@ export interface InstallResult {
 
 export interface UninstallResult {
   success: boolean
-  removedPrompts: string[]
   removedSkills: string[]
   removedRoles: string[]
   removedAgents: string[]
   removedBin: boolean
   errors: string[]
+  legacyPromptsDetected?: string[]
 }
 
 export interface WorkflowConfig {

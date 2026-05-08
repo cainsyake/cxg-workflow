@@ -109,19 +109,44 @@ async function postflightCheck(
   result: InstallResult,
 ): Promise<string[]> {
   const errors: string[] = []
-  const promptsDir = join(codexHome, 'prompts')
+  const skillsDir = join(codexHome, 'skills', 'cxg')
   const agentsDir = join(codexHome, '.cxg', 'agents', 'codex')
-  const missingPrompts: string[] = []
+  const missingSkillAssets: string[] = []
   const missingAgents: string[] = []
 
-  for (const cmd of ALL_COMMANDS) {
-    if (!(await fs.pathExists(join(promptsDir, `${cmd}.md`)))) {
-      missingPrompts.push(cmd)
+  const requiredSkillAssets = [
+    join(skillsDir, 'SKILL.md'),
+    join(skillsDir, 'run_skill.js'),
+    join(skillsDir, 'shared', 'workflow-rules.md'),
+    join(skillsDir, 'shared', 'interaction-checkpoints.md'),
+    join(skillsDir, 'shared', 'output-contracts.md'),
+    join(skillsDir, 'orchestration', 'multi-agent', 'SKILL.md'),
+    join(skillsDir, 'tools', 'gen-docs', 'SKILL.md'),
+    join(skillsDir, 'tools', 'gen-docs', 'scripts', 'doc_generator.js'),
+    join(skillsDir, 'tools', 'verify-change', 'SKILL.md'),
+    join(skillsDir, 'tools', 'verify-change', 'scripts', 'change_analyzer.js'),
+    join(skillsDir, 'tools', 'verify-module', 'SKILL.md'),
+    join(skillsDir, 'tools', 'verify-module', 'scripts', 'module_scanner.js'),
+    join(skillsDir, 'tools', 'verify-quality', 'SKILL.md'),
+    join(skillsDir, 'tools', 'verify-quality', 'scripts', 'quality_checker.js'),
+    join(skillsDir, 'tools', 'verify-security', 'SKILL.md'),
+    join(skillsDir, 'tools', 'verify-security', 'scripts', 'security_scanner.js'),
+  ]
+
+  for (const assetPath of requiredSkillAssets) {
+    if (!(await fs.pathExists(assetPath))) {
+      missingSkillAssets.push(assetPath.replace(`${codexHome}/`, ''))
     }
   }
 
-  if (missingPrompts.length > 0) {
-    errors.push(`Missing prompt files after install: ${missingPrompts.join(', ')}`)
+  for (const cmd of ALL_COMMANDS) {
+    if (!(await fs.pathExists(join(skillsDir, cmd, 'SKILL.md')))) {
+      missingSkillAssets.push(join('skills', 'cxg', cmd, 'SKILL.md'))
+    }
+  }
+
+  if (missingSkillAssets.length > 0) {
+    errors.push(`Missing skill assets after install: ${missingSkillAssets.join(', ')}`)
   }
 
   for (const agent of AGENT_TEMPLATES) {
@@ -160,7 +185,6 @@ export async function installCxg(options: {
 } = {}): Promise<InstallResult> {
   const { force = false, liteMode = true, mcpProvider = DEFAULT_MCP_PROVIDER, skipBinary = false } = options
   const codexHome = join(homedir(), '.codex')
-  const promptsDir = join(codexHome, 'prompts')
   const skillsDir = join(codexHome, 'skills', 'cxg')
   const rolesDir = join(codexHome, '.cxg', 'roles', 'codex')
   const agentsDir = join(codexHome, '.cxg', 'agents', 'codex')
@@ -170,7 +194,6 @@ export async function installCxg(options: {
 
   const result: InstallResult = {
     success: true,
-    installedPrompts: [],
     installedSkills: [],
     installedRoles: [],
     installedAgents: [],
@@ -184,39 +207,12 @@ export async function installCxg(options: {
     return result
   }
 
-  await fs.ensureDir(promptsDir)
   await fs.ensureDir(skillsDir)
   await fs.ensureDir(rolesDir)
   await fs.ensureDir(agentsDir)
   await fs.ensureDir(binDir)
 
-  // 1. Install Custom Prompts
-  const promptsTemplateDir = join(templateDir, 'prompts')
-  for (const cmd of ALL_COMMANDS) {
-    const srcFile = join(promptsTemplateDir, `${cmd}.md`)
-    const destFile = join(promptsDir, `${cmd}.md`)
-
-    try {
-      if (!(await fs.pathExists(srcFile))) {
-        result.errors.push(`Prompt template not found: ${cmd}`)
-        result.success = false
-        continue
-      }
-      if (force || !(await fs.pathExists(destFile))) {
-        let content = await fs.readFile(srcFile, 'utf-8')
-        content = injectTemplateVariables(content, installConfig)
-        content = replaceHomePathsInTemplate(content, codexHome)
-        await fs.writeFile(destFile, content, 'utf-8')
-        result.installedPrompts.push(cmd)
-      }
-    }
-    catch (error) {
-      result.errors.push(`Failed to install prompt ${cmd}: ${error}`)
-      result.success = false
-    }
-  }
-
-  // 2. Install skills
+  // 1. Install skills
   const skillsTemplateDir = join(templateDir, 'skills')
   if (await fs.pathExists(skillsTemplateDir)) {
     try {
@@ -241,7 +237,7 @@ export async function installCxg(options: {
     result.success = false
   }
 
-  // 3. Install role prompts
+  // 2. Install role prompts
   const rolesTemplateDir = join(templateDir, 'roles', 'codex')
   if (await fs.pathExists(rolesTemplateDir)) {
     try {
@@ -270,7 +266,7 @@ export async function installCxg(options: {
     result.success = false
   }
 
-  // 4. Install agent prompt templates
+  // 3. Install agent prompt templates
   const agentsTemplateDir = join(templateDir, 'commands', 'agents')
   if (await fs.pathExists(agentsTemplateDir)) {
     try {
@@ -300,7 +296,7 @@ export async function installCxg(options: {
     result.success = false
   }
 
-  // 5. Install codeagent-wrapper binary
+  // 4. Install codeagent-wrapper binary
   if (!skipBinary) {
     const binaryName = resolveBinaryName()
     const destBinary = getWrapperPath(binDir)
@@ -368,7 +364,6 @@ export async function uninstallCxg(options?: { preserveBinary?: boolean }): Prom
 
   const result: UninstallResult = {
     success: true,
-    removedPrompts: [],
     removedSkills: [],
     removedRoles: [],
     removedAgents: [],
@@ -376,19 +371,21 @@ export async function uninstallCxg(options?: { preserveBinary?: boolean }): Prom
     errors: [],
   }
 
-  // 1. Remove Custom Prompts (only cxg-* files)
+  // 1. Detect legacy Custom Prompts without removing them
   if (await fs.pathExists(promptsDir)) {
     try {
       const files = await fs.readdir(promptsDir)
-      for (const file of files) {
-        if (file.startsWith('cxg-') && file.endsWith('.md')) {
-          await fs.remove(join(promptsDir, file))
-          result.removedPrompts.push(file.replace('.md', ''))
-        }
+      const legacyPromptsDetected = files
+        .filter(file => file.startsWith('cxg-') && file.endsWith('.md'))
+        .map(file => file.replace('.md', ''))
+        .sort()
+
+      if (legacyPromptsDetected.length > 0) {
+        result.legacyPromptsDetected = legacyPromptsDetected
       }
     }
     catch (error) {
-      result.errors.push(`Failed to remove prompts: ${error}`)
+      result.errors.push(`Failed to detect legacy prompts: ${error}`)
       result.success = false
     }
   }

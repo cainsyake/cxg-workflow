@@ -35,10 +35,12 @@ function collectMarkdownFiles(dir: string): string[] {
 }
 
 const PACKAGE_ROOT = findPackageRoot()
+const PACKAGE_JSON_PATH = join(PACKAGE_ROOT, 'package.json')
 const PROMPTS_DIR = join(PACKAGE_ROOT, 'templates', 'prompts')
 const SKILLS_DIR = join(PACKAGE_ROOT, 'templates', 'skills')
 const ROLES_DIR = join(PACKAGE_ROOT, 'templates', 'roles', 'codex')
 const AGENTS_DIR = join(PACKAGE_ROOT, 'templates', 'commands', 'agents')
+const PACKAGE_JSON = JSON.parse(readFileSync(PACKAGE_JSON_PATH, 'utf-8')) as { files?: string[] }
 const REQUIRED_SKILL_FILES = [
   join(SKILLS_DIR, 'SKILL.md'),
   join(SKILLS_DIR, 'run_skill.js'),
@@ -123,6 +125,11 @@ describe('command registry', () => {
 // B. Template file completeness
 // ─────────────────────────────────────────────────────────────
 describe('template file completeness', () => {
+  it('package publish list excludes templates/prompts', () => {
+    expect(PACKAGE_JSON.files).toBeTruthy()
+    expect(PACKAGE_JSON.files).not.toContain('templates/prompts/')
+  })
+
   it('every command has a matching Custom Prompt template', () => {
     for (const cmd of ALL_COMMANDS) {
       const templatePath = join(PROMPTS_DIR, `${cmd}.md`)
@@ -197,6 +204,14 @@ describe('template file completeness', () => {
         `required agent template missing: ${requiredFile.replace(`${PACKAGE_ROOT}/`, '')}`,
       ).toBe(true)
     }
+  })
+
+  it('installer completeness remains anchored on skills assets instead of prompt artifacts', () => {
+    expect(REQUIRED_SKILL_FILES.length).toBeGreaterThan(0)
+    expect(REQUIRED_WORKFLOW_SKILL_SECTIONS.length).toBeGreaterThan(0)
+    expect(REQUIRED_WORKFLOW_SHARED_REFERENCES.length).toBeGreaterThan(0)
+    expect(REQUIRED_AGENT_FILES.length).toBeGreaterThan(0)
+    expect(existsSync(PROMPTS_DIR), 'legacy prompt references should stay in the repo').toBe(true)
   })
 })
 
