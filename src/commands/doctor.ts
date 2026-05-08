@@ -69,7 +69,21 @@ export async function doctor(): Promise<void> {
 
   // 3. Check role prompts
   const rolesDir = join(codexHome, '.cxg', 'roles', 'codex')
-  const roleNames = ['analyzer', 'architect', 'reviewer']
+  const roleNames = [
+    'analyzer',
+    'analyzer-frontend',
+    'architect',
+    'architect-frontend',
+    'debugger',
+    'debugger-frontend',
+    'frontend',
+    'optimizer',
+    'optimizer-frontend',
+    'reviewer',
+    'reviewer-frontend',
+    'tester',
+    'tester-frontend',
+  ]
   const missingRoles: string[] = []
   for (const role of roleNames) {
     if (!(await fs.pathExists(join(rolesDir, `${role}.md`)))) {
