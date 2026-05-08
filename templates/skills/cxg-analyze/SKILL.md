@@ -1,6 +1,6 @@
 ---
 name: cxg-analyze
-description: Investigate a codebase question or task deeply without changing product code.
+description: 在不修改产品代码的前提下，深入分析代码库问题、设计或实现路径。
 license: MIT
 user-invocable: true
 disable-model-invocation: false
@@ -8,33 +8,33 @@ disable-model-invocation: false
 
 # $cxg-analyze
 
-Use this skill when the user wants understanding, not edits.
+当用户需要理解现状，而不是立即改代码时，使用此技能。
 
-## Purpose
+## 用途
 
-- Gather evidence from the repository and explain how a system currently works.
-- Surface constraints, risks, and likely implementation paths without making code changes.
+- 收集仓库证据并解释系统当前如何工作。
+- 在不动代码的前提下，指出约束、风险和可能的实现路径。
 
-## Expected Input
+## 预期输入
 
-- A question, investigation target, architecture concern, or decision point.
-- Optional file paths, symbols, error messages, or constraints to focus the analysis.
+- 一个问题、调查目标、架构顾虑，或决策点。
+- 可选聚焦信息，例如文件路径、符号名、报错信息或额外约束。
 
-## Shared Guidance
+## 共享指引
 
-- Workflow rules: `../shared/workflow-rules.md`
-- Interaction checkpoints: `../shared/interaction-checkpoints.md`
-- Output contracts: `../shared/output-contracts.md`
+- 工作流规则：`../shared/workflow-rules.md`
+- 交互检查点：`../shared/interaction-checkpoints.md`
+- 输出约定：`../shared/output-contracts.md`
 
-## Workflow
+## 工作流程
 
-1. Define the question precisely and list the signals needed to answer it.
-2. Inspect the relevant code, tests, configuration, and documentation.
-3. Separate observed behavior from inference and highlight confidence level.
-4. If useful, compare 2-3 implementation or remediation options with tradeoffs.
-5. Stay read-only unless the user explicitly changes the task.
+1. 准确定义问题，并列出回答它所需的信号。
+2. 检查相关代码、测试、配置和文档。
+3. 区分“已观察到的事实”和“推断”，并标明信心程度。
+4. 如果有帮助，对 2 到 3 种实现或修复方案做权衡比较。
+5. 除非用户明确改任务，否则始终保持只读。
 
-## Deliverable
+## 交付结果
 
-- Findings with file references.
-- Assumptions, risks, and recommended next actions.
+- 带文件引用的分析结论。
+- 假设、风险以及建议的下一步动作。

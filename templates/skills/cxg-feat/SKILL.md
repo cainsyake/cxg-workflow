@@ -1,6 +1,6 @@
 ---
 name: cxg-feat
-description: Develop a feature from request shaping through implementation and handoff.
+description: 从需求整理到实现交付，端到端完成一个新功能切片。
 license: MIT
 user-invocable: true
 disable-model-invocation: false
@@ -8,33 +8,33 @@ disable-model-invocation: false
 
 # $cxg-feat
 
-Use this skill when the user asks for new functionality and expects you to carry it through to delivery.
+当用户提出一个新功能，并希望你一路推进到可以交付时，使用此技能。
 
-## Purpose
+## 用途
 
-- Shape a feature request into an implementable scope.
-- Coordinate planning, implementation, and validation for new functionality.
+- 将功能需求整理成可实现的范围。
+- 协调规划、实现和验证，交付一个新的功能切片。
 
-## Expected Input
+## 预期输入
 
-- A feature description, enhancement request, or user story.
-- Optional UX, API, performance, or compatibility constraints.
+- 功能描述、增强请求，或用户故事。
+- 可选约束，例如 UX、API、性能或兼容性要求。
 
-## Shared Guidance
+## 共享指引
 
-- Workflow rules: `../shared/workflow-rules.md`
-- Interaction checkpoints: `../shared/interaction-checkpoints.md`
-- Output contracts: `../shared/output-contracts.md`
+- 工作流规则：`../shared/workflow-rules.md`
+- 交互检查点：`../shared/interaction-checkpoints.md`
+- 输出约定：`../shared/output-contracts.md`
 
-## Workflow
+## 工作流程
 
-1. Clarify the feature outcome, boundaries, and success criteria.
-2. Inspect current patterns and identify the modules the feature touches.
-3. Produce a lightweight plan if the request is not already implementation-ready.
-4. Implement incrementally, adding or updating tests as behavior changes.
-5. Verify the new feature and summarize any tradeoffs or future extensions.
+1. 澄清功能目标、边界和成功标准。
+2. 检查现有模式，并识别该功能会触达的模块。
+3. 如果需求还不能直接实施，先产出一份轻量计划。
+4. 以增量方式实现，并在行为变化时新增或更新测试。
+5. 验证新功能，并总结权衡点或后续扩展方向。
 
-## Deliverable
+## 交付结果
 
-- A shipped or implementation-ready feature slice.
-- Notes on validation, remaining gaps, and suggested next iteration if relevant.
+- 一个已落地或已达到实现就绪状态的功能切片。
+- 关于验证结果、剩余缺口和下一轮迭代建议的说明。

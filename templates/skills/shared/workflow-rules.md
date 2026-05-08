@@ -1,32 +1,32 @@
-# Workflow Rules
+# 工作流规则
 
-These rules apply to every `$cxg-*` skill unless a skill explicitly narrows the scope.
+除非某个 skill 明确收窄范围，否则以下规则适用于所有 `$cxg-*` 技能。
 
-## Core Principles
+## 核心原则
 
-1. Stay within the user-approved scope. Do not widen the task without stating why.
-2. Prefer repository evidence over assumption. Read relevant files before concluding.
-3. Keep outputs actionable. Every recommendation should map to a next step, file, or command.
-4. Preserve existing user work. Never revert unrelated changes.
-5. Match the repository's conventions for formatting, naming, testing, and commit hygiene.
+1. 严格停留在用户批准的范围内；如果需要扩展任务，先说明原因。
+2. 优先依据仓库证据，而不是主观假设；结论前先读相关文件。
+3. 保持输出可执行；每条建议都应映射到下一步、文件或命令。
+4. 保护用户已有工作；绝不回滚无关改动。
+5. 遵循仓库现有的格式、命名、测试和提交约定。
 
-## Execution Discipline
+## 执行纪律
 
-1. Start by restating the goal, constraints, and any assumption you must make.
-2. Inspect the current workspace before proposing or making changes.
-3. Use the minimal workflow that can safely complete the task.
-4. If a task implies code changes, testing, or review, say which checks will prove success.
-5. When the task is implementation-oriented, prefer a test-first or verification-first loop.
+1. 从重述目标、约束和必须做出的假设开始。
+2. 在提出方案或动手修改前先检查当前工作区。
+3. 使用能安全完成任务的最小工作流。
+4. 如果任务涉及实现、测试或评审，要提前说明如何验证成功。
+5. 当任务偏向实现时，优先采用 test-first 或 verification-first 循环。
 
-## Scope Boundaries
+## 范围边界
 
-1. Treat any legacy prompt templates or repository-only scaffolding as optional reference material when a skill needs historical context.
-2. Limit direct edits to the files required by the active task.
-3. If the workspace contains concurrent edits, adapt to them instead of overwriting them.
-4. Escalate only when a decision has meaningful product, architecture, or workflow impact.
+1. 把任何 legacy prompt 模板或仓库内部脚手架视为可选参考，而不是默认权威来源。
+2. 直接修改范围只限于当前任务必需的文件。
+3. 如果工作区存在并发改动，应适配它们，而不是覆盖它们。
+4. 只有在决策会显著影响产品、架构或工作流时才升级沟通。
 
-## Decision Rules
+## 决策规则
 
-1. Ask for clarification only when the ambiguity changes the implementation path.
-2. If several valid paths exist, recommend one and explain the tradeoff briefly.
-3. If a requested action cannot be verified, state the gap and the closest safe outcome.
+1. 只有当歧义会改变实现路径时才追问澄清。
+2. 如果存在多条可行路径，推荐一条并简要说明权衡。
+3. 如果请求无法被验证，要明确说明缺口和最接近的安全结果。

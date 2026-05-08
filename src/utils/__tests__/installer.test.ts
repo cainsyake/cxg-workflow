@@ -90,10 +90,11 @@ const REQUIRED_AGENT_FILES = [
   join(AGENTS_DIR, 'ui-ux-designer.md'),
 ]
 const REQUIRED_WORKFLOW_SKILL_SECTIONS = [
-  '## Purpose',
-  '## Expected Input',
-  '## Workflow',
-  '## Deliverable',
+  '## 用途',
+  '## 预期输入',
+  '## 共享指引',
+  '## 工作流程',
+  '## 交付结果',
 ]
 const REQUIRED_WORKFLOW_SHARED_REFERENCES = [
   '../shared/workflow-rules.md',
@@ -218,7 +219,72 @@ describe('template file completeness', () => {
           `${commandId} missing shared guidance reference: ${sharedReference}`,
         ).toBe(true)
       }
+
+      expect(
+        content.includes('当用户'),
+        `${commandId} should use Chinese localization for the workflow entrypoint`,
+      ).toBe(true)
+      expect(
+        content.includes('使用此技能'),
+        `${commandId} should use Chinese localization for the workflow entrypoint`,
+      ).toBe(true)
+      expect(
+        content.includes('Use this skill when'),
+        `${commandId} should not retain English entrypoint wording`,
+      ).toBe(false)
+
+      for (const englishHeading of [
+        '## Purpose',
+        '## Expected Input',
+        '## Shared Guidance',
+        '## Workflow',
+        '## Deliverable',
+      ]) {
+        expect(
+          content.includes(englishHeading),
+          `${commandId} should not retain English heading: ${englishHeading}`,
+        ).toBe(false)
+      }
     }
+  })
+
+  it('shared skill docs and overview are localized in Chinese', () => {
+    const sharedDocs = [
+      [join(SKILLS_DIR, 'shared', 'workflow-rules.md'), '# 工作流规则'],
+      [join(SKILLS_DIR, 'shared', 'interaction-checkpoints.md'), '# 交互检查点'],
+      [join(SKILLS_DIR, 'shared', 'output-contracts.md'), '# 输出约定'],
+    ] as const
+
+    for (const [filePath, heading] of sharedDocs) {
+      const content = readFileSync(filePath, 'utf-8')
+      expect(
+        content.includes(heading),
+        `${filePath.replace(`${PACKAGE_ROOT}/`, '')} should be localized in Chinese`,
+      ).toBe(true)
+    }
+
+    for (const [filePath, heading] of [
+      [join(SKILLS_DIR, 'shared', 'workflow-rules.md'), '# Workflow Rules'],
+      [join(SKILLS_DIR, 'shared', 'interaction-checkpoints.md'), '# Interaction Checkpoints'],
+      [join(SKILLS_DIR, 'shared', 'output-contracts.md'), '# Output Contracts'],
+    ] as const) {
+      const content = readFileSync(filePath, 'utf-8')
+      expect(
+        content.includes(heading),
+        `${filePath.replace(`${PACKAGE_ROOT}/`, '')} should not retain the English heading`,
+      ).toBe(false)
+    }
+
+    const overviewContent = readFileSync(join(SKILLS_DIR, 'SKILL.md'), 'utf-8')
+    expect(overviewContent.includes('# CXG 技能总览'), 'templates/skills/SKILL.md should use the Chinese overview title').toBe(true)
+    expect(overviewContent.includes('## 工作流技能'), 'templates/skills/SKILL.md should include the Chinese workflow skills section').toBe(true)
+    expect(overviewContent.includes('## 共享指引'), 'templates/skills/SKILL.md should include the Chinese shared guidance section').toBe(true)
+    expect(overviewContent.includes('## 质量关卡'), 'templates/skills/SKILL.md should include the Chinese quality checks section').toBe(true)
+    expect(overviewContent.includes('## 多智能体编排'), 'templates/skills/SKILL.md should include the Chinese multi-agent orchestration section').toBe(true)
+    expect(
+      overviewContent.includes('# CXG Skills'),
+      'templates/skills/SKILL.md should not retain the English overview title',
+    ).toBe(false)
   })
 
   it('top-level shipped skill docs advertise $cxg-* entrypoints instead of slash commands', () => {

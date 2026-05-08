@@ -1,27 +1,29 @@
-# Output Contracts
+# 输出约定
 
-Every `$cxg-*` skill should produce a result that is easy to review and act on.
+每个 `$cxg-*` 技能都应产出易于审阅、易于执行的结果。
 
-## Minimum Output Shape
+## 最小输出结构
 
-1. `Goal`: what the skill understood the user wanted.
-2. `Context`: the files, systems, or constraints that mattered.
-3. `Work`: the analysis, plan, edits, or commands performed.
-4. `Result`: the concrete deliverable, decision, or recommendation.
-5. `Verification`: the checks run, or the reason verification could not be completed.
+以下 5 个字段名默认视为固定输出槽位；除非某个 skill 明确要求改写，否则应直接使用这些标签，避免在不同中文文档中出现随意替换。
 
-## Delivery Expectations By Skill Type
+1. `Goal`：技能理解到的用户目标是什么。
+2. `Context`：哪些文件、系统或约束最关键。
+3. `Work`：执行了哪些分析、计划、改动或命令。
+4. `Result`：最终交付了什么、决定了什么，或推荐了什么。
+5. `Verification`：运行了哪些检查；如果没有完成验证，也要说明原因。
 
-- Analysis skills should return findings, assumptions, risks, and recommended next actions.
-- Planning skills should return sequenced steps, touched files, and validation points.
-- Execution skills should return implemented changes, tests run, and any follow-up work.
-- Review skills should return prioritized issues first, then overall assessment.
-- Meta skills should return reusable artifacts such as prompts, plans, commit messages, or docs.
+## 按技能类型的交付要求
 
-## Quality Bar
+- 分析类技能应返回 findings、假设、风险和建议的下一步动作。
+- 规划类技能应返回顺序化步骤、涉及文件和验证点。
+- 执行类技能应返回已实现改动、运行过的测试和任何后续工作。
+- 评审类技能应先返回按优先级排序的问题，再给总体评估。
+- 元技能应返回可复用资产，例如 prompts、计划、提交信息或文档。
 
-1. Be explicit about whether the skill changed files or stayed read-only.
-2. Prefer file paths, commands, and acceptance criteria over abstract advice.
-3. Separate observed facts from inference.
-4. Do not imply success without evidence from the verification step.
-5. Keep the summary concise enough for a teammate to scan quickly.
+## 质量门槛
+
+1. 明确说明该技能是否修改了文件，还是保持只读。
+2. 尽量使用文件路径、命令和验收标准，而不是抽象建议。
+3. 清楚区分观察事实与推断结论。
+4. 没有验证证据时，不要暗示已经成功。
+5. 让总结足够简洁，便于队友快速扫读。

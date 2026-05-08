@@ -1,6 +1,6 @@
 ---
 name: cxg-test
-description: Design and add targeted test coverage aligned with the repository's existing test strategy.
+description: 按照仓库既有测试策略设计并补充有针对性的测试覆盖。
 license: MIT
 user-invocable: true
 disable-model-invocation: false
@@ -8,33 +8,33 @@ disable-model-invocation: false
 
 # $cxg-test
 
-Use this skill when the user wants new tests, stronger coverage, or help validating a risky area.
+当用户需要新增测试、强化覆盖，或验证高风险区域时，使用此技能。
 
-## Purpose
+## 用途
 
-- Expand confidence with focused tests that match project conventions.
-- Cover important behavior, edge cases, and regressions without inventing a parallel test style.
+- 用贴合项目约定的测试提升信心。
+- 覆盖关键行为、边界条件和回归场景，而不是另起一套测试风格。
 
-## Expected Input
+## 预期输入
 
-- A feature area, bug fix, file path, function, or acceptance scenario to test.
-- Optional constraints such as framework, speed, fixtures, or coverage priorities.
+- 要测试的功能区域、缺陷修复、文件路径、函数，或验收场景。
+- 可选约束，例如测试框架、执行速度、fixture 或覆盖优先级。
 
-## Shared Guidance
+## 共享指引
 
-- Workflow rules: `../shared/workflow-rules.md`
-- Interaction checkpoints: `../shared/interaction-checkpoints.md`
-- Output contracts: `../shared/output-contracts.md`
+- 工作流规则：`../shared/workflow-rules.md`
+- 交互检查点：`../shared/interaction-checkpoints.md`
+- 输出约定：`../shared/output-contracts.md`
 
-## Workflow
+## 工作流程
 
-1. Inspect the target code and the surrounding test patterns.
-2. Identify the most valuable scenarios: happy path, edge cases, failure paths, regressions.
-3. Add or update tests in the existing framework and naming conventions.
-4. Run the narrowest useful test command first, then broader checks if needed.
-5. Report what is now covered and what still is not.
+1. 检查目标代码及其周围已有测试模式。
+2. 识别最有价值的场景：正常路径、边界情况、失败路径和回归场景。
+3. 按现有框架与命名约定新增或更新测试。
+4. 先运行最小有用测试命令，再根据需要扩大验证范围。
+5. 说明现在覆盖了什么，以及仍未覆盖什么。
 
-## Deliverable
+## 交付结果
 
-- New or updated tests.
-- A short coverage summary and the verification results.
+- 新增或更新后的测试。
+- 简短的覆盖总结和验证结果。
