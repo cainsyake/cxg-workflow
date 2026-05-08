@@ -109,7 +109,7 @@ npx cxg-workflow update --yes
 npx cxg-workflow uninstall
 ```
 
-## Commands
+## Skills
 
 ### Core Workflow
 
@@ -243,7 +243,7 @@ CXG stores its own state in `~/.codex/.cxg/config.toml`, including:
 - Default with `npx cxg-workflow init`
 - Also available via `npx cxg-workflow init --mcp ace-tool`
 - CXG writes the MCP server entry into `~/.codex/config.toml`
-- Prompt templates use `mcp__ace-tool__search_context`
+- Installed CXG skill assets call `mcp__ace-tool__search_context` when retrieval is enabled
 
 **`contextweaver`**
 
@@ -254,7 +254,7 @@ CXG stores its own state in `~/.codex/.cxg/config.toml`, including:
 **`skip`**
 
 - Use `npx cxg-workflow init --skip-mcp`
-- Prompt templates fall back to filesystem search via `Glob + Grep`
+- CXG falls back to filesystem search via `Glob + Grep`
 
 ## Supported Platforms
 

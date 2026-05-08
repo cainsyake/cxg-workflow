@@ -113,7 +113,7 @@ npx cxg-workflow update --yes
 npx cxg-workflow uninstall
 ```
 
-## 命令
+## 技能
 
 ### 核心工作流
 
@@ -247,7 +247,7 @@ CXG 自身状态保存在 `~/.codex/.cxg/config.toml`，包含：
 - 默认使用 `npx cxg-workflow init`
 - 也可显式指定 `npx cxg-workflow init --mcp ace-tool`
 - CXG 会把 MCP 服务写入 `~/.codex/config.toml`
-- 命令模板内部调用 `mcp__ace-tool__search_context`
+- 已安装的 CXG skill 资产会在启用检索时调用 `mcp__ace-tool__search_context`
 
 **`contextweaver`**
 
@@ -258,7 +258,7 @@ CXG 自身状态保存在 `~/.codex/.cxg/config.toml`，包含：
 **`skip`**
 
 - 使用 `npx cxg-workflow init --skip-mcp`
-- 命令模板自动退回 `Glob + Grep` 文件系统检索
+- CXG 会自动退回 `Glob + Grep` 文件系统检索
 
 ## 支持平台
 

@@ -44,20 +44,6 @@ const ROLES_DIR = join(PACKAGE_ROOT, 'templates', 'roles', 'codex')
 const AGENTS_DIR = join(PACKAGE_ROOT, 'templates', 'commands', 'agents')
 const PACKAGE_JSON = JSON.parse(readFileSync(PACKAGE_JSON_PATH, 'utf-8')) as { files?: string[] }
 const README_PATHS = [README_EN_PATH, README_ZH_PATH]
-const SKILLS_NATIVE_COMMANDS = [
-  'cxg-workflow',
-  'cxg-plan',
-  'cxg-execute',
-  'cxg-feat',
-  'cxg-analyze',
-  'cxg-debug',
-  'cxg-optimize',
-  'cxg-test',
-  'cxg-review',
-  'cxg-enhance',
-  'cxg-commit',
-  'cxg-init',
-]
 const TARGET_ROLE_FILES = [
   'analyzer.md',
   'analyzer-frontend.md',
@@ -72,6 +58,12 @@ const TARGET_ROLE_FILES = [
   'reviewer-frontend.md',
   'tester.md',
   'tester-frontend.md',
+]
+const README_PROMPT_ERA_PHRASES = [
+  'Prompt templates use',
+  'Prompt templates fall back',
+  '命令模板内部调用',
+  '命令模板自动退回',
 ]
 const REQUIRED_SKILL_FILES = [
   join(SKILLS_DIR, 'SKILL.md'),
@@ -293,11 +285,11 @@ describe('template file completeness', () => {
       const content = readFileSync(readmePath, 'utf-8')
 
       expect(
-        SKILLS_NATIVE_COMMANDS.some(commandId => content.includes(`$${commandId}`)),
+        ALL_COMMANDS.some(commandId => content.includes(`$${commandId}`)),
         `${readmePath.replace(`${PACKAGE_ROOT}/`, '')} should include at least one $cxg-* example`,
       ).toBe(true)
 
-      for (const commandId of SKILLS_NATIVE_COMMANDS) {
+      for (const commandId of ALL_COMMANDS) {
         expect(
           content.includes(`/${commandId}`),
           `${readmePath.replace(`${PACKAGE_ROOT}/`, '')} should not advertise /${commandId} examples`,
@@ -314,6 +306,13 @@ describe('template file completeness', () => {
         content.includes('~/.codex/prompts/'),
         `${readmePath.replace(`${PACKAGE_ROOT}/`, '')} should not describe ~/.codex/prompts/ as the runtime entrypoint`,
       ).toBe(false)
+
+      for (const promptEraPhrase of README_PROMPT_ERA_PHRASES) {
+        expect(
+          content.includes(promptEraPhrase),
+          `${readmePath.replace(`${PACKAGE_ROOT}/`, '')} should not use prompt-era README wording: ${promptEraPhrase}`,
+        ).toBe(false)
+      }
     }
   })
 
