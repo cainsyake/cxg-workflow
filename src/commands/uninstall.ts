@@ -8,12 +8,9 @@ export async function uninstall(): Promise<void> {
   console.log('  卸载 CXG Workflow...')
   console.log()
 
-  // 1. Remove prompts, skills, roles, binary
+  // 1. Remove managed skills, roles, agents, binary
   const result = await uninstallCxg()
 
-  if (result.removedPrompts.length > 0) {
-    console.log(`  ✓ 已移除 ${result.removedPrompts.length} 个 Custom Prompts`)
-  }
   if (result.removedSkills.length > 0) {
     console.log(`  ✓ 已移除 skills: ${result.removedSkills.length} 个目录`)
   }
@@ -25,6 +22,9 @@ export async function uninstall(): Promise<void> {
   }
   if (result.removedBin) {
     console.log('  ✓ 已移除 codeagent-wrapper')
+  }
+  if (result.legacyPromptsDetected && result.legacyPromptsDetected.length > 0) {
+    console.log(`  ⚠ 检测到遗留 Custom Prompts，未自动删除: ${result.legacyPromptsDetected.join(', ')}`)
   }
 
   // 2. Remove MCP servers

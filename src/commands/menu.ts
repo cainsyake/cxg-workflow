@@ -181,7 +181,7 @@ async function toggleLiteMode(config: CxgConfig | null): Promise<void> {
   }
 
   console.log()
-  console.log(ansis.yellow('  ⏳ 正在重渲染 prompts/skills/roles/agents...'))
+  console.log(ansis.yellow('  ⏳ 正在重渲染 skills/roles/agents...'))
 
   const result = await installCxg({
     force: true,
@@ -194,8 +194,9 @@ async function toggleLiteMode(config: CxgConfig | null): Promise<void> {
     mcpProvider: provider,
     liteMode: next,
   })
-  nextConfig.commands.installed = result.installedPrompts.length > 0
-    ? result.installedPrompts
+  nextConfig.commands.installed = result.installedSkills.length > 0
+    ? result.installedSkills
+        .filter(skillId => skillId.startsWith('cxg-'))
     : (config.commands?.installed || [])
 
   await writeCxgConfig(nextConfig)

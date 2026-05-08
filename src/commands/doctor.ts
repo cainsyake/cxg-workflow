@@ -4,6 +4,7 @@ import { join } from 'pathe'
 import { version } from '../../package.json'
 import { AGENT_TEMPLATES, ALL_COMMANDS } from '../utils/constants'
 import { readCxgConfig } from '../utils/config'
+import { getManagedPostflightPaths } from '../utils/installer'
 import { isWindows } from '../utils/platform'
 
 interface DiagnosticResult {
@@ -28,44 +29,11 @@ export async function doctor(): Promise<void> {
     detail: config ? `v${config.general.version}` : '未找到',
   })
 
-  // 2. Check Custom Prompts
-  const promptsDir = join(codexHome, 'prompts')
-  let promptCount = 0
-  const missingPrompts: string[] = []
-  for (const cmd of ALL_COMMANDS) {
-    const promptPath = join(promptsDir, `${cmd}.md`)
-    if (await fs.pathExists(promptPath)) {
-      promptCount++
-    }
-    else {
-      missingPrompts.push(cmd)
-    }
-  }
-  results.push({
-    label: `Custom Prompts (${promptCount}/${ALL_COMMANDS.length})`,
-    ok: promptCount === ALL_COMMANDS.length,
-    detail: missingPrompts.length > 0 ? `缺失: ${missingPrompts.join(', ')}` : undefined,
-  })
-
-  // 3. Check skills
+  // 2. Check skills
   const skillsDir = join(codexHome, 'skills', 'cxg')
-  const requiredSkillFiles = [
-    join(skillsDir, 'SKILL.md'),
-    join(skillsDir, 'run_skill.js'),
-    join(skillsDir, 'orchestration', 'multi-agent', 'SKILL.md'),
-    join(skillsDir, 'tools', 'gen-docs', 'SKILL.md'),
-    join(skillsDir, 'tools', 'gen-docs', 'scripts', 'doc_generator.js'),
-    join(skillsDir, 'tools', 'verify-change', 'SKILL.md'),
-    join(skillsDir, 'tools', 'verify-change', 'scripts', 'change_analyzer.js'),
-    join(skillsDir, 'tools', 'verify-module', 'SKILL.md'),
-    join(skillsDir, 'tools', 'verify-module', 'scripts', 'module_scanner.js'),
-    join(skillsDir, 'tools', 'verify-quality', 'SKILL.md'),
-    join(skillsDir, 'tools', 'verify-quality', 'scripts', 'quality_checker.js'),
-    join(skillsDir, 'tools', 'verify-security', 'SKILL.md'),
-    join(skillsDir, 'tools', 'verify-security', 'scripts', 'security_scanner.js'),
-  ]
+  const { skillAssets } = getManagedPostflightPaths(codexHome)
   const missingSkillFiles: string[] = []
-  for (const file of requiredSkillFiles) {
+  for (const file of skillAssets) {
     if (!(await fs.pathExists(file))) {
       missingSkillFiles.push(file.replace(`${codexHome}/`, ''))
     }
@@ -99,7 +67,7 @@ export async function doctor(): Promise<void> {
     detail: missingSkillFiles.length > 0 ? `缺失: ${missingSkillFiles.join(', ')}` : undefined,
   })
 
-  // 4. Check role prompts
+  // 3. Check role prompts
   const rolesDir = join(codexHome, '.cxg', 'roles', 'codex')
   const roleNames = ['analyzer', 'architect', 'reviewer']
   const missingRoles: string[] = []
@@ -114,7 +82,7 @@ export async function doctor(): Promise<void> {
     detail: missingRoles.length > 0 ? `缺失: ${missingRoles.join(', ')}` : undefined,
   })
 
-  // 5. Check built-in agent templates
+  // 4. Check built-in agent templates
   const agentsDir = join(codexHome, '.cxg', 'agents', 'codex')
   const missingAgents: string[] = []
   for (const agent of AGENT_TEMPLATES) {
@@ -128,7 +96,7 @@ export async function doctor(): Promise<void> {
     detail: missingAgents.length > 0 ? `缺失: ${missingAgents.join(', ')}` : undefined,
   })
 
-  // 6. Check binary
+  // 5. Check binary
   const wrapperName = isWindows() ? 'codeagent-wrapper.exe' : 'codeagent-wrapper'
   const wrapperPath = join(codexHome, 'bin', wrapperName)
   const binExists = await fs.pathExists(wrapperPath)
@@ -153,7 +121,7 @@ export async function doctor(): Promise<void> {
     detail: binExists ? details : '未安装',
   })
 
-  // 7. Check MCP config
+  // 6. Check MCP config
   if (config?.mcp?.provider && config.mcp.provider !== 'skip') {
     const codexConfig = join(codexHome, 'config.toml')
     const codexConfigExists = await fs.pathExists(codexConfig)
