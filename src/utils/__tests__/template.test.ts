@@ -257,7 +257,7 @@ describe('replaceHomePathsInTemplate', () => {
 })
 
 describe('runtime helper artifacts', () => {
-  it('does not write cxg prompt helpers into ~/.codex/prompts', () => {
+  it('writes grok helper references under the installed cxg skills tree, not ~/.codex/prompts', () => {
     const configMcpSource = readFileSync(
       join(import.meta.dirname, '..', '..', 'commands', 'config-mcp.ts'),
       'utf-8',
@@ -266,5 +266,7 @@ describe('runtime helper artifacts', () => {
     expect(configMcpSource.includes('cxg-grok-search.md')).toBe(false)
     expect(configMcpSource.includes("join(homedir(), '.codex', 'prompts')")).toBe(false)
     expect(configMcpSource.includes('~/.codex/prompts/cxg-grok-search.md')).toBe(false)
+    expect(configMcpSource.includes("join(homedir(), '.codex', 'skills', 'cxg', 'references')")).toBe(true)
+    expect(configMcpSource.includes('grok-search-reference.md')).toBe(true)
   })
 })
