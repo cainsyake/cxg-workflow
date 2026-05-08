@@ -48,7 +48,7 @@ function pad(s: string, w: number): string {
 export async function showMainMenu(): Promise<void> {
   while (true) {
     const config = await readCxgConfig()
-    const cmdCount = config?.commands?.installed?.length || 0
+    const cmdCount = config?.skills.installed.length || 0
     const mcpProvider = config?.mcp?.provider || '—'
     const liteMode = config?.runtime?.lite_mode ?? true
 
@@ -194,10 +194,10 @@ async function toggleLiteMode(config: CxgConfig | null): Promise<void> {
     mcpProvider: provider,
     liteMode: next,
   })
-  nextConfig.commands.installed = result.installedSkills.length > 0
+  nextConfig.skills.installed = result.installedSkills.length > 0
     ? result.installedSkills
         .filter(skillId => skillId.startsWith('cxg-'))
-    : (config.commands?.installed || [])
+    : config.skills.installed
 
   await writeCxgConfig(nextConfig)
 

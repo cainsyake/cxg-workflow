@@ -155,7 +155,7 @@ async function performAtomicUpdate(
           version: installResult.binVersion,
         },
       })
-      nextConfig.commands.installed = [...ALL_COMMANDS]
+      nextConfig.skills.installed = [...ALL_COMMANDS]
       await writeCxgConfig(nextConfig)
     }
 

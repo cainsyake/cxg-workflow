@@ -1,6 +1,25 @@
 export type SupportedLang = 'zh-CN' | 'en'
 export type McpProvider = 'skip' | 'ace-tool' | 'contextweaver'
 
+export interface CxgPaths {
+  skills: string
+  roles: string
+  agents: string
+  wrapper: string
+}
+
+export interface LegacyCxgPaths extends CxgPaths {
+  prompts?: string
+}
+
+export interface CxgSkillsConfig {
+  installed: string[]
+}
+
+export interface LegacyCxgCommandsConfig {
+  installed?: string[]
+}
+
 export interface CxgConfig {
   general: {
     version: string
@@ -10,16 +29,8 @@ export interface CxgConfig {
     backend: 'codex'
     lite_mode: boolean
   }
-  paths: {
-    prompts: string
-    skills: string
-    roles: string
-    agents: string
-    wrapper: string
-  }
-  commands: {
-    installed: string[]
-  }
+  paths: CxgPaths
+  skills: CxgSkillsConfig
   binary?: {
     source?: string
     checksum_status?: 'verified' | 'missing' | 'failed' | 'skipped'
@@ -29,6 +40,12 @@ export interface CxgConfig {
   mcp?: {
     provider: McpProvider
   }
+}
+
+export interface RawCxgConfig extends Omit<CxgConfig, 'paths' | 'skills'> {
+  paths: LegacyCxgPaths
+  skills?: CxgSkillsConfig
+  commands?: LegacyCxgCommandsConfig
 }
 
 export interface InstallResult {

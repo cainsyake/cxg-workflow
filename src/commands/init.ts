@@ -84,7 +84,7 @@ export async function init(options: InitOptions = {}): Promise<void> {
         version: result.binVersion,
       },
     })
-    config.commands.installed = installedCommands
+    config.skills.installed = installedCommands
     await writeCxgConfig(config)
     console.log('    ✓ ~/.codex/.cxg/config.toml')
   }
