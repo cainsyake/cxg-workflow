@@ -36,11 +36,43 @@ function collectMarkdownFiles(dir: string): string[] {
 
 const PACKAGE_ROOT = findPackageRoot()
 const PACKAGE_JSON_PATH = join(PACKAGE_ROOT, 'package.json')
+const README_EN_PATH = join(PACKAGE_ROOT, 'README.md')
+const README_ZH_PATH = join(PACKAGE_ROOT, 'README.zh-CN.md')
 const PROMPTS_DIR = join(PACKAGE_ROOT, 'templates', 'prompts')
 const SKILLS_DIR = join(PACKAGE_ROOT, 'templates', 'skills')
 const ROLES_DIR = join(PACKAGE_ROOT, 'templates', 'roles', 'codex')
 const AGENTS_DIR = join(PACKAGE_ROOT, 'templates', 'commands', 'agents')
 const PACKAGE_JSON = JSON.parse(readFileSync(PACKAGE_JSON_PATH, 'utf-8')) as { files?: string[] }
+const README_PATHS = [README_EN_PATH, README_ZH_PATH]
+const SKILLS_NATIVE_COMMANDS = [
+  'cxg-workflow',
+  'cxg-plan',
+  'cxg-execute',
+  'cxg-feat',
+  'cxg-analyze',
+  'cxg-debug',
+  'cxg-optimize',
+  'cxg-test',
+  'cxg-review',
+  'cxg-enhance',
+  'cxg-commit',
+  'cxg-init',
+]
+const TARGET_ROLE_FILES = [
+  'analyzer.md',
+  'analyzer-frontend.md',
+  'architect.md',
+  'architect-frontend.md',
+  'debugger.md',
+  'debugger-frontend.md',
+  'frontend.md',
+  'optimizer.md',
+  'optimizer-frontend.md',
+  'reviewer.md',
+  'reviewer-frontend.md',
+  'tester.md',
+  'tester-frontend.md',
+]
 const REQUIRED_SKILL_FILES = [
   join(SKILLS_DIR, 'SKILL.md'),
   join(SKILLS_DIR, 'run_skill.js'),
@@ -253,6 +285,51 @@ describe('template file completeness', () => {
 
     for (const commandId of ALL_COMMANDS) {
       expect(skillAssets).toContain(join(codexHome, 'skills', 'cxg', commandId, 'SKILL.md'))
+    }
+  })
+
+  it('both READMEs use skills-native $cxg-* examples instead of slash commands', () => {
+    for (const readmePath of README_PATHS) {
+      const content = readFileSync(readmePath, 'utf-8')
+
+      expect(
+        SKILLS_NATIVE_COMMANDS.some(commandId => content.includes(`$${commandId}`)),
+        `${readmePath.replace(`${PACKAGE_ROOT}/`, '')} should include at least one $cxg-* example`,
+      ).toBe(true)
+
+      for (const commandId of SKILLS_NATIVE_COMMANDS) {
+        expect(
+          content.includes(`/${commandId}`),
+          `${readmePath.replace(`${PACKAGE_ROOT}/`, '')} should not advertise /${commandId} examples`,
+        ).toBe(false)
+      }
+    }
+  })
+
+  it('both READMEs stop describing ~/.codex/prompts/ as the runtime entrypoint', () => {
+    for (const readmePath of README_PATHS) {
+      const content = readFileSync(readmePath, 'utf-8')
+
+      expect(
+        content.includes('~/.codex/prompts/'),
+        `${readmePath.replace(`${PACKAGE_ROOT}/`, '')} should not describe ~/.codex/prompts/ as the runtime entrypoint`,
+      ).toBe(false)
+    }
+  })
+
+  it('listed role docs no longer use prompt-era For headers', () => {
+    for (const roleFile of TARGET_ROLE_FILES) {
+      const rolePath = join(ROLES_DIR, roleFile)
+      const content = readFileSync(rolePath, 'utf-8')
+
+      expect(
+        content.includes('> For: /prompts:cxg-'),
+        `${roleFile} should not use prompt-era For headers`,
+      ).toBe(false)
+      expect(
+        content.includes('For: $cxg-'),
+        `${roleFile} should describe $cxg-* skill entrypoints in the For header`,
+      ).toBe(true)
     }
   })
 })
