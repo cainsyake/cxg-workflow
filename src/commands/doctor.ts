@@ -150,7 +150,7 @@ async function getBinaryStatus(wrapperPath: string): Promise<{
 export async function buildDoctorDiagnostics(deps: DoctorDependencies = {}): Promise<DoctorDiagnostics> {
   const codexHome = deps.codexHome || join(homedir(), '.codex')
   const exists = deps.exists || fs.pathExists
-  const readDir = deps.readDir || (async path => {
+  const readDir = deps.readDir || (async (path) => {
     const entries = await fs.readdir(path, { withFileTypes: true })
     return entries.filter(entry => entry.isDirectory() || entry.isFile()).map(entry => entry.name)
   })

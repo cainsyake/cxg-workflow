@@ -1,6 +1,6 @@
 import { join } from 'pathe'
 import { describe, expect, it } from 'vitest'
-import { ALL_COMMANDS, AGENT_TEMPLATES } from '../../utils/constants'
+import { AGENT_TEMPLATES, ALL_COMMANDS } from '../../utils/constants'
 import { buildDoctorDiagnostics } from '../doctor'
 
 interface MockTree {
@@ -116,10 +116,12 @@ function createMockFs(codexHome: string) {
 }
 
 describe('buildDoctorDiagnostics', () => {
-  it('counts nested skill definitions and fails when a workflow skill file is missing', async () => {
+  it('counts nested skill definitions and reports missing skill assets', async () => {
     const codexHome = '/mock-codex-home'
     const { tree, exists, readDir } = createMockFs(codexHome)
     tree.files.delete(join(codexHome, 'skills', 'cxg', 'cxg-plan', 'SKILL.md'))
+    tree.files.delete(join(codexHome, 'skills', 'cxg', 'orchestration', 'multi-agent', 'SKILL.md'))
+    tree.files.delete(join(codexHome, 'skills', 'cxg', 'tools', 'lib', 'shared.js'))
 
     const diagnostics = await buildDoctorDiagnostics({
       codexHome,
@@ -154,12 +156,16 @@ describe('buildDoctorDiagnostics', () => {
       }),
     })
 
+    const skillsResult = diagnostics.results.find(result => result.label.startsWith('Skills'))
+
     expect(diagnostics.ok).toBe(false)
-    expect(diagnostics.results.find(result => result.label.startsWith('Skills'))).toMatchObject({
+    expect(skillsResult).toMatchObject({
       ok: false,
-      label: `Skills (${ALL_COMMANDS.length + 5} 个定义)`,
+      label: `Skills (${ALL_COMMANDS.length + 4} 个定义)`,
     })
-    expect(diagnostics.results.find(result => result.label.startsWith('Skills'))?.detail).toContain('skills/cxg/cxg-plan/SKILL.md')
+    expect(skillsResult?.detail).toContain('skills/cxg/cxg-plan/SKILL.md')
+    expect(skillsResult?.detail).toContain('skills/cxg/orchestration/multi-agent/SKILL.md')
+    expect(skillsResult?.detail).toContain('skills/cxg/tools/lib/shared.js')
   })
 
   it('reports legacy prompt files as warning-only without failing the doctor run', async () => {

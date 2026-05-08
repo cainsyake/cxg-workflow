@@ -3,6 +3,7 @@ import antfu from '@antfu/eslint-config'
 export default antfu(
   {
     ignores: [
+      'docs/superpowers/plans/**',
       'templates/commands/**',
       'templates/skills/**',
       'dist',
