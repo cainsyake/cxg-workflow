@@ -64,9 +64,28 @@ async function countSkillDefinitions(
       count++
     }
 
-    const entries = await readDir(current)
+    let entries: string[] = []
+    try {
+      entries = await readDir(current)
+    }
+    catch {
+      return
+    }
+
     for (const entry of entries) {
-      await walk(join(current, entry))
+      const next = join(current, entry)
+      if (await exists(next) && await exists(join(next, 'SKILL.md'))) {
+        await walk(next)
+        continue
+      }
+
+      try {
+        await readDir(next)
+        await walk(next)
+      }
+      catch {
+        continue
+      }
     }
   }
 

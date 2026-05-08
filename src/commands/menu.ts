@@ -59,7 +59,7 @@ export async function showMainMenu(): Promise<void> {
 
     // Status line
     const statusParts = [
-      `${cmdCount} commands`,
+      `${cmdCount} skills`,
     ]
     if (mcpProvider && mcpProvider !== '—' && mcpProvider !== 'skip') {
       statusParts.push(ansis.magenta(mcpProvider))
