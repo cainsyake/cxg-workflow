@@ -103,6 +103,7 @@ async function performAtomicUpdate(
   console.log()
   console.log(ansis.yellow.bold('  ⚙ 正在执行原子更新...'))
   console.log(ansis.gray(`    v${fromVersion} -> v${toVersion}`))
+  console.log(ansis.gray('    备份并重装托管 skills / roles / agents / wrapper（保留 legacy prompts 兼容回滚）'))
   console.log()
 
   try {

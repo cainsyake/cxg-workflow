@@ -109,17 +109,17 @@ export async function init(options: InitOptions = {}): Promise<void> {
   }
 
   console.log()
-  console.log('  已安装命令:')
+  console.log('  已安装工作流技能:')
   if (installedCommands.length === 0) {
     console.log('    (无)')
   }
   else {
-    for (const cmd of installedCommands) {
-      console.log(`    /${cmd}`)
+    for (const skillId of installedCommands) {
+      console.log(`    ${skillId}`)
     }
   }
 
   console.log()
-  console.log('  使用方法: 在 Codex CLI 中输入 /<命令名> 调用')
+  console.log('  使用方式: 在 Codex 中调用已安装的 CXG skills，并配合 ~/.codex/.cxg 下的角色、agents 与 wrapper 运行')
   console.log()
 }
