@@ -103,18 +103,14 @@ async function preflightCheck(templateDir: string, skipBinary: boolean): Promise
   return errors
 }
 
-async function postflightCheck(
-  codexHome: string,
-  skipBinary: boolean,
-  result: InstallResult,
-): Promise<string[]> {
-  const errors: string[] = []
+export function getManagedPostflightPaths(codexHome: string): {
+  skillAssets: string[]
+  agentAssets: string[]
+} {
   const skillsDir = join(codexHome, 'skills', 'cxg')
   const agentsDir = join(codexHome, '.cxg', 'agents', 'codex')
-  const missingSkillAssets: string[] = []
-  const missingAgents: string[] = []
 
-  const requiredSkillAssets = [
+  const skillAssets = [
     join(skillsDir, 'SKILL.md'),
     join(skillsDir, 'run_skill.js'),
     join(skillsDir, 'shared', 'workflow-rules.md'),
@@ -131,17 +127,38 @@ async function postflightCheck(
     join(skillsDir, 'tools', 'verify-quality', 'scripts', 'quality_checker.js'),
     join(skillsDir, 'tools', 'verify-security', 'SKILL.md'),
     join(skillsDir, 'tools', 'verify-security', 'scripts', 'security_scanner.js'),
+    ...ALL_COMMANDS.map(cmd => join(skillsDir, cmd, 'SKILL.md')),
   ]
 
-  for (const assetPath of requiredSkillAssets) {
-    if (!(await fs.pathExists(assetPath))) {
-      missingSkillAssets.push(assetPath.replace(`${codexHome}/`, ''))
-    }
+  const agentAssets = AGENT_TEMPLATES.map(agent => join(agentsDir, `${agent}.md`))
+
+  return { skillAssets, agentAssets }
+}
+
+async function removeIfEmpty(dir: string): Promise<void> {
+  if (!(await fs.pathExists(dir))) {
+    return
   }
 
-  for (const cmd of ALL_COMMANDS) {
-    if (!(await fs.pathExists(join(skillsDir, cmd, 'SKILL.md')))) {
-      missingSkillAssets.push(join('skills', 'cxg', cmd, 'SKILL.md'))
+  const entries = await fs.readdir(dir)
+  if (entries.length === 0) {
+    await fs.remove(dir)
+  }
+}
+
+async function postflightCheck(
+  codexHome: string,
+  skipBinary: boolean,
+  result: InstallResult,
+): Promise<string[]> {
+  const errors: string[] = []
+  const { skillAssets, agentAssets } = getManagedPostflightPaths(codexHome)
+  const missingSkillAssets: string[] = []
+  const missingAgents: string[] = []
+
+  for (const assetPath of skillAssets) {
+    if (!(await fs.pathExists(assetPath))) {
+      missingSkillAssets.push(assetPath.replace(`${codexHome}/`, ''))
     }
   }
 
@@ -149,9 +166,9 @@ async function postflightCheck(
     errors.push(`Missing skill assets after install: ${missingSkillAssets.join(', ')}`)
   }
 
-  for (const agent of AGENT_TEMPLATES) {
-    if (!(await fs.pathExists(join(agentsDir, `${agent}.md`)))) {
-      missingAgents.push(agent)
+  for (const assetPath of agentAssets) {
+    if (!(await fs.pathExists(assetPath))) {
+      missingAgents.push(assetPath.replace(`${codexHome}/`, ''))
     }
   }
 
@@ -357,8 +374,10 @@ export async function uninstallCxg(options?: { preserveBinary?: boolean }): Prom
   const codexHome = join(homedir(), '.codex')
   const promptsDir = join(codexHome, 'prompts')
   const skillsDir = join(codexHome, 'skills', 'cxg')
-  const rolesDir = join(codexHome, '.cxg', 'roles')
-  const agentsDir = join(codexHome, '.cxg', 'agents')
+  const rolesRootDir = join(codexHome, '.cxg', 'roles')
+  const rolesDir = join(rolesRootDir, 'codex')
+  const agentsRootDir = join(codexHome, '.cxg', 'agents')
+  const agentsDir = join(agentsRootDir, 'codex')
   const cxgDir = join(codexHome, '.cxg')
   const binDir = join(codexHome, 'bin')
 
@@ -407,32 +426,42 @@ export async function uninstallCxg(options?: { preserveBinary?: boolean }): Prom
     }
   }
 
-  // 3. Remove Roles and .cxg directory
-  if (await fs.pathExists(cxgDir)) {
+  // 3. Remove managed roles and agents subtrees only
+  if (await fs.pathExists(rolesDir)) {
     try {
-      if (await fs.pathExists(rolesDir)) {
-        const files = await fs.readdir(join(rolesDir, 'codex')).catch(() => [])
-        for (const file of files) {
-          if (typeof file === 'string') {
-            result.removedRoles.push(file.replace('.md', ''))
-          }
+      const files = await fs.readdir(rolesDir)
+      for (const file of files) {
+        if (file.endsWith('.md')) {
+          result.removedRoles.push(file.replace('.md', ''))
         }
       }
-      if (await fs.pathExists(agentsDir)) {
-        const files = await fs.readdir(join(agentsDir, 'codex')).catch(() => [])
-        for (const file of files) {
-          if (typeof file === 'string' && file.endsWith('.md')) {
-            result.removedAgents.push(file.replace('.md', ''))
-          }
-        }
-      }
-      await fs.remove(cxgDir)
+      await fs.remove(rolesDir)
+      await removeIfEmpty(rolesRootDir)
     }
     catch (error) {
-      result.errors.push(`Failed to remove .cxg directory: ${error}`)
+      result.errors.push(`Failed to remove roles: ${error}`)
       result.success = false
     }
   }
+
+  if (await fs.pathExists(agentsDir)) {
+    try {
+      const files = await fs.readdir(agentsDir)
+      for (const file of files) {
+        if (file.endsWith('.md')) {
+          result.removedAgents.push(file.replace('.md', ''))
+        }
+      }
+      await fs.remove(agentsDir)
+      await removeIfEmpty(agentsRootDir)
+    }
+    catch (error) {
+      result.errors.push(`Failed to remove agents: ${error}`)
+      result.success = false
+    }
+  }
+
+  await removeIfEmpty(cxgDir)
 
   // 4. Remove codeagent-wrapper binary
   if (!options?.preserveBinary && await fs.pathExists(binDir)) {

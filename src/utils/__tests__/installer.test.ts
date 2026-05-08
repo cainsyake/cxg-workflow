@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { ALL_COMMANDS, WORKFLOW_CONFIGS } from '../constants'
-import { getAllCommandIds, getWorkflowConfigs } from '../installer'
+import { getAllCommandIds, getManagedPostflightPaths, getWorkflowConfigs } from '../installer'
 import { injectTemplateVariables } from '../template'
 
 // Helper: find package root
@@ -207,11 +207,32 @@ describe('template file completeness', () => {
   })
 
   it('installer completeness remains anchored on skills assets instead of prompt artifacts', () => {
+    expect(existsSync(PROMPTS_DIR), 'legacy prompt references should stay in the repo').toBe(true)
     expect(REQUIRED_SKILL_FILES.length).toBeGreaterThan(0)
     expect(REQUIRED_WORKFLOW_SKILL_SECTIONS.length).toBeGreaterThan(0)
     expect(REQUIRED_WORKFLOW_SHARED_REFERENCES.length).toBeGreaterThan(0)
     expect(REQUIRED_AGENT_FILES.length).toBeGreaterThan(0)
-    expect(existsSync(PROMPTS_DIR), 'legacy prompt references should stay in the repo').toBe(true)
+
+    const codexHome = '/mock-codex-home'
+    const { skillAssets, agentAssets } = getManagedPostflightPaths(codexHome)
+
+    expect(skillAssets).toEqual(expect.arrayContaining([
+      join(codexHome, 'skills', 'cxg', 'SKILL.md'),
+      join(codexHome, 'skills', 'cxg', 'run_skill.js'),
+      join(codexHome, 'skills', 'cxg', 'shared', 'workflow-rules.md'),
+      join(codexHome, 'skills', 'cxg', 'orchestration', 'multi-agent', 'SKILL.md'),
+      join(codexHome, 'skills', 'cxg', 'tools', 'verify-security', 'scripts', 'security_scanner.js'),
+    ]))
+    expect(agentAssets).toEqual(expect.arrayContaining([
+      join(codexHome, '.cxg', 'agents', 'codex', 'get-current-datetime.md'),
+      join(codexHome, '.cxg', 'agents', 'codex', 'planner.md'),
+    ]))
+    expect(skillAssets.some(path => path.includes('/prompts/'))).toBe(false)
+    expect(agentAssets.some(path => path.includes('/prompts/'))).toBe(false)
+
+    for (const commandId of ALL_COMMANDS) {
+      expect(skillAssets).toContain(join(codexHome, 'skills', 'cxg', commandId, 'SKILL.md'))
+    }
   })
 })
 
