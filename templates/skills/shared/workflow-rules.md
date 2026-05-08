@@ -20,7 +20,7 @@ These rules apply to every `$cxg-*` skill unless a skill explicitly narrows the 
 
 ## Scope Boundaries
 
-1. Treat `templates/prompts/` as reference material when a skill needs historical context.
+1. Treat any legacy prompt templates or repository-only scaffolding as optional reference material when a skill needs historical context.
 2. Limit direct edits to the files required by the active task.
 3. If the workspace contains concurrent edits, adapt to them instead of overwriting them.
 4. Escalate only when a decision has meaningful product, architecture, or workflow impact.

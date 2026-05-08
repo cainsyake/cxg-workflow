@@ -63,6 +63,17 @@ const REQUIRED_AGENT_FILES = [
   join(AGENTS_DIR, 'planner.md'),
   join(AGENTS_DIR, 'ui-ux-designer.md'),
 ]
+const REQUIRED_WORKFLOW_SKILL_SECTIONS = [
+  '## Purpose',
+  '## Expected Input',
+  '## Workflow',
+  '## Deliverable',
+]
+const REQUIRED_WORKFLOW_SHARED_REFERENCES = [
+  '../shared/workflow-rules.md',
+  '../shared/interaction-checkpoints.md',
+  '../shared/output-contracts.md',
+]
 
 // ─────────────────────────────────────────────────────────────
 // A. Command registry consistency
@@ -156,6 +167,27 @@ describe('template file completeness', () => {
       skillDefinitionFiles.length,
       'expected workflow skill entrypoints plus nested supporting skills in templates/skills/',
     ).toBeGreaterThanOrEqual(ALL_COMMANDS.length + 6)
+  })
+
+  it('workflow skill entrypoints include the shared content contract', () => {
+    for (const commandId of ALL_COMMANDS) {
+      const skillEntryPath = join(SKILLS_DIR, commandId, 'SKILL.md')
+      const content = readFileSync(skillEntryPath, 'utf-8')
+
+      for (const section of REQUIRED_WORKFLOW_SKILL_SECTIONS) {
+        expect(
+          content.includes(section),
+          `${commandId} missing required section: ${section}`,
+        ).toBe(true)
+      }
+
+      for (const sharedReference of REQUIRED_WORKFLOW_SHARED_REFERENCES) {
+        expect(
+          content.includes(sharedReference),
+          `${commandId} missing shared guidance reference: ${sharedReference}`,
+        ).toBe(true)
+      }
+    }
   })
 
   it('agent templates exist', () => {

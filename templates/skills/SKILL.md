@@ -34,7 +34,7 @@ skills/
 │   └── lib/
 ├── orchestration/         # Coordination helpers
 │   └── multi-agent/
-├── run_skill.js           # Unified skill runner
+├── run_skill.js           # Helper runner for tool-like workflows under tools/
 └── SKILL.md               # This file
 ```
 
@@ -99,11 +99,13 @@ Refactoring:    refactor -> verify-change -> verify-quality -> verify-security
 
 ### Running Skills
 
+The top-level `$cxg-*` entrypoints are invoked as skills in the host environment. `run_skill.js` is only the helper runner for tool-oriented workflows such as `verify-security`, `verify-quality`, `verify-change`, `verify-module`, and `gen-docs`.
+
 ```bash
-# Unified runner
+# Tool workflow runner
 node ~/.codex/skills/cxg/run_skill.js <skill-name> [args...]
 
-# Examples
+# Examples for tools/ skills
 node ~/.codex/skills/cxg/run_skill.js verify-security ./src
 node ~/.codex/skills/cxg/run_skill.js verify-quality ./src -v
 node ~/.codex/skills/cxg/run_skill.js verify-change --mode staged
