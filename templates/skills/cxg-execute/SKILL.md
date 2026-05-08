@@ -1,6 +1,6 @@
 ---
 name: cxg-execute
-description: Execute an approved plan, apply the required code or content changes, and verify the result.
+description: 执行已批准的计划，完成所需代码或内容改动，并在结束前完成验证。
 license: MIT
 user-invocable: true
 disable-model-invocation: false
@@ -8,33 +8,33 @@ disable-model-invocation: false
 
 # $cxg-execute
 
-Use this skill when a task already has an agreed direction and needs focused implementation.
+当用户已经明确任务方向，只需要聚焦落地实现时，使用此技能。
 
-## Purpose
+## 用途
 
-- Turn an approved plan or explicit task into working repository changes.
-- Keep edits scoped, reviewable, and verified before completion is reported.
+- 把已批准的计划或明确任务落地成可工作的仓库改动。
+- 让修改保持范围清晰、便于审阅，并在宣布完成前完成验证。
 
-## Expected Input
+## 预期输入
 
-- A plan file path, approved checklist, or direct implementation request.
-- Optional guardrails such as files to avoid, tests to run, or commit expectations.
+- 计划文件路径、已批准的检查清单，或直接的实现请求。
+- 可选护栏，例如不要触碰的文件、必须运行的测试，或提交要求。
 
-## Shared Guidance
+## 共享指引
 
-- Workflow rules: `../shared/workflow-rules.md`
-- Interaction checkpoints: `../shared/interaction-checkpoints.md`
-- Output contracts: `../shared/output-contracts.md`
+- 工作流规则：`../shared/workflow-rules.md`
+- 交互检查点：`../shared/interaction-checkpoints.md`
+- 输出约定：`../shared/output-contracts.md`
 
-## Workflow
+## 工作流程
 
-1. Reconfirm the execution scope and identify the proof of completion.
-2. Inspect the current implementation and write or update tests when behavior changes.
-3. Apply the smallest complete set of edits needed to satisfy the request.
-4. Run the targeted verification commands and fix failures before moving on.
-5. Summarize what changed, what was verified, and any follow-up the user should know about.
+1. 重新确认执行范围，并明确完成证明应该是什么。
+2. 检查当前实现，并在行为发生变化时编写或更新测试。
+3. 只做满足请求所需的最小完整修改集合。
+4. 运行定向验证命令，并在继续前修复失败项。
+5. 总结改动内容、验证结果以及用户需要知道的后续事项。
 
-## Deliverable
+## 交付结果
 
-- The implemented changes.
-- Verification results tied to the executed plan or task request.
+- 已实现的改动。
+- 与计划或任务请求对应的验证结果。

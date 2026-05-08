@@ -1,33 +1,33 @@
-# Interaction Checkpoints
+# 交互检查点
 
-Use these checkpoints to keep `$cxg-*` skill runs collaborative and predictable.
+使用这些检查点，让 `$cxg-*` 技能在协作中保持可预期、可跟进。
 
-## Before Work Starts
+## 开始工作前
 
-1. Confirm the requested outcome in one or two sentences.
-2. Name the first concrete action you will take.
-3. Call out any assumption you are making because the request did not specify it.
+1. 用一到两句话确认请求目标。
+2. 说明你马上要执行的第一个具体动作。
+3. 指出任何因为请求未明确而不得不采用的假设。
 
-## During Investigation
+## 调研过程中
 
-1. Share what context you are gathering and why it matters.
-2. Surface blockers early, especially missing files, failing tests, or conflicting edits.
-3. When a task has multiple phases, tell the user which phase you are in.
+1. 说明你正在收集什么上下文，以及它为什么重要。
+2. 尽早暴露阻塞，尤其是缺文件、测试失败或冲突改动。
+3. 如果任务分多个阶段，告诉用户当前处于哪个阶段。
 
-## Before Editing
+## 编辑文件前
 
-1. Explain what files you are about to create or modify.
-2. State whether the edit is additive, structural, or behavioral.
-3. If a change could affect existing workflows, mention the expected impact.
+1. 说明即将创建或修改哪些文件。
+2. 明确这是增量修改、结构调整还是行为变更。
+3. 如果改动可能影响现有工作流，要提前说出预期影响。
 
-## Before Claiming Completion
+## 宣布完成前
 
-1. Run the verification command that matches the task.
-2. Read the full result and capture any failures or warnings.
-3. Report what passed, what was not checked, and any residual risk.
+1. 运行与任务匹配的验证命令。
+2. 阅读完整结果，并记录任何失败或警告。
+3. 说明哪些已通过、哪些没有检查，以及残余风险是什么。
 
-## When Escalation Is Needed
+## 需要升级沟通时
 
-1. Pause before irreversible actions or non-obvious tradeoffs.
-2. Present concise options with a recommendation.
-3. Wait for user confirmation when the choice changes scope, behavior, or history.
+1. 在不可逆操作或非显而易见的权衡前先暂停。
+2. 用简洁选项呈现路径，并给出推荐方案。
+3. 如果选择会改变范围、行为或历史，等待用户确认后再继续。

@@ -1,6 +1,6 @@
 ---
 name: cxg-plan
-description: Create an implementation-ready plan for a repository task without modifying product code.
+description: 在不修改产品代码的前提下，为仓库任务生成可执行的实施计划。
 license: MIT
 user-invocable: true
 disable-model-invocation: false
@@ -8,33 +8,33 @@ disable-model-invocation: false
 
 # $cxg-plan
 
-Use this skill when the user wants a concrete execution plan before code changes begin.
+当用户希望在开始改代码前先拿到一份可执行计划时，使用此技能。
 
-## Purpose
+## 用途
 
-- Translate a request into an implementation plan with clear scope and validation steps.
-- Keep the session read-only except for plan artifacts the user explicitly requests.
+- 将需求翻译为有明确范围和验证步骤的实施计划。
+- 在规划阶段保持只读，除非用户明确要求产出计划文件或其他计划资产。
 
-## Expected Input
+## 预期输入
 
-- A task description, feature request, migration step, or plan file update request.
-- Optional constraints such as target files, sequencing, ownership boundaries, or testing expectations.
+- 任务描述、功能请求、迁移步骤，或已有计划文件的更新请求。
+- 可选约束，例如目标文件、执行顺序、责任边界或测试要求。
 
-## Shared Guidance
+## 共享指引
 
-- Workflow rules: `../shared/workflow-rules.md`
-- Interaction checkpoints: `../shared/interaction-checkpoints.md`
-- Output contracts: `../shared/output-contracts.md`
+- 工作流规则：`../shared/workflow-rules.md`
+- 交互检查点：`../shared/interaction-checkpoints.md`
+- 输出约定：`../shared/output-contracts.md`
 
-## Workflow
+## 工作流程
 
-1. Confirm the goal, non-goals, and any missing constraints.
-2. Inspect the relevant files, tests, and repository conventions.
-3. Break the work into ordered steps with touched files and verification commands.
-4. Call out dependencies, risky decisions, and any prerequisite user approvals.
-5. Keep the plan implementation-ready and avoid modifying product code while planning.
+1. 确认目标、非目标以及仍缺失的约束。
+2. 检查相关文件、测试和仓库约定。
+3. 将工作拆解为有顺序的步骤，并写明涉及文件和验证命令。
+4. 标注依赖关系、风险决策和任何需要用户批准的前置事项。
+5. 保持计划可直接执行，避免在规划阶段修改产品代码。
 
-## Deliverable
+## 交付结果
 
-- A sequenced plan with file targets, tests, and acceptance checks.
-- A short risk register or list of open questions if anything blocks execution.
+- 一份包含目标文件、测试与验收检查点的顺序化计划。
+- 如果存在阻塞，附上简短的风险清单或待确认问题。

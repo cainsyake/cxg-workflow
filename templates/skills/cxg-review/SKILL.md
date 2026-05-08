@@ -1,6 +1,6 @@
 ---
 name: cxg-review
-description: Review changes for correctness, regressions, risk, and missing validation with findings-first output.
+description: 以 findings-first 方式审查改动的正确性、回归风险、缺失验证与整体风险。
 license: MIT
 user-invocable: true
 disable-model-invocation: false
@@ -8,33 +8,33 @@ disable-model-invocation: false
 
 # $cxg-review
 
-Use this skill when the user wants a code review or a quality gate on a set of changes.
+当用户需要代码审查，或希望对一组改动做质量把关时，使用此技能。
 
-## Purpose
+## 用途
 
-- Evaluate change risk before merge or release.
-- Prioritize concrete findings over general commentary.
+- 在合并或发布前评估改动风险。
+- 把具体问题放在泛泛评论之前。
 
-## Expected Input
+## 预期输入
 
-- A diff, branch, file path, or request to review current workspace changes.
-- Optional focus areas such as security, performance, testing, or API behavior.
+- 一个 diff、分支、文件路径，或“审查当前工作区改动”的请求。
+- 可选聚焦方向，例如安全、性能、测试或 API 行为。
 
-## Shared Guidance
+## 共享指引
 
-- Workflow rules: `../shared/workflow-rules.md`
-- Interaction checkpoints: `../shared/interaction-checkpoints.md`
-- Output contracts: `../shared/output-contracts.md`
+- 工作流规则：`../shared/workflow-rules.md`
+- 交互检查点：`../shared/interaction-checkpoints.md`
+- 输出约定：`../shared/output-contracts.md`
 
-## Workflow
+## 工作流程
 
-1. Identify the review scope and gather the relevant diff and context.
-2. Inspect for functional bugs, regressions, risky assumptions, and missing tests first.
-3. Order findings by severity and include file references.
-4. State clearly when no findings are present, along with residual risk or coverage gaps.
-5. Keep summaries brief and secondary to the findings.
+1. 确定评审范围，并收集相关 diff 与上下文。
+2. 优先检查功能缺陷、行为回归、危险假设和缺失测试。
+3. 按严重程度排序 findings，并附上文件引用。
+4. 如果没有发现问题，也要明确说明，并补充残余风险或覆盖缺口。
+5. 让总结保持简洁，并始终从属于 findings。
 
-## Deliverable
+## 交付结果
 
-- Findings-first review output with severity ordering.
-- Open questions, assumptions, and concise overall assessment.
+- 按严重级别排序的 findings-first 评审结果。
+- 待确认问题、前提假设和简短的总体评估。

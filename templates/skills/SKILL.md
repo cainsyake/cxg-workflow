@@ -1,105 +1,105 @@
 ---
 name: cxg-skills
-description: CXG Skills - workflow entrypoints, shared guidance, quality gates, and orchestration assets. Auto-installed by CXG workflow system.
+description: CXG 技能资产总览，包含工作流入口、共享指引、质量关卡与编排辅助能力。
 license: MIT
 user-invocable: false
 disable-model-invocation: false
 ---
 
-# CXG Skills
+# CXG 技能总览
 
-## Directory Structure
+## 目录结构
 
-```
+```text
 skills/
-├── cxg-workflow/          # End-to-end workflow entrypoint
-├── cxg-plan/              # Planning entrypoint
-├── cxg-execute/           # Execution entrypoint
-├── cxg-feat/              # Feature delivery entrypoint
-├── cxg-analyze/           # Read-only analysis entrypoint
-├── cxg-debug/             # Debugging entrypoint
-├── cxg-optimize/          # Optimization entrypoint
-├── cxg-test/              # Testing entrypoint
-├── cxg-review/            # Review entrypoint
-├── cxg-enhance/           # Task-brief enhancement entrypoint
-├── cxg-commit/            # Commit preparation entrypoint
-├── cxg-init/              # Context bootstrap entrypoint
-├── shared/                # Reusable workflow rules and output contracts
-├── tools/                 # Quality gates and generators
+├── cxg-workflow/          # 端到端工作流入口
+├── cxg-plan/              # 规划入口
+├── cxg-execute/           # 执行入口
+├── cxg-feat/              # 功能交付入口
+├── cxg-analyze/           # 只读分析入口
+├── cxg-debug/             # 调试修复入口
+├── cxg-optimize/          # 优化入口
+├── cxg-test/              # 测试入口
+├── cxg-review/            # 评审入口
+├── cxg-enhance/           # 需求增强入口
+├── cxg-commit/            # 提交准备入口
+├── cxg-init/              # 上下文初始化入口
+├── shared/                # 复用的规则、检查点与输出约定
+├── tools/                 # 质量关卡与生成器
 │   ├── verify-security/
 │   ├── verify-quality/
 │   ├── verify-change/
 │   ├── verify-module/
 │   ├── gen-docs/
 │   └── lib/
-├── orchestration/         # Coordination helpers
+├── orchestration/         # 协同编排辅助能力
 │   └── multi-agent/
-├── run_skill.js           # Helper runner for tool-like workflows under tools/
-└── SKILL.md               # This file
+├── run_skill.js           # 面向工具型工作流的辅助 runner
+└── SKILL.md               # 本文件
 ```
 
-## Quick Navigation
+## 快速导航
 
-| Category | Description | Entry |
-|----------|-------------|-------|
-| **Workflow Entry Points** | User-invocable `$cxg-*` skills for planning, execution, analysis, and delivery | [Workflow Skills](#workflow-skills) |
-| **Shared Guidance** | Reusable workflow rules, checkpoints, and output contracts | [Shared Guidance](#shared-guidance) |
-| **Quality Gates** | Module completeness, security, quality, and change validation | [Quality Gates](#quality-gates) |
-| **Orchestration** | Multi-agent coordination and task decomposition support | [Multi-Agent](#multi-agent-orchestration) |
+| 分类 | 说明 | 入口 |
+|------|------|------|
+| **工作流入口** | 用户直接调用的 `$cxg-*` 技能，覆盖规划、执行、分析与交付 | [工作流技能](#工作流技能) |
+| **共享指引** | 复用的工作流规则、交互检查点与输出约定 | [共享指引](#共享指引) |
+| **质量关卡** | 模块完整性、安全、质量与变更验证 | [质量关卡](#质量关卡) |
+| **多智能体编排** | 多智能体协作与任务拆分辅助能力 | [多智能体编排](#多智能体编排) |
 
 ---
 
-## Workflow Skills
+## 工作流技能
 
-These are the user-facing skill entrypoints. Refer to them as `$cxg-*` skills, not prompt commands.
+这些是面向用户的技能入口。描述时统一称它们为 `$cxg-*` 技能，而不是 prompt 命令。
 
-| Skill | Primary Use |
-|-------|-------------|
-| `$cxg-workflow` | Run a task through research, planning, execution, optimization, and review |
-| `$cxg-plan` | Produce an implementation plan without modifying product code |
-| `$cxg-execute` | Execute an approved plan and verify the result |
-| `$cxg-feat` | Deliver a new feature from shaping through validation |
-| `$cxg-analyze` | Investigate how the codebase works without making changes |
-| `$cxg-debug` | Diagnose and fix a defect with regression proof |
-| `$cxg-optimize` | Improve performance or efficiency with measurable validation |
-| `$cxg-test` | Add or strengthen test coverage |
-| `$cxg-review` | Review changes for correctness, regressions, and risk |
-| `$cxg-enhance` | Rewrite a rough request into a structured task brief |
-| `$cxg-commit` | Prepare or perform a focused Conventional Commit |
-| `$cxg-init` | Initialize or refresh agent-facing repository guidance |
+| 技能 | 主要用途 |
+|------|----------|
+| `$cxg-workflow` | 将任务贯穿研究、规划、执行、优化与评审 |
+| `$cxg-plan` | 在不修改产品代码的前提下生成实施计划 |
+| `$cxg-execute` | 执行已批准的计划并验证结果 |
+| `$cxg-feat` | 从需求整理一路交付新功能 |
+| `$cxg-analyze` | 只分析代码库，不直接修改 |
+| `$cxg-debug` | 诊断并修复缺陷，同时补上回归证明 |
+| `$cxg-optimize` | 用可度量的方式提升性能或效率 |
+| `$cxg-test` | 补充或强化测试覆盖 |
+| `$cxg-review` | 审查改动的正确性、风险与回归问题 |
+| `$cxg-enhance` | 将粗糙需求改写成结构化任务简报 |
+| `$cxg-commit` | 准备或执行聚焦的 Conventional Commit |
+| `$cxg-init` | 初始化或刷新面向 agent 的仓库指导文档 |
 
-## Shared Guidance
+## 共享指引
 
-Shared markdown assets keep the workflow entrypoints consistent:
+共享 markdown 资产用于让所有入口技能保持一致：
 
-- `shared/workflow-rules.md` defines execution discipline, scope control, and decision rules.
-- `shared/interaction-checkpoints.md` defines progress updates, escalation points, and verification checkpoints.
-- `shared/output-contracts.md` defines the expected shape and quality bar of skill outputs.
+- `shared/workflow-rules.md` 定义执行纪律、范围控制和决策规则。
+- `shared/interaction-checkpoints.md` 定义进度更新、升级沟通时机和验证检查点。
+- `shared/output-contracts.md` 定义技能输出的结构和质量门槛。
 
-## Quality Gates
+## 质量关卡
 
-**Mandatory quality checkpoints to ensure deliverable standards.**
+**这些技能用于保证交付物达到既定质量标准。**
 
-| Skill | Trigger | Description |
-|-------|---------|-------------|
-| `verify-module` | New module completed | Module structure and documentation completeness |
-| `verify-security` | New module, security changes, refactoring | Security vulnerability scanning |
-| `verify-change` | Design-level changes, refactoring | Change analysis and documentation sync |
-| `verify-quality` | Complex modules, refactoring | Code quality metrics checking |
-| `gen-docs` | New module created | README.md and DESIGN.md skeleton generator |
+| 技能 | 触发时机 | 说明 |
+|------|----------|------|
+| `verify-module` | 新模块完成后 | 检查模块结构与文档完整性 |
+| `verify-security` | 新模块、安全改动、重构 | 扫描安全漏洞与高风险模式 |
+| `verify-change` | 设计级变更、重构 | 分析变更影响并检查文档同步 |
+| `verify-quality` | 复杂模块、重构 | 检查代码质量指标 |
+| `gen-docs` | 新模块创建后 | 生成 README.md 与 DESIGN.md 骨架 |
 
-### Auto-trigger Rules
+### 自动触发规则
 
+```text
+新模块：     gen-docs -> 实施 -> verify-module -> verify-security
+代码变更：   实施 -> verify-change -> verify-quality
+安全任务：   执行 -> verify-security
+重构任务：   重构 -> verify-change -> verify-quality -> verify-security
 ```
-New module:     gen-docs -> implementation -> verify-module -> verify-security
-Code changes:   implementation -> verify-change -> verify-quality
-Security tasks: execution -> verify-security
-Refactoring:    refactor -> verify-change -> verify-quality -> verify-security
-```
 
-### Running Skills
+### 工具型技能运行方式
 
-The top-level `$cxg-*` entrypoints are invoked as skills in the host environment. `run_skill.js` is only the helper runner for tool-oriented workflows such as `verify-security`, `verify-quality`, `verify-change`, `verify-module`, and `gen-docs`.
+顶层 `$cxg-*` 入口以宿主环境中的技能形式调用。`run_skill.js` 只服务于 `verify-security`、`verify-quality`、`verify-change`、`verify-module`、`gen-docs` 这类工具型工作流。
 
 ```bash
 # Tool workflow runner
@@ -115,22 +115,21 @@ node ~/.codex/skills/cxg/run_skill.js gen-docs ./new-module --force
 
 ---
 
-## Multi-Agent Orchestration
+## 多智能体编排
 
-| Skill | Trigger | Description |
-|-------|---------|-------------|
-| `multi-agent` | TeamCreate, parallel tasks, multi-agent | Ant colony-inspired multi-agent coordination |
+| 技能 | 触发时机 | 说明 |
+|------|----------|------|
+| `multi-agent` | TeamCreate、并行任务、多智能体协作 | 基于蚁群思路的多智能体协同能力 |
 
-Provides:
-- Agent role system (Lead/Scout/Worker/Soldier/Drone)
-- Pheromone-based indirect communication
-- File ownership locking & conflict avoidance
-- Adaptive concurrency control
-- TeamCreate vs single-agent decision tree
+提供能力：
 
----
+- 角色体系（Lead / Scout / Worker / Soldier / Drone）
+- 信息素式间接通信
+- 文件所有权锁与冲突规避
+- 自适应并发控制
+- TeamCreate 与单智能体模式的决策树
 
-## Installed by CXG
+## 由 CXG 自动安装
 
-These skills are automatically installed during `npx cxg-workflow init`.
-To update: run `npx cxg-workflow update` or `npx cxg-workflow init --force`.
+这些技能会在 `npx cxg-workflow init` 时自动安装。
+更新时可运行：`npx cxg-workflow update` 或 `npx cxg-workflow init --force`。

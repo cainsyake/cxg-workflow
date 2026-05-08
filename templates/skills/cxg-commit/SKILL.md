@@ -1,6 +1,6 @@
 ---
 name: cxg-commit
-description: Prepare a focused Conventional Commit from the current repository changes.
+description: 基于当前仓库改动，准备一条范围清晰的 Conventional Commit 提交。
 license: MIT
 user-invocable: true
 disable-model-invocation: false
@@ -8,33 +8,33 @@ disable-model-invocation: false
 
 # $cxg-commit
 
-Use this skill when the user wants help staging, scoping, and committing the current work.
+当用户需要帮助整理暂存范围、界定提交边界或生成提交信息时，使用此技能。
 
-## Purpose
+## 用途
 
-- Summarize the change set accurately.
-- Produce a Conventional Commit message that matches repository history and scope.
+- 准确概括当前改动集合。
+- 生成与仓库历史和改动范围匹配的 Conventional Commit 信息。
 
-## Expected Input
+## 预期输入
 
-- The current workspace changes, optionally with flags like `--all`, `--amend`, or a desired type/scope.
-- Optional instructions about staging boundaries or hook behavior.
+- 当前工作区改动，可选地附带 --all、--amend 或期望的 type/scope。
+- 可选说明，例如暂存边界、hook 行为或提交策略。
 
-## Shared Guidance
+## 共享指引
 
-- Workflow rules: `../shared/workflow-rules.md`
-- Interaction checkpoints: `../shared/interaction-checkpoints.md`
-- Output contracts: `../shared/output-contracts.md`
+- 工作流规则：`../shared/workflow-rules.md`
+- 交互检查点：`../shared/interaction-checkpoints.md`
+- 输出约定：`../shared/output-contracts.md`
 
-## Workflow
+## 工作流程
 
-1. Inspect git status, staged changes, and unstaged changes.
-2. Decide whether the work is one coherent commit or should be split.
-3. Recommend a Conventional Commit type and scope based on the actual diff.
-4. If the user wants execution, stage only the intended files and create the commit non-interactively.
-5. Report the final commit message and any scope caveats.
+1. 检查 git status、已暂存改动和未暂存改动。
+2. 判断这些工作应当形成一个提交，还是需要拆分成多个提交。
+3. 基于真实 diff 推荐合适的 Conventional Commit type 和 scope。
+4. 如果用户要求直接执行，只暂存目标文件，并用非交互方式创建提交。
+5. 汇报最终提交信息以及任何范围边界上的注意事项。
 
-## Deliverable
+## 交付结果
 
-- A focused Conventional Commit recommendation or an actual commit.
-- Clear note of what was staged, what was excluded, and the resulting SHA when committed.
+- 一条聚焦的 Conventional Commit 建议，或已经实际创建的提交。
+- 清楚说明哪些文件被暂存、哪些被排除，以及提交后的 SHA。

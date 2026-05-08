@@ -1,6 +1,6 @@
 ---
 name: cxg-init
-description: Initialize or refresh repository context artifacts such as AGENTS.md and related guidance docs.
+description: 初始化或刷新仓库上下文资产，例如 AGENTS.md 及相关指导文档。
 license: MIT
 user-invocable: true
 disable-model-invocation: false
@@ -8,33 +8,33 @@ disable-model-invocation: false
 
 # $cxg-init
 
-Use this skill when the user wants project context scaffolding or documentation refreshed for agentic work.
+当用户希望为 agentic 协作补齐项目上下文脚手架，或刷新现有指导文档时，使用此技能。
 
-## Purpose
+## 用途
 
-- Generate or update high-signal repository guidance artifacts.
-- Keep documentation aligned with the current module structure and workflow expectations.
+- 生成或更新高信号的仓库指导资产。
+- 让文档与当前模块结构和工作流预期保持一致。
 
-## Expected Input
+## 预期输入
 
-- A project summary, onboarding goal, or request to refresh `AGENTS.md`-style context.
-- Optional boundaries such as directories to include, ignore, or document more deeply.
+- 项目摘要、上手目标，或刷新 AGENTS.md 风格上下文的请求。
+- 可选边界，例如要包含、忽略，或重点展开的目录。
 
-## Shared Guidance
+## 共享指引
 
-- Workflow rules: `../shared/workflow-rules.md`
-- Interaction checkpoints: `../shared/interaction-checkpoints.md`
-- Output contracts: `../shared/output-contracts.md`
+- 工作流规则：`../shared/workflow-rules.md`
+- 交互检查点：`../shared/interaction-checkpoints.md`
+- 输出约定：`../shared/output-contracts.md`
 
-## Workflow
+## 工作流程
 
-1. Inspect the repository structure, important entrypoints, and existing guidance docs.
-2. Decide which context artifacts should be created or updated.
-3. Draft concise root guidance and more detailed module-level guidance where needed.
-4. Keep edits documentation-only unless the user explicitly asks for code changes too.
-5. Verify the generated files are internally consistent and easy to navigate.
+1. 检查仓库结构、关键入口点和现有指导文档。
+2. 判断应该新建或更新哪些上下文资产。
+3. 先写简洁的根级指导，再按需要补充更细的模块级指导。
+4. 除非用户额外要求代码改动，否则只做文档层面的更新。
+5. 验证生成的文件内部一致、易于导航。
 
-## Deliverable
+## 交付结果
 
-- New or updated repository context documents.
-- A short summary of coverage, skipped areas, and recommended follow-up.
+- 新增或更新后的仓库上下文文档。
+- 对覆盖范围、跳过区域和建议后续动作的简短总结。

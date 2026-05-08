@@ -1,6 +1,6 @@
 ---
 name: cxg-enhance
-description: Refine a rough request into a structured task brief without changing the user's intent.
+description: 在不改变用户意图的前提下，把粗糙请求整理成结构化任务简报。
 license: MIT
 user-invocable: true
 disable-model-invocation: false
@@ -8,33 +8,33 @@ disable-model-invocation: false
 
 # $cxg-enhance
 
-Use this skill when the user's request is underspecified and would benefit from a clearer brief before execution.
+当用户的请求还不够具体，先整理成更清晰的任务简报会更稳妥时，使用此技能。
 
-## Purpose
+## 用途
 
-- Turn ambiguous input into an actionable task description.
-- Preserve the user's goal while making scope, constraints, and acceptance criteria explicit.
+- 将模糊输入整理为可执行任务描述。
+- 在不改变用户目标的前提下，显式写出范围、约束和验收标准。
 
-## Expected Input
+## 预期输入
 
-- A raw request, short idea, or loosely scoped task.
-- Optional context such as target files, technical stack, deadlines, or quality expectations.
+- 原始请求、简短想法，或边界模糊的任务描述。
+- 可选上下文，例如目标文件、技术栈、时间要求或质量预期。
 
-## Shared Guidance
+## 共享指引
 
-- Workflow rules: `../shared/workflow-rules.md`
-- Interaction checkpoints: `../shared/interaction-checkpoints.md`
-- Output contracts: `../shared/output-contracts.md`
+- 工作流规则：`../shared/workflow-rules.md`
+- 交互检查点：`../shared/interaction-checkpoints.md`
+- 输出约定：`../shared/output-contracts.md`
 
-## Workflow
+## 工作流程
 
-1. Extract the intended outcome, constraints, and missing information.
-2. Inspect the repository only as needed to ground the request in real code and conventions.
-3. Rewrite the task in a structured format with goals, boundaries, and validation signals.
-4. Highlight any uncertainty that still needs user confirmation.
-5. Do not implement the work unless the user explicitly changes the task from enhancement to execution.
+1. 提炼目标结果、约束条件和缺失信息。
+2. 仅在必要时检查仓库，以便让任务描述贴近真实代码与约定。
+3. 以结构化格式重写任务，写清目标、边界和验证信号。
+4. 标出仍需要用户确认的不确定点。
+5. 除非用户明确把任务切换成执行，否则不要直接开始实现。
 
-## Deliverable
+## 交付结果
 
-- An enhanced task brief ready for `$cxg-plan`, `$cxg-execute`, or another `$cxg-*` skill.
-- A short list of any remaining open questions.
+- 一份可直接交给 $cxg-plan、$cxg-execute 或其他 $cxg-* 技能使用的增强任务简报。
+- 一份简短的待确认问题列表。
